@@ -1,5 +1,5 @@
 # EntityFrameworkCore.MySql.SimpleBulks
-A very simple .net core library that can help to sync a large number of records in-memory into the database using the **COPY FROM STDIN** command.
+A very simple .net core library that can help to sync a large number of records in-memory into the database using the **MySqlBulkCopy** class.
  
 ## Overview
 This library provides extension methods so that you can use with your EntityFrameworkCore **DbContext** instance **DbContextExtensions.cs**
