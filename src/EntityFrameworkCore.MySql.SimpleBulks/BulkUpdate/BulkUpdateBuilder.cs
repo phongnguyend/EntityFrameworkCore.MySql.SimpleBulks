@@ -107,6 +107,7 @@ public class BulkUpdateBuilder<T>
 
         var dataTable = data.ToDataTable(propertyNamesIncludeId);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName);
+        sqlCreateTemptable += $"\nCREATE UNIQUE INDEX Idx_Id ON {temptableName} ({string.Join(",", _idColumns.Select(x => $"`{x}`"))});";
 
         var joinCondition = string.Join(" and ", _idColumns.Select(x =>
         {

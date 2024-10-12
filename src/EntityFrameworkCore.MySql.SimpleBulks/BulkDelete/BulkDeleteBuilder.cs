@@ -88,6 +88,7 @@ public class BulkDeleteBuilder<T>
         var temptableName = $"`{Guid.NewGuid()}`";
         var dataTable = data.ToDataTable(_idColumns);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName);
+        sqlCreateTemptable += $"\nCREATE UNIQUE INDEX Idx_Id ON {temptableName} ({string.Join(",", _idColumns.Select(x => $"`{x}`"))});";
 
         var joinCondition = string.Join(" AND ", _idColumns.Select(x =>
         {

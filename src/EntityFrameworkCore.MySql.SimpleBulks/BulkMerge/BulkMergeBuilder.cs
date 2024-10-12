@@ -134,6 +134,7 @@ public class BulkMergeBuilder<T>
 
         var dataTable = data.ToDataTable(propertyNames);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName);
+        sqlCreateTemptable += $"\nCREATE INDEX Idx_Id ON {temptableName} ({string.Join(",", _idColumns.Select(x => $"`{x}`"))});";
 
         var joinCondition = string.Join(" and ", _idColumns.Select(x =>
         {
@@ -201,9 +202,9 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
-            using var updateCommand = _connection.CreateTextCommand(_transaction, sqlInsertStatement, _options);
+            using var insertCommand = _connection.CreateTextCommand(_transaction, sqlInsertStatement, _options);
 
-            result.InsertedRows = updateCommand.ExecuteNonQuery();
+            result.InsertedRows = insertCommand.ExecuteNonQuery();
 
             Log("End inserting.");
         }
