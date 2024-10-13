@@ -23,7 +23,7 @@ public class BulkMergeBenchmarks
     [IterationSetup]
     public void IterationSetup()
     {
-        _context = new TestDbContext($"Server=127.0.0.1;Database=EntityFrameworkCore.MySql.SimpleBulks.Benchmarks.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true");
+        _context = new TestDbContext($"Server=127.0.0.1;Database=SimpleBulks.Benchmarks.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true");
         _context.Database.EnsureCreated();
         _context.Database.SetCommandTimeout(TimeSpan.FromMinutes(2));
 
@@ -42,7 +42,10 @@ public class BulkMergeBenchmarks
             _customers.Add(customer);
         }
 
-        _context.BulkInsert(_customers);
+        _context.BulkInsert(_customers, opt =>
+        {
+            opt.Timeout = 0;
+        });
         _customerIds = _customers.Select(x => x.Id).ToList();
 
         for (int i = RowsCount; i < RowsCount * 2; i++)
@@ -97,6 +100,11 @@ public class BulkMergeBenchmarks
             customer.FirstName = "Updated" + random.Next();
         }
 
+        foreach (var customer in _newCustomers)
+        {
+            customer.Id = SequentialGuidGenerator.Next();
+        }
+
         var customers = new List<Customer>(RowsCount * 2);
         customers.AddRange(_customers);
         customers.AddRange(_newCustomers);
@@ -104,7 +112,7 @@ public class BulkMergeBenchmarks
         _context.BulkMerge(customers,
             x => x.Id,
             x => new { x.FirstName },
-            x => new { x.FirstName, x.LastName, x.Index },
+            x => new { x.Id, x.FirstName, x.LastName, x.Index },
             opt =>
             {
                 opt.Timeout = 0;

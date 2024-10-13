@@ -10,10 +10,6 @@ internal class TestDbContext : DbContext
 
     public DbSet<CompositeKeyRow<int, int>> CompositeKeyRows { get; set; }
 
-    public DbSet<SingleKeyRowWithSchema<int>> SingleKeyRowsWithSchema { get; set; }
-
-    public DbSet<CompositeKeyRowWithSchema<int, int>> CompositeKeyRowsWithSchema { get; set; }
-
     public DbSet<Customer> Customers { get; set; }
 
     public DbSet<Contact> Contacts { get; set; }
@@ -34,8 +30,6 @@ internal class TestDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<CompositeKeyRow<int, int>>().HasKey(x => new { x.Id1, x.Id2 });
-
-        modelBuilder.Entity<CompositeKeyRowWithSchema<int, int>>().HasKey(x => new { x.Id1, x.Id2 });
 
         modelBuilder.Entity<ConfigurationEntry>().Property(x => x.Id).HasColumnName("Id1");
         modelBuilder.Entity<ConfigurationEntry>().Property(x => x.Key).HasColumnName("Key1");

@@ -19,7 +19,7 @@ public class BulkInsertSingleTableBenchmarks
     [IterationSetup]
     public void IterationSetup()
     {
-        _context = new TestDbContext($"Server=127.0.0.1;Database=EntityFrameworkCore.MySql.SimpleBulks.Benchmarks.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true");
+        _context = new TestDbContext($"Server=127.0.0.1;Database=SimpleBulks.Benchmarks.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true");
         _context.Database.EnsureCreated();
 
         _customers = new List<Customer>(RowsCount);
