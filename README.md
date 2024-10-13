@@ -372,24 +372,24 @@ BenchmarkDotNet=v0.13.2, OS=Windows 10 (10.0.19045.5011)
 11th Gen Intel Core i7-1165G7 2.80GHz, 1 CPU, 8 logical and 4 physical cores
 .NET SDK=8.0.400
   [Host]     : .NET 8.0.8 (8.0.824.36612), X64 RyuJIT AVX2
-  Job-JZFEWQ : .NET 8.0.8 (8.0.824.36612), X64 RyuJIT AVX2
+  Job-LPQRVU : .NET 8.0.8 (8.0.824.36612), X64 RyuJIT AVX2
 
 InvocationCount=1  IterationCount=1  UnrollFactor=1  
 WarmupCount=0  
 
 ```
-|       Method | RowsCount |         Mean | Error |        Gen0 |       Gen1 |     Allocated |
-|------------- |---------- |-------------:|------:|------------:|-----------:|--------------:|
-| **EFCoreUpdate** |       **100** |     **49.92 ms** |    **NA** |           **-** |          **-** |     **860.98 KB** |
-|   BulkUpdate |       100 |     20.90 ms |    NA |           - |          - |      56.61 KB |
-| **EFCoreUpdate** |      **1000** |    **327.28 ms** |    **NA** |   **1000.0000** |          **-** |    **8284.28 KB** |
-|   BulkUpdate |      1000 |     72.71 ms |    NA |           - |          - |     336.83 KB |
-| **EFCoreUpdate** |     **10000** |  **2,609.00 ms** |    **NA** |  **12000.0000** |  **3000.0000** |   **81612.44 KB** |
-|   BulkUpdate |     10000 |    320.06 ms |    NA |           - |          - |    3105.73 KB |
-| **EFCoreUpdate** |    **100000** | **26,402.28 ms** |    **NA** | **122000.0000** | **29000.0000** |   **808508.6 KB** |
-|   BulkUpdate |    100000 |  6,449.05 ms |    NA |   4000.0000 |  1000.0000 |   29886.09 KB |
-| **EFCoreUpdate** |    **250000** | **69,878.17 ms** |    **NA** | **306000.0000** | **70000.0000** | **2001389.61 KB** |
-|   BulkUpdate |    250000 | 31,401.96 ms |    NA |  12000.0000 |  6000.0000 |   74524.23 KB |
+|       Method | RowsCount |          Mean | Error |        Gen0 |       Gen1 |      Gen2 |     Allocated |
+|------------- |---------- |--------------:|------:|------------:|-----------:|----------:|--------------:|
+| **EFCoreUpdate** |       **100** |      **77.32 ms** |    **NA** |           **-** |          **-** |         **-** |     **861.01 KB** |
+|   BulkUpdate |       100 |      34.38 ms |    NA |           - |          - |         - |      53.57 KB |
+| **EFCoreUpdate** |      **1000** |     **590.48 ms** |    **NA** |   **1000.0000** |          **-** |         **-** |    **8242.91 KB** |
+|   BulkUpdate |      1000 |      96.88 ms |    NA |           - |          - |         - |     312.71 KB |
+| **EFCoreUpdate** |     **10000** |   **4,474.04 ms** |    **NA** |  **12000.0000** |  **3000.0000** |         **-** |   **81612.58 KB** |
+|   BulkUpdate |     10000 |   1,121.61 ms |    NA |           - |          - |         - |    2899.23 KB |
+| **EFCoreUpdate** |    **100000** |  **47,509.80 ms** |    **NA** | **122000.0000** | **29000.0000** |         **-** |  **808508.63 KB** |
+|   BulkUpdate |    100000 |  12,767.85 ms |    NA |   4000.0000 |  2000.0000 |         - |      28613 KB |
+| **EFCoreUpdate** |    **250000** | **110,395.96 ms** |    **NA** | **307000.0000** | **71000.0000** | **1000.0000** | **2001921.86 KB** |
+|   BulkUpdate |    250000 |  22,615.14 ms |    NA |   9000.0000 |  4000.0000 |         - |    71565.2 KB |
 
 
 ``` ini
@@ -398,7 +398,7 @@ BenchmarkDotNet=v0.13.2, OS=Windows 10 (10.0.19045.5011)
 11th Gen Intel Core i7-1165G7 2.80GHz, 1 CPU, 8 logical and 4 physical cores
 .NET SDK=8.0.400
   [Host]     : .NET 8.0.8 (8.0.824.36612), X64 RyuJIT AVX2
-  Job-JZFEWQ : .NET 8.0.8 (8.0.824.36612), X64 RyuJIT AVX2
+  Job-LPQRVU : .NET 8.0.8 (8.0.824.36612), X64 RyuJIT AVX2
 
 InvocationCount=1  IterationCount=1  UnrollFactor=1  
 WarmupCount=0  
@@ -406,8 +406,8 @@ WarmupCount=0
 ```
 |     Method | RowsCount |    Mean | Error |       Gen0 |       Gen1 | Allocated |
 |----------- |---------- |--------:|------:|-----------:|-----------:|----------:|
-| **BulkUpdate** |    **500000** | **114.1 s** |    **NA** | **24000.0000** | **15000.0000** | **145.43 MB** |
-| **BulkUpdate** |   **1000000** | **435.8 s** |    **NA** | **48000.0000** | **32000.0000** | **290.75 MB** |
+| **BulkUpdate** |    **500000** | **44.36 s** |    **NA** | **18000.0000** |  **8000.0000** |  **139.6 MB** |
+| **BulkUpdate** |   **1000000** | **81.88 s** |    **NA** | **37000.0000** | **18000.0000** | **282.08 MB** |
 
 
 ### BulkDelete

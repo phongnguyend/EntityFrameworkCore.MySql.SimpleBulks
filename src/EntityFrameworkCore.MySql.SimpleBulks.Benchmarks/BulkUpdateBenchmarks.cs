@@ -84,18 +84,12 @@ public class BulkUpdateBenchmarks1
             customer.FirstName = "Updated" + random.Next();
         }
 
-        var pageSize = 10_000;
-        var pages = _customers.Chunk(pageSize);
-
-        foreach (var page in pages)
+        _context.BulkUpdate(_customers,
+        x => new { x.FirstName },
+        opt =>
         {
-            _context.BulkUpdate(page,
-            x => new { x.FirstName },
-            opt =>
-            {
-                opt.Timeout = 0;
-            });
-        }
+            opt.Timeout = 0;
+        });
     }
 }
 
@@ -156,17 +150,11 @@ public class BulkUpdateBenchmarks2
             customer.FirstName = "Updated" + random.Next();
         }
 
-        var pageSize = 10_000;
-        var pages = _customers.Chunk(pageSize);
-
-        foreach (var page in pages)
+        _context.BulkUpdate(_customers,
+        x => new { x.FirstName },
+        opt =>
         {
-            _context.BulkUpdate(page,
-            x => new { x.FirstName },
-            opt =>
-            {
-                opt.Timeout = 0;
-            });
-        }
+            opt.Timeout = 0;
+        });
     }
 }
