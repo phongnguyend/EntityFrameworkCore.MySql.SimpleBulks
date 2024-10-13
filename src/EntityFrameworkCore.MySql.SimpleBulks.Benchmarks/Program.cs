@@ -1,13 +1,17 @@
 ﻿using BenchmarkDotNet.Running;
 using EntityFrameworkCore.MySql.SimpleBulks.Benchmarks;
+using System.Diagnostics;
 
 
-//var test = new BulkMergeBenchmarks();
-//test.RowsCount = 250_000;
-//test.IterationSetup();
-//test.BulkMerge();
-//test.IterationCleanup();
-//return;
+var test = new BulkInsertSingleTableBenchmarks();
+test.RowsCount = 100000;
+test.IterationSetup();
+var start = Stopwatch.GetTimestamp();
+test.BulkInsert();
+var elapsed = Stopwatch.GetElapsedTime(start);
+Console.WriteLine($"Elapsed: {elapsed}");
+test.IterationCleanup();
+return;
 
 _ = BenchmarkRunner.Run<BulkInsertSingleTableBenchmarks>();
 _ = BenchmarkRunner.Run<BulkInsertMultipleTablesBenchmarks>();
