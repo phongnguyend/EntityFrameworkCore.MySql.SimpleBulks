@@ -315,7 +315,7 @@ BenchmarkDotNet=v0.13.2, OS=Windows 10 (10.0.19045.5011)
 11th Gen Intel Core i7-1165G7 2.80GHz, 1 CPU, 8 logical and 4 physical cores
 .NET SDK=8.0.400
   [Host]     : .NET 8.0.8 (8.0.824.36612), X64 RyuJIT AVX2
-  Job-GTAXNS : .NET 8.0.8 (8.0.824.36612), X64 RyuJIT AVX2
+  Job-RGIUAC : .NET 8.0.8 (8.0.824.36612), X64 RyuJIT AVX2
 
 InvocationCount=1  IterationCount=1  UnrollFactor=1  
 WarmupCount=0  
@@ -323,18 +323,18 @@ WarmupCount=0
 ```
 |       Method | RowsCount |         Mean | Error |        Gen0 |        Gen1 |      Gen2 |     Allocated |
 |------------- |---------- |-------------:|------:|------------:|------------:|----------:|--------------:|
-| **EFCoreInsert** |       **100** |     **28.27 ms** |    **NA** |           **-** |           **-** |         **-** |     **976.75 KB** |
-|   BulkInsert |       100 |     26.71 ms |    NA |           - |           - |         - |      59.38 KB |
-| **EFCoreInsert** |      **1000** |    **183.20 ms** |    **NA** |   **1000.0000** |           **-** |         **-** |    **9740.39 KB** |
-|   BulkInsert |      1000 |     80.25 ms |    NA |           - |           - |         - |     343.91 KB |
-| **EFCoreInsert** |     **10000** |    **912.21 ms** |    **NA** |  **15000.0000** |   **5000.0000** |         **-** |   **96372.25 KB** |
-|   BulkInsert |     10000 |    517.93 ms |    NA |           - |           - |         - |    3214.63 KB |
-| **EFCoreInsert** |    **100000** |  **5,380.19 ms** |    **NA** | **147000.0000** |  **37000.0000** |         **-** |  **956706.72 KB** |
-|   BulkInsert |    100000 |  2,092.49 ms |    NA |   4000.0000 |   2000.0000 |         - |   31731.75 KB |
-| **EFCoreInsert** |    **250000** | **13,244.24 ms** |    **NA** | **368000.0000** |  **88000.0000** |         **-** | **2368616.14 KB** |
-|   BulkInsert |    250000 |  3,452.06 ms |    NA |  11000.0000 |   5000.0000 | 1000.0000 |   79360.14 KB |
-| **EFCoreInsert** |    **500000** | **26,493.27 ms** |    **NA** | **736000.0000** | **174000.0000** |         **-** | **4744493.05 KB** |
-|   BulkInsert |    500000 | 10,214.11 ms |    NA |  20000.0000 |   7000.0000 | 1000.0000 |  158517.27 KB |
+| **EFCoreInsert** |       **100** |     **36.86 ms** |    **NA** |           **-** |           **-** |         **-** |     **976.73 KB** |
+|   BulkInsert |       100 |     18.73 ms |    NA |           - |           - |         - |      56.31 KB |
+| **EFCoreInsert** |      **1000** |    **146.98 ms** |    **NA** |   **1000.0000** |           **-** |         **-** |    **9740.39 KB** |
+|   BulkInsert |      1000 |    112.55 ms |    NA |           - |           - |         - |     312.73 KB |
+| **EFCoreInsert** |     **10000** |  **1,247.58 ms** |    **NA** |  **15000.0000** |   **5000.0000** |         **-** |   **96372.25 KB** |
+|   BulkInsert |     10000 |    531.13 ms |    NA |           - |           - |         - |    2902.21 KB |
+| **EFCoreInsert** |    **100000** |  **5,455.73 ms** |    **NA** | **147000.0000** |  **37000.0000** |         **-** |  **956706.58 KB** |
+|   BulkInsert |    100000 |  1,267.28 ms |    NA |   3000.0000 |   1000.0000 |         - |   28606.81 KB |
+| **EFCoreInsert** |    **250000** | **13,465.43 ms** |    **NA** | **368000.0000** |  **88000.0000** |         **-** | **2368616.45 KB** |
+|   BulkInsert |    250000 |  2,606.24 ms |    NA |   9000.0000 |   5000.0000 | 1000.0000 |   71551.59 KB |
+| **EFCoreInsert** |    **500000** | **27,001.92 ms** |    **NA** | **736000.0000** | **174000.0000** |         **-** |  **4744491.9 KB** |
+|   BulkInsert |    500000 |  4,806.86 ms |    NA |  17000.0000 |   7000.0000 |         - |  142890.45 KB |
 
 
 Multiple Tables (1x parent rows + 5x child rows) [/src/EntityFrameworkCore.MySql.SimpleBulks.Benchmarks/BulkInsertMultipleTablesBenchmarks.cs](/src/EntityFrameworkCore.MySql.SimpleBulks.Benchmarks/BulkInsertMultipleTablesBenchmarks.cs)
@@ -345,22 +345,22 @@ BenchmarkDotNet=v0.13.2, OS=Windows 10 (10.0.19045.5011)
 11th Gen Intel Core i7-1165G7 2.80GHz, 1 CPU, 8 logical and 4 physical cores
 .NET SDK=8.0.400
   [Host]     : .NET 8.0.8 (8.0.824.36612), X64 RyuJIT AVX2
-  Job-GTAXNS : .NET 8.0.8 (8.0.824.36612), X64 RyuJIT AVX2
+  Job-XRWCCS : .NET 8.0.8 (8.0.824.36612), X64 RyuJIT AVX2
 
 InvocationCount=1  IterationCount=1  UnrollFactor=1  
 WarmupCount=0  
 
 ```
-|       Method | RowsCount |        Mean | Error |         Gen0 |        Gen1 |      Gen2 |     Allocated |
-|------------- |---------- |------------:|------:|-------------:|------------:|----------:|--------------:|
-| **EFCoreInsert** |       **100** |    **161.8 ms** |    **NA** |    **1000.0000** |           **-** |         **-** |    **6875.63 KB** |
-|   BulkInsert |       100 |    184.5 ms |    NA |            - |           - |         - |     289.69 KB |
-| **EFCoreInsert** |      **1000** |  **1,646.0 ms** |    **NA** |   **10000.0000** |   **4000.0000** |         **-** |   **67968.48 KB** |
-|   BulkInsert |      1000 |  1,465.8 ms |    NA |            - |           - |         - |    2174.38 KB |
-| **EFCoreInsert** |     **10000** |  **5,494.4 ms** |    **NA** |  **105000.0000** |  **29000.0000** |         **-** |  **675867.91 KB** |
-|   BulkInsert |     10000 |  2,756.2 ms |    NA |    4000.0000 |   2000.0000 | 1000.0000 |   21205.54 KB |
-| **EFCoreInsert** |    **100000** | **39,859.9 ms** |    **NA** | **1050000.0000** | **249000.0000** |         **-** | **6740770.29 KB** |
-|   BulkInsert |    100000 | 24,543.1 ms |    NA |   28000.0000 |  12000.0000 | 1000.0000 |  211348.53 KB |
+|       Method | RowsCount |        Mean | Error |         Gen0 |        Gen1 |      Gen2 |    Allocated |
+|------------- |---------- |------------:|------:|-------------:|------------:|----------:|-------------:|
+| **EFCoreInsert** |       **100** |    **189.6 ms** |    **NA** |    **1000.0000** |           **-** |         **-** |   **6875.61 KB** |
+|   BulkInsert |       100 |    166.7 ms |    NA |            - |           - |         - |    271.06 KB |
+| **EFCoreInsert** |      **1000** |  **1,097.2 ms** |    **NA** |   **10000.0000** |   **4000.0000** |         **-** |   **67968.5 KB** |
+|   BulkInsert |      1000 |    721.5 ms |    NA |            - |           - |         - |   1987.01 KB |
+| **EFCoreInsert** |     **10000** |  **4,663.4 ms** |    **NA** |  **105000.0000** |  **29000.0000** |         **-** | **675868.05 KB** |
+|   BulkInsert |     10000 |  1,789.9 ms |    NA |    3000.0000 |   1000.0000 | 1000.0000 |  19330.64 KB |
+| **EFCoreInsert** |    **100000** | **43,841.6 ms** |    **NA** | **1050000.0000** | **250000.0000** |         **-** | **6740771.2 KB** |
+|   BulkInsert |    100000 | 19,456.4 ms |    NA |   25000.0000 |  12000.0000 | 1000.0000 | 193110.47 KB |
 
 
 ### BulkUpdate

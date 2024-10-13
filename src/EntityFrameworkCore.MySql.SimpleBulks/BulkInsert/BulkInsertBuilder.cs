@@ -141,10 +141,11 @@ public class BulkInsertBuilder<T>
             }
 
             var idProperty = typeof(T).GetProperty(_outputIdColumn);
+            var setIdDelegate = (Action<T, Guid>)Delegate.CreateDelegate(typeof(Action<T, Guid>), idProperty.GetSetMethod());
 
             foreach (var row in data)
             {
-                idProperty.SetValue(row, SequentialGuidGenerator.Next());
+                setIdDelegate(row, SequentialGuidGenerator.Next());
             }
 
             dataTable = data.ToDataTable(columnsToInsert);
@@ -188,8 +189,9 @@ public class BulkInsertBuilder<T>
             }
 
             var idProperty = typeof(T).GetProperty(_outputIdColumn);
+            var setIdDelegate = (Action<T, Guid>)Delegate.CreateDelegate(typeof(Action<T, Guid>), idProperty.GetSetMethod());
 
-            idProperty.SetValue(dataToInsert, SequentialGuidGenerator.Next());
+            setIdDelegate(dataToInsert, SequentialGuidGenerator.Next());
         }
 
         insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName} ({string.Join(", ", columnsToInsert.Select(x => $"`{GetDbColumnName(x)}`"))})");
