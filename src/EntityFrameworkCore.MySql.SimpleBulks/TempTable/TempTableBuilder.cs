@@ -10,7 +10,8 @@ public class TempTableBuilder<T>
 {
     private IEnumerable<T> _data;
     private IEnumerable<string> _columnNames;
-    private IDictionary<string, string> _dbColumnMappings;
+    private IReadOnlyDictionary<string, string> _columnNameMappings;
+    private IReadOnlyDictionary<string, string> _columnTypeMappings;
     private TempTableOptions _options;
     private readonly MySqlConnection _connection;
     private readonly MySqlTransaction _transaction;
@@ -44,9 +45,15 @@ public class TempTableBuilder<T>
         return this;
     }
 
-    public TempTableBuilder<T> WithDbColumnMappings(IDictionary<string, string> dbColumnMappings)
+    public TempTableBuilder<T> WithDbColumnMappings(IReadOnlyDictionary<string, string> dbColumnMappings)
     {
-        _dbColumnMappings = dbColumnMappings;
+        _columnNameMappings = dbColumnMappings;
+        return this;
+    }
+
+    public TempTableBuilder<T> WithDbColumnTypeMappings(IReadOnlyDictionary<string, string> columnTypeMappings)
+    {
+        _columnTypeMappings = columnTypeMappings;
         return this;
     }
 
@@ -79,7 +86,7 @@ public class TempTableBuilder<T>
     {
         var tempTableName = $"`{GetTableName()}`";
         var dataTable = _data.ToDataTable(_columnNames);
-        var sqlCreateTempTable = dataTable.GenerateTempTableDefinition(tempTableName, _dbColumnMappings);
+        var sqlCreateTempTable = dataTable.GenerateTempTableDefinition(tempTableName, _columnNameMappings, _columnTypeMappings);
 
         Log($"Begin creating temp table:{Environment.NewLine}{sqlCreateTempTable}");
 
@@ -93,7 +100,7 @@ public class TempTableBuilder<T>
 
         Log($"Begin executing SqlBulkCopy. TableName: {tempTableName}");
 
-        dataTable.SqlBulkCopy(tempTableName, _dbColumnMappings, _connection, _transaction);
+        dataTable.SqlBulkCopy(tempTableName, _columnNameMappings, _connection, _transaction);
 
         Log("End executing SqlBulkCopy.");
 

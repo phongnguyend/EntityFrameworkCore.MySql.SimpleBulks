@@ -11,7 +11,8 @@ public class BulkDeleteBuilder<T>
 {
     private TableInfor _table;
     private IEnumerable<string> _idColumns;
-    private IDictionary<string, string> _dbColumnMappings;
+    private IReadOnlyDictionary<string, string> _columnNameMappings;
+    private IReadOnlyDictionary<string, string> _columnTypeMappings;
     private BulkDeleteOptions _options;
     private readonly MySqlConnection _connection;
     private readonly MySqlTransaction _transaction;
@@ -52,9 +53,15 @@ public class BulkDeleteBuilder<T>
         return this;
     }
 
-    public BulkDeleteBuilder<T> WithDbColumnMappings(IDictionary<string, string> dbColumnMappings)
+    public BulkDeleteBuilder<T> WithDbColumnMappings(IReadOnlyDictionary<string, string> dbColumnMappings)
     {
-        _dbColumnMappings = dbColumnMappings;
+        _columnNameMappings = dbColumnMappings;
+        return this;
+    }
+
+    public BulkDeleteBuilder<T> WithDbColumnTypeMappings(IReadOnlyDictionary<string, string> columnTypeMappings)
+    {
+        _columnTypeMappings = columnTypeMappings;
         return this;
     }
 
@@ -70,12 +77,12 @@ public class BulkDeleteBuilder<T>
 
     private string GetDbColumnName(string columnName)
     {
-        if (_dbColumnMappings == null)
+        if (_columnNameMappings == null)
         {
             return columnName;
         }
 
-        return _dbColumnMappings.TryGetValue(columnName, out string value) ? value : columnName;
+        return _columnNameMappings.TryGetValue(columnName, out string value) ? value : columnName;
     }
 
     public BulkDeleteResult Execute(IEnumerable<T> data)
@@ -87,7 +94,7 @@ public class BulkDeleteBuilder<T>
 
         var temptableName = $"`{Guid.NewGuid()}`";
         var dataTable = data.ToDataTable(_idColumns);
-        var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName);
+        var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _columnTypeMappings);
         sqlCreateTemptable += $"\nCREATE UNIQUE INDEX Idx_Id ON {temptableName} ({string.Join(",", _idColumns.Select(x => $"`{x}`"))});";
 
         var joinCondition = string.Join(" AND ", _idColumns.Select(x =>

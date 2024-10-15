@@ -16,18 +16,21 @@ public static class DbContextExtensions
 
         var isEntityType = dbContext.IsEntityType(typeof(T));
 
-        IDictionary<string, string> dbColumnMappings = null;
+        IReadOnlyDictionary<string, string> columnNameMappings = null;
+        IReadOnlyDictionary<string, string> columnTypeMappings = null;
 
         if (isEntityType)
         {
             var properties = dbContext.GetProperties(typeof(T));
-            dbColumnMappings = properties.ToDictionary(x => x.PropertyName, x => x.ColumnName);
+            columnNameMappings = properties.ToDictionary(x => x.PropertyName, x => x.ColumnName);
+            columnTypeMappings = properties.ToDictionary(x => x.PropertyName, x => x.ColumnType);
         }
 
         return new TempTableBuilder<T>(connection, transaction)
              .WithData(data)
              .WithColumns(columnNamesSelector)
-             .WithDbColumnMappings(dbColumnMappings)
+             .WithDbColumnMappings(columnNameMappings)
+             .WithDbColumnTypeMappings(columnTypeMappings)
              .ConfigureTempTableOptions(configureOptions)
              .Execute();
     }
@@ -39,19 +42,22 @@ public static class DbContextExtensions
 
         var isEntityType = dbContext.IsEntityType(typeof(T));
 
-        IDictionary<string, string> dbColumnMappings = null;
+        IReadOnlyDictionary<string, string> columnNameMappings = null;
+        IReadOnlyDictionary<string, string> columnTypeMappings = null;
         IEnumerable<string> columnNames = typeof(T).GetDbColumnNames();
 
         if (isEntityType)
         {
             var properties = dbContext.GetProperties(typeof(T));
-            dbColumnMappings = properties.ToDictionary(x => x.PropertyName, x => x.ColumnName);
+            columnNameMappings = properties.ToDictionary(x => x.PropertyName, x => x.ColumnName);
+            columnTypeMappings = properties.ToDictionary(x => x.PropertyName, x => x.ColumnType);
         }
 
         return new TempTableBuilder<T>(connection, transaction)
              .WithData(data)
              .WithColumns(columnNames)
-             .WithDbColumnMappings(dbColumnMappings)
+             .WithDbColumnMappings(columnNameMappings)
+             .WithDbColumnTypeMappings(columnTypeMappings)
              .ConfigureTempTableOptions(configureOptions)
              .Execute();
     }

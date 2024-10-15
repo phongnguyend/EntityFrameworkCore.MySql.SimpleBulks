@@ -7,7 +7,7 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 
 public static class DataTableExtensions
 {
-    public static string GenerateTempTableDefinition(this DataTable table, string tableName, IDictionary<string, string> dbColumnMappings = null)
+    public static string GenerateTempTableDefinition(this DataTable table, string tableName, IReadOnlyDictionary<string, string> columnNameMappings, IReadOnlyDictionary<string, string> columnTypeMappings)
     {
         var sql = new StringBuilder();
 
@@ -20,8 +20,8 @@ public static class DataTableExtensions
                 sql.Append(",");
             }
 
-            sql.Append($"\n\t`{GetDbColumnName(table.Columns[i].ColumnName, dbColumnMappings)}`");
-            var sqlType = table.Columns[i].DataType.ToSqlType();
+            sql.Append($"\n\t`{GetDbColumnName(table.Columns[i].ColumnName, columnNameMappings)}`");
+            var sqlType = GetDbColumnType(table.Columns[i], columnTypeMappings);
             sql.Append($" {sqlType} NULL");
         }
 
@@ -30,7 +30,7 @@ public static class DataTableExtensions
         return sql.ToString();
     }
 
-    public static void SqlBulkCopy(this DataTable dataTable, string tableName, IDictionary<string, string> dbColumnMappings, MySqlConnection connection, MySqlTransaction transaction, BulkOptions options = null)
+    public static void SqlBulkCopy(this DataTable dataTable, string tableName, IReadOnlyDictionary<string, string> columnNameMappings, MySqlConnection connection, MySqlTransaction transaction, BulkOptions options = null)
     {
         options ??= new BulkOptions()
         {
@@ -48,20 +48,30 @@ public static class DataTableExtensions
 
         foreach (DataColumn dtColum in dataTable.Columns)
         {
-            bulkCopy.ColumnMappings.Add(new MySqlBulkCopyColumnMapping(idx, GetDbColumnName(dtColum.ColumnName, dbColumnMappings)));
+            bulkCopy.ColumnMappings.Add(new MySqlBulkCopyColumnMapping(idx, GetDbColumnName(dtColum.ColumnName, columnNameMappings)));
             idx++;
         }
 
         bulkCopy.WriteToServer(dataTable);
     }
 
-    private static string GetDbColumnName(string columnName, IDictionary<string, string> dbColumnMappings)
+    private static string GetDbColumnName(string columnName, IReadOnlyDictionary<string, string> columnNameMappings)
     {
-        if (dbColumnMappings == null)
+        if (columnNameMappings == null)
         {
             return columnName;
         }
 
-        return dbColumnMappings.TryGetValue(columnName, out string value) ? value : columnName;
+        return columnNameMappings.TryGetValue(columnName, out string value) ? value : columnName;
+    }
+
+    private static string GetDbColumnType(DataColumn dataColumn, IReadOnlyDictionary<string, string> columnTypeMappings)
+    {
+        if (columnTypeMappings == null)
+        {
+            return dataColumn.DataType.ToSqlType();
+        }
+
+        return columnTypeMappings.TryGetValue(dataColumn.ColumnName, out string value) ? value : dataColumn.DataType.ToSqlType();
     }
 }

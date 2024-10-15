@@ -14,7 +14,8 @@ public class BulkMergeBuilder<T>
     private IEnumerable<string> _idColumns;
     private IEnumerable<string> _updateColumnNames;
     private IEnumerable<string> _insertColumnNames;
-    private IDictionary<string, string> _dbColumnMappings;
+    private IReadOnlyDictionary<string, string> _columnNameMappings;
+    private IReadOnlyDictionary<string, string> _columnTypeMappings;
     private string _outputIdColumn;
     private BulkMergeOptions _options;
     private readonly MySqlConnection _connection;
@@ -80,9 +81,15 @@ public class BulkMergeBuilder<T>
         return this;
     }
 
-    public BulkMergeBuilder<T> WithDbColumnMappings(IDictionary<string, string> dbColumnMappings)
+    public BulkMergeBuilder<T> WithDbColumnMappings(IReadOnlyDictionary<string, string> columnNameMappings)
     {
-        _dbColumnMappings = dbColumnMappings;
+        _columnNameMappings = columnNameMappings;
+        return this;
+    }
+
+    public BulkMergeBuilder<T> WithDbColumnTypeMappings(IReadOnlyDictionary<string, string> columnTypeMappings)
+    {
+        _columnTypeMappings = columnTypeMappings;
         return this;
     }
 
@@ -110,12 +117,12 @@ public class BulkMergeBuilder<T>
 
     private string GetDbColumnName(string columnName)
     {
-        if (_dbColumnMappings == null)
+        if (_columnNameMappings == null)
         {
             return columnName;
         }
 
-        return _dbColumnMappings.TryGetValue(columnName, out string value) ? value : columnName;
+        return _columnNameMappings.TryGetValue(columnName, out string value) ? value : columnName;
     }
 
     public BulkMergeResult Execute(IEnumerable<T> data)
@@ -133,7 +140,7 @@ public class BulkMergeBuilder<T>
         propertyNames = propertyNames.Distinct().ToList();
 
         var dataTable = data.ToDataTable(propertyNames);
-        var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName);
+        var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _columnTypeMappings);
         sqlCreateTemptable += $"\nCREATE INDEX Idx_Id ON {temptableName} ({string.Join(",", _idColumns.Select(x => $"`{x}`"))});";
 
         var joinCondition = string.Join(" and ", _idColumns.Select(x =>

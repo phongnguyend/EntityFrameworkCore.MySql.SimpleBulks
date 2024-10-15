@@ -14,7 +14,8 @@ public class BulkUpdateBuilder<T>
     private TableInfor _table;
     private IEnumerable<string> _idColumns;
     private IEnumerable<string> _columnNames;
-    private IDictionary<string, string> _dbColumnMappings;
+    private IReadOnlyDictionary<string, string> _columnNameMappings;
+    private IReadOnlyDictionary<string, string> _columnTypeMappings;
     private BulkUpdateOptions _options;
     private readonly MySqlConnection _connection;
     private readonly MySqlTransaction _transaction;
@@ -67,9 +68,15 @@ public class BulkUpdateBuilder<T>
         return this;
     }
 
-    public BulkUpdateBuilder<T> WithDbColumnMappings(IDictionary<string, string> dbColumnMappings)
+    public BulkUpdateBuilder<T> WithDbColumnMappings(IReadOnlyDictionary<string, string> columnNameMappings)
     {
-        _dbColumnMappings = dbColumnMappings;
+        _columnNameMappings = columnNameMappings;
+        return this;
+    }
+
+    public BulkUpdateBuilder<T> WithDbColumnTypeMappings(IReadOnlyDictionary<string, string> columnTypeMappings)
+    {
+        _columnTypeMappings = columnTypeMappings;
         return this;
     }
 
@@ -85,12 +92,12 @@ public class BulkUpdateBuilder<T>
 
     private string GetDbColumnName(string columnName)
     {
-        if (_dbColumnMappings == null)
+        if (_columnNameMappings == null)
         {
             return columnName;
         }
 
-        return _dbColumnMappings.TryGetValue(columnName, out string value) ? value : columnName;
+        return _columnNameMappings.TryGetValue(columnName, out string value) ? value : columnName;
     }
 
     public BulkUpdateResult Execute(IEnumerable<T> data)
@@ -106,7 +113,7 @@ public class BulkUpdateBuilder<T>
         propertyNamesIncludeId.AddRange(_idColumns);
 
         var dataTable = data.ToDataTable(propertyNamesIncludeId);
-        var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName);
+        var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _columnTypeMappings);
         sqlCreateTemptable += $"\nCREATE UNIQUE INDEX Idx_Id ON {temptableName} ({string.Join(",", _idColumns.Select(x => $"`{x}`"))});";
 
         var joinCondition = string.Join(" and ", _idColumns.Select(x =>
