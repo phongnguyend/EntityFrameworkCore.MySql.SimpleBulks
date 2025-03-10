@@ -1,4 +1,6 @@
-﻿namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.Database;
+﻿using static EntityFrameworkCore.MySql.SimpleBulks.Tests.Database.Enums;
+
+namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.Database;
 
 public class SingleKeyRow<TId>
 {
@@ -9,6 +11,8 @@ public class SingleKeyRow<TId>
     public string Column2 { get; set; }
 
     public DateTime Column3 { get; set; }
+
+    public Season? Season { get; set; }
 
     public Guid? BulkId { get; set; }
 
