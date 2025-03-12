@@ -5,22 +5,13 @@ using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.DbContextExtensions;
 
-public class BulkMatchTests : IDisposable
+public class BulkMatchTests : BaseTest
 {
-    private readonly ITestOutputHelper _output;
-
-    private TestDbContext _context;
-
     private readonly List<Customer> _customers;
     private readonly List<Contact> _contacts;
 
-    public BulkMatchTests(ITestOutputHelper output)
+    public BulkMatchTests(ITestOutputHelper output) : base(output, "SimpleBulks.BulkMatch")
     {
-        _output = output;
-
-        _context = new TestDbContext($"server=localhost;database=SimpleBulks.BulkMatch.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true");
-        _context.Database.EnsureCreated();
-
         var tran = _context.Database.BeginTransaction();
 
         var isoCodes = new string[] { "VN", "US", "GB" };
@@ -251,10 +242,5 @@ public class BulkMatchTests : IDisposable
             Assert.Equal(0, contactsFromDb[i].Index);
             Assert.Equal(Guid.Empty, contactsFromDb[i].CustomerId);
         }
-    }
-
-    public void Dispose()
-    {
-        _context.Database.EnsureDeleted();
     }
 }

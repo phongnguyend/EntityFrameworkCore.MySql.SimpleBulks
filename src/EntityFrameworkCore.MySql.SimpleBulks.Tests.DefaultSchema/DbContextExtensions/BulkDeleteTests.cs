@@ -1,4 +1,4 @@
-using EntityFrameworkCore.MySql.SimpleBulks.BulkDelete;
+﻿using EntityFrameworkCore.MySql.SimpleBulks.BulkDelete;
 using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 using EntityFrameworkCore.MySql.SimpleBulks.Tests.Database;
 using Microsoft.EntityFrameworkCore;
@@ -6,19 +6,10 @@ using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.DbContextExtensions;
 
-public class BulkDeleteTests : IDisposable
+public class BulkDeleteTests : BaseTest
 {
-    private readonly ITestOutputHelper _output;
-
-    private TestDbContext _context;
-
-    public BulkDeleteTests(ITestOutputHelper output)
+    public BulkDeleteTests(ITestOutputHelper output) : base(output, "SimpleBulks.BulkDelete")
     {
-        _output = output;
-
-        _context = new TestDbContext($"server=localhost;database=SimpleBulks.BulkDelete.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true");
-        _context.Database.EnsureCreated();
-
         var tran = _context.Database.BeginTransaction();
 
         var rows = new List<SingleKeyRow<int>>();
@@ -50,11 +41,6 @@ public class BulkDeleteTests : IDisposable
                 row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 });
 
         tran.Commit();
-    }
-
-    public void Dispose()
-    {
-        _context.Database.EnsureDeleted();
     }
 
     [Theory]

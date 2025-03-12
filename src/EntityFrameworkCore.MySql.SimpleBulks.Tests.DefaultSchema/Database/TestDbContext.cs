@@ -2,7 +2,7 @@
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.Database;
 
-internal class TestDbContext : DbContext
+public class TestDbContext : DbContext
 {
     private readonly string _connectionString;
 

@@ -6,12 +6,8 @@ using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.DbContextExtensions;
 
-public class TempTableTests : IDisposable
+public class TempTableTests : BaseTest
 {
-    private readonly ITestOutputHelper _output;
-
-    private TestDbContext _context;
-
     private readonly static List<CustomerDto> _customers = new List<CustomerDto>
     {
         new CustomerDto
@@ -62,17 +58,8 @@ public class TempTableTests : IDisposable
         }
     };
 
-    public TempTableTests(ITestOutputHelper output)
+    public TempTableTests(ITestOutputHelper output) : base(output, "SimpleBulks.TempTable")
     {
-        _output = output;
-
-        _context = new TestDbContext($"server=localhost;database=SimpleBulks.TempTable.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true");
-        _context.Database.EnsureCreated();
-    }
-
-    public void Dispose()
-    {
-        _context.Database.EnsureDeleted();
     }
 
     [Fact]

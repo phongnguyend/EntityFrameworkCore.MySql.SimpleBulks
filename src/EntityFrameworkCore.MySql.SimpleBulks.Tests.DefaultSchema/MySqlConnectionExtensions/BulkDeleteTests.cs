@@ -1,29 +1,15 @@
-using EntityFrameworkCore.MySql.SimpleBulks.BulkDelete;
+﻿using EntityFrameworkCore.MySql.SimpleBulks.BulkDelete;
 using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 using EntityFrameworkCore.MySql.SimpleBulks.Tests.Database;
 using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
 using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.MySqlConnectionExtensions;
 
-public class BulkDeleteTests : IDisposable
+public class BulkDeleteTests : BaseTest
 {
-    private readonly ITestOutputHelper _output;
-
-    private TestDbContext _context;
-    private MySqlConnection _connection;
-
-    public BulkDeleteTests(ITestOutputHelper output)
+    public BulkDeleteTests(ITestOutputHelper output) : base(output, "SimpleBulks.BulkDelete")
     {
-        _output = output;
-
-        var connectionString = $"server=localhost;database=SimpleBulks.BulkInsert.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true";
-        _context = new TestDbContext(connectionString);
-        _context.Database.EnsureCreated();
-
-        _connection = new MySqlConnection(connectionString);
-
         TableMapper.Register(typeof(SingleKeyRow<int>), "SingleKeyRows");
         TableMapper.Register(typeof(CompositeKeyRow<int, int>), "CompositeKeyRows");
 
@@ -54,11 +40,6 @@ public class BulkDeleteTests : IDisposable
 
         _context.BulkInsert(compositeKeyRows,
                 row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 });
-    }
-
-    public void Dispose()
-    {
-        _context.Database.EnsureDeleted();
     }
 
     [Theory]

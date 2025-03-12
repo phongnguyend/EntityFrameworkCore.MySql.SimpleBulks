@@ -1,4 +1,4 @@
-using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
+﻿using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 using EntityFrameworkCore.MySql.SimpleBulks.DirectUpdate;
 using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using EntityFrameworkCore.MySql.SimpleBulks.Tests.Database;
@@ -7,18 +7,10 @@ using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.DbContextExtensions;
 
-public class DirectUpdateTests : IDisposable
+public class DirectUpdateTests : BaseTest
 {
-    private readonly ITestOutputHelper _output;
-
-    private TestDbContext _context;
-
-    public DirectUpdateTests(ITestOutputHelper output)
+    public DirectUpdateTests(ITestOutputHelper output) : base(output, "SimpleBulks.DirectUpdate")
     {
-        _output = output;
-
-        _context = new TestDbContext($"server=localhost;database=SimpleBulks.DirectUpdate.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true");
-        _context.Database.EnsureCreated();
     }
 
     private void SeedData(int length)
@@ -54,11 +46,6 @@ public class DirectUpdateTests : IDisposable
                 row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 });
 
         tran.Commit();
-    }
-
-    public void Dispose()
-    {
-        _context.Database.EnsureDeleted();
     }
 
     [Theory]

@@ -3,26 +3,13 @@ using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using EntityFrameworkCore.MySql.SimpleBulks.Tests.Database;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
-using static EntityFrameworkCore.MySql.SimpleBulks.Tests.Database.Enums;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.DbContextExtensions;
 
-public class BulkInsertTests : IDisposable
+public class BulkInsertTests : BaseTest
 {
-
-    private TestDbContext _context;
-    private readonly ITestOutputHelper _output;
-
-    public BulkInsertTests(ITestOutputHelper output)
+    public BulkInsertTests(ITestOutputHelper output) : base(output, "SimpleBulks.BulkInsert")
     {
-        _output = output;
-        _context = new TestDbContext($"server=localhost;database=SimpleBulks.BulkInsert.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true");
-        _context.Database.EnsureCreated();
-    }
-
-    public void Dispose()
-    {
-        _context.Database.EnsureDeleted();
     }
 
     [Theory]

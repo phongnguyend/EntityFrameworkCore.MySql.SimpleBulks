@@ -1,36 +1,17 @@
-using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
+﻿using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using EntityFrameworkCore.MySql.SimpleBulks.Tests.Database;
 using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
 using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.MySqlConnectionExtensions;
 
-public class BulkInsertTests : IDisposable
+public class BulkInsertTests : BaseTest
 {
-
-    private TestDbContext _context;
-    private MySqlConnection _connection;
-    private readonly ITestOutputHelper _output;
-
-    public BulkInsertTests(ITestOutputHelper output)
+    public BulkInsertTests(ITestOutputHelper output) : base(output, "SimpleBulks.BulkInsert")
     {
-        _output = output;
-
-        var connectionString = $"server=localhost;database=SimpleBulks.BulkInsert.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true";
-        _context = new TestDbContext(connectionString);
-        _context.Database.EnsureCreated();
-
-        _connection = new MySqlConnection(connectionString);
-
         TableMapper.Register(typeof(SingleKeyRow<int>), "SingleKeyRows");
         TableMapper.Register(typeof(CompositeKeyRow<int, int>), "CompositeKeyRows");
-    }
-
-    public void Dispose()
-    {
-        _context.Database.EnsureDeleted();
     }
 
     [Theory]

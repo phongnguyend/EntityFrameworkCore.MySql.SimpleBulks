@@ -1,6 +1,4 @@
-﻿using static EntityFrameworkCore.MySql.SimpleBulks.Tests.Database.Enums;
-
-namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.Database;
+﻿namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.Database;
 
 public class CompositeKeyRow<TId1, TId2>
 {

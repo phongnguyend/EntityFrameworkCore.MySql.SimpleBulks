@@ -1,4 +1,4 @@
-using EntityFrameworkCore.MySql.SimpleBulks.DirectInsert;
+﻿using EntityFrameworkCore.MySql.SimpleBulks.DirectInsert;
 using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using EntityFrameworkCore.MySql.SimpleBulks.Tests.Database;
 using Microsoft.EntityFrameworkCore;
@@ -6,22 +6,10 @@ using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.DbContextExtensions;
 
-public class DirectInsertTests : IDisposable
+public class DirectInsertTests : BaseTest
 {
-
-    private TestDbContext _context;
-    private readonly ITestOutputHelper _output;
-
-    public DirectInsertTests(ITestOutputHelper output)
+    public DirectInsertTests(ITestOutputHelper output) : base(output, "SimpleBulks.DirectInsert")
     {
-        _output = output;
-        _context = new TestDbContext($"server=localhost;database=SimpleBulks.DirectInsert.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true");
-        _context.Database.EnsureCreated();
-    }
-
-    public void Dispose()
-    {
-        _context.Database.EnsureDeleted();
     }
 
     [Fact]
