@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.Database;
 
@@ -24,7 +25,15 @@ public class TestDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         var serverVersion = new MySqlServerVersion(new Version(8, 0, 39));
-        optionsBuilder.UseMySql(_connectionString, serverVersion);
+
+        if (!string.IsNullOrEmpty(_schema))
+        {
+            optionsBuilder.UseMySql(_connectionString, serverVersion, o => o.SchemaBehavior(MySqlSchemaBehavior.Translate, (schema, table) => $"{schema}_{table}"));
+        }
+        else
+        {
+            optionsBuilder.UseMySql(_connectionString, serverVersion);
+        }
 
         base.OnConfiguring(optionsBuilder);
     }
