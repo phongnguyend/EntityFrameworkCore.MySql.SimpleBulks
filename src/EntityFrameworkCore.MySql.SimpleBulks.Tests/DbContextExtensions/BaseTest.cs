@@ -4,16 +4,16 @@ using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.DbContextExtensions;
 
-public abstract class BaseTest: IDisposable
+public abstract class BaseTest : IDisposable
 {
     protected readonly ITestOutputHelper _output;
 
     protected readonly TestDbContext _context;
 
-    protected BaseTest(ITestOutputHelper output, string dbPrefixName)
+    protected BaseTest(ITestOutputHelper output, string dbPrefixName, string schema = "")
     {
         _output = output;
-        _context = GetDbContext(dbPrefixName);
+        _context = GetDbContext(dbPrefixName, schema);
         _context.Database.EnsureCreated();
         _context.Database.ExecuteSqlRaw("SET GLOBAL local_infile = 1;");
     }
@@ -28,8 +28,8 @@ public abstract class BaseTest: IDisposable
         return $"server=localhost;database={dbPrefixName}.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true";
     }
 
-    protected TestDbContext GetDbContext(string dbPrefixName)
+    protected TestDbContext GetDbContext(string dbPrefixName, string schema)
     {
-        return new TestDbContext(GetConnectionString(dbPrefixName));
+        return new TestDbContext(GetConnectionString(dbPrefixName), schema);
     }
 }

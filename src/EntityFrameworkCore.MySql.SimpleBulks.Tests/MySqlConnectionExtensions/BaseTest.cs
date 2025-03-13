@@ -12,13 +12,13 @@ public abstract class BaseTest: IDisposable
     protected readonly TestDbContext _context;
     protected readonly MySqlConnection _connection;
 
-    protected BaseTest(ITestOutputHelper output, string dbPrefixName)
+    protected BaseTest(ITestOutputHelper output, string dbPrefixName, string schema = "")
     {
         _output = output;
 
         var connectionString = GetConnectionString(dbPrefixName);
 
-        _context = GetDbContext(connectionString);
+        _context = GetDbContext(connectionString, schema);
         _context.Database.EnsureCreated();
         _context.Database.ExecuteSqlRaw("SET GLOBAL local_infile = 1;");
         _connection = new MySqlConnection(connectionString);
@@ -34,8 +34,8 @@ public abstract class BaseTest: IDisposable
         return $"server=localhost;database={dbPrefixName}.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true";
     }
 
-    protected TestDbContext GetDbContext(string connectionString)
+    protected TestDbContext GetDbContext(string connectionString, string schema)
     {
-        return new TestDbContext(connectionString);
+        return new TestDbContext(connectionString, schema);
     }
 }

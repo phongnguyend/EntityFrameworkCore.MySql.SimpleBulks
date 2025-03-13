@@ -1,34 +1,21 @@
-using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
+﻿using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 using EntityFrameworkCore.MySql.SimpleBulks.BulkMerge;
 using EntityFrameworkCore.MySql.SimpleBulks.BulkUpdate;
 using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
-using EntityFrameworkCore.MySql.SimpleBulks.Tests.CustomSchema;
 using EntityFrameworkCore.MySql.SimpleBulks.Tests.Database;
 using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
 using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.MySqlConnectionExtensions;
 
-public class BulkUpdateTests : IDisposable
+public class BulkUpdateTests : BaseTest
 {
-    private readonly ITestOutputHelper _output;
+    private string _schema = "";
 
-    private TestDbContext _context;
-    private MySqlConnection _connection;
-
-    public BulkUpdateTests(ITestOutputHelper output)
+    public BulkUpdateTests(ITestOutputHelper output) : base(output, "SimpleBulks.BulkUpdate")
     {
-        _output = output;
-
-        var connectionString = $"server=localhost;database=SimpleBulks.BulkInsert.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true";
-        _context = new TestDbContext(connectionString);
-        _context.Database.EnsureCreated();
-
-        _connection = new MySqlConnection(connectionString);
-
-        TableMapper.Register(typeof(SingleKeyRow<int>), TestConstants.Schema, "SingleKeyRows");
-        TableMapper.Register(typeof(CompositeKeyRow<int, int>), TestConstants.Schema, "CompositeKeyRows");
+        TableMapper.Register(typeof(SingleKeyRow<int>), _schema, "SingleKeyRows");
+        TableMapper.Register(typeof(CompositeKeyRow<int, int>), _schema, "CompositeKeyRows");
 
         var tran = _context.Database.BeginTransaction();
 
@@ -61,11 +48,6 @@ public class BulkUpdateTests : IDisposable
                 row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 });
 
         tran.Commit();
-    }
-
-    public void Dispose()
-    {
-        _context.Database.EnsureDeleted();
     }
 
     [Theory]
@@ -112,7 +94,7 @@ public class BulkUpdateTests : IDisposable
             }
             else
             {
-                _connection.BulkUpdate(rows, new TableInfor(TestConstants.Schema, "SingleKeyRows"),
+                _connection.BulkUpdate(rows, new TableInfor(_schema, "SingleKeyRows"),
                     row => row.Id,
                     row => new { row.Column3, row.Column2 },
                     options =>
@@ -120,7 +102,7 @@ public class BulkUpdateTests : IDisposable
                         options.LogTo = _output.WriteLine;
                     });
 
-                _connection.BulkUpdate(compositeKeyRows, new TableInfor(TestConstants.Schema, "CompositeKeyRows"),
+                _connection.BulkUpdate(compositeKeyRows, new TableInfor(_schema, "CompositeKeyRows"),
                     row => new { row.Id1, row.Id2 },
                     row => new { row.Column3, row.Column2 },
                     options =>
@@ -175,7 +157,7 @@ public class BulkUpdateTests : IDisposable
             }
             else
             {
-                _connection.BulkMerge(rows, new TableInfor(TestConstants.Schema, "SingleKeyRows"),
+                _connection.BulkMerge(rows, new TableInfor(_schema, "SingleKeyRows"),
                     row => row.Id,
                     row => new { row.Column1, row.Column2 },
                     row => new { row.Column1, row.Column2, row.Column3, row.BulkId },
@@ -184,7 +166,7 @@ public class BulkUpdateTests : IDisposable
                         options.LogTo = _output.WriteLine;
                     });
 
-                _connection.BulkMerge(compositeKeyRows, new TableInfor(TestConstants.Schema, "CompositeKeyRows"),
+                _connection.BulkMerge(compositeKeyRows, new TableInfor(_schema, "CompositeKeyRows"),
                     row => new { row.Id1, row.Id2 },
                     row => new { row.Column1, row.Column2, row.Column3 },
                     row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 },
@@ -219,7 +201,7 @@ public class BulkUpdateTests : IDisposable
             }
             else
             {
-                _connection.BulkUpdate(rows, new TableInfor(TestConstants.Schema, "SingleKeyRows"),
+                _connection.BulkUpdate(rows, new TableInfor(_schema, "SingleKeyRows"),
                     "Id",
                     ["Column3", "Column2"],
                     options =>
@@ -227,7 +209,7 @@ public class BulkUpdateTests : IDisposable
                         options.LogTo = _output.WriteLine;
                     });
 
-                _connection.BulkUpdate(compositeKeyRows, new TableInfor(TestConstants.Schema, "CompositeKeyRows"),
+                _connection.BulkUpdate(compositeKeyRows, new TableInfor(_schema, "CompositeKeyRows"),
                     ["Id1", "Id2"],
                     ["Column3", "Column2"],
                     options =>
@@ -282,19 +264,19 @@ public class BulkUpdateTests : IDisposable
             }
             else
             {
-                _connection.BulkMerge(rows, new TableInfor(TestConstants.Schema, "SingleKeyRows"),
+                _connection.BulkMerge(rows, new TableInfor(_schema, "SingleKeyRows"),
                     "Id",
-                    [ "Column1", "Column2" ],
-                    [ "Column1", "Column2", "Column3", "BulkId"],
+                    ["Column1", "Column2"],
+                    ["Column1", "Column2", "Column3", "BulkId"],
                     options =>
                     {
                         options.LogTo = _output.WriteLine;
                     });
 
-                _connection.BulkMerge(compositeKeyRows, new TableInfor(TestConstants.Schema, "CompositeKeyRows"),
-                    [ "Id1", "Id2" ],
-                    [ "Column1", "Column2", "Column3" ],
-                    [ "Id1", "Id2", "Column1", "Column2", "Column3" ],
+                _connection.BulkMerge(compositeKeyRows, new TableInfor(_schema, "CompositeKeyRows"),
+                    ["Id1", "Id2"],
+                    ["Column1", "Column2", "Column3"],
+                    ["Id1", "Id2", "Column1", "Column2", "Column3"],
                     options =>
                     {
                         options.LogTo = _output.WriteLine;
