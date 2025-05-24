@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
@@ -93,6 +94,16 @@ public class BulkInsertBuilder<T>
         return _columnNameMappings.TryGetValue(columnName, out string value) ? value : columnName;
     }
 
+    private PropertyInfo GetIdProperty()
+    {
+        return typeof(T).GetProperty(_outputIdColumn);
+    }
+
+    private static Action<T, Guid> GetSetIdMethod(PropertyInfo idProperty)
+    {
+        return (Action<T, Guid>)Delegate.CreateDelegate(typeof(Action<T, Guid>), idProperty.GetSetMethod());
+    }
+
     public void Execute(IEnumerable<T> data)
     {
         if (data.Count() == 1)
@@ -140,12 +151,12 @@ public class BulkInsertBuilder<T>
                 columnsToInsert.Add(_outputIdColumn);
             }
 
-            var idProperty = typeof(T).GetProperty(_outputIdColumn);
-            var setIdDelegate = (Action<T, Guid>)Delegate.CreateDelegate(typeof(Action<T, Guid>), idProperty.GetSetMethod());
+            var idProperty = GetIdProperty();
+            var setId = GetSetIdMethod(idProperty);
 
             foreach (var row in data)
             {
-                setIdDelegate(row, SequentialGuidGenerator.Next());
+                setId(row, SequentialGuidGenerator.Next());
             }
 
             dataTable = data.ToDataTable(columnsToInsert);
@@ -188,10 +199,10 @@ public class BulkInsertBuilder<T>
                 columnsToInsert.Add(_outputIdColumn);
             }
 
-            var idProperty = typeof(T).GetProperty(_outputIdColumn);
-            var setIdDelegate = (Action<T, Guid>)Delegate.CreateDelegate(typeof(Action<T, Guid>), idProperty.GetSetMethod());
+            var idProperty = GetIdProperty();
+            var setId = GetSetIdMethod(idProperty);
 
-            setIdDelegate(dataToInsert, SequentialGuidGenerator.Next());
+            setId(dataToInsert, SequentialGuidGenerator.Next());
         }
 
         insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName} ({string.Join(", ", columnsToInsert.Select(x => $"`{GetDbColumnName(x)}`"))})");

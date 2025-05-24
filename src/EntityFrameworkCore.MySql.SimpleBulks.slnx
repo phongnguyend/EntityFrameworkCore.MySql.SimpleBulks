@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/benchmarks/">
+    <Project Path="EntityFrameworkCore.MySql.SimpleBulks.Benchmarks/EntityFrameworkCore.MySql.SimpleBulks.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/examples/">
+    <Project Path="EntityFrameworkCore.MySql.SimpleBulks.Demo/EntityFrameworkCore.MySql.SimpleBulks.Demo.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="EntityFrameworkCore.MySql.SimpleBulks/EntityFrameworkCore.MySql.SimpleBulks.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="EntityFrameworkCore.MySql.SimpleBulks.Tests/EntityFrameworkCore.MySql.SimpleBulks.Tests.csproj" />
+  </Folder>
+</Solution>
