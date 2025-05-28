@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
 using MySqlConnector;
 using System;
@@ -53,7 +54,8 @@ public static class DbContextExtensions
                 ColumnType = entityProp.GetColumnType(),
                 ValueGenerated = entityProp.ValueGenerated,
                 DefaultValueSql = entityProp.GetDefaultValueSql(),
-                IsPrimaryKey = entityProp.IsPrimaryKey()
+                IsPrimaryKey = entityProp.IsPrimaryKey(),
+                IsRowVersion = entityProp.IsRowVersion()
             });
 
         return data.ToList();
@@ -88,5 +90,13 @@ public static class DbContextExtensions
         {
             guids.Enqueue(item);
         }
+    }
+
+    public static bool IsRowVersion(this IProperty property)
+    {
+        return property.IsConcurrencyToken
+            && property.ValueGenerated == ValueGenerated.OnAddOrUpdate
+            && property.ClrType == typeof(byte[])
+            && string.Equals(property.GetColumnType(), "timestamp(6)", StringComparison.OrdinalIgnoreCase);
     }
 }
