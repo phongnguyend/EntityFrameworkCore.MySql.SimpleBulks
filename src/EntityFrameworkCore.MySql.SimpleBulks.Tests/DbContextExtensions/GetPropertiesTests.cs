@@ -47,4 +47,18 @@ public class GetPropertiesTests
         Assert.False(versionProperty.IsPrimaryKey);
         Assert.True(versionProperty.IsRowVersion);
     }
+
+    [Fact]
+    public void GetProperties_ShouldReturnFromCache()
+    {
+        // Arrange
+        var dbContext = GetDbContext("Tests", "");
+
+        // Act
+        var properties1 = dbContext.GetProperties(typeof(ConfigurationEntry));
+        var properties2 = dbContext.GetProperties(typeof(ConfigurationEntry));
+
+        // Assert
+        Assert.Equal(properties1, properties2);
+    }
 }
