@@ -61,4 +61,31 @@ public class GetPropertiesTests
         // Assert
         Assert.Equal(properties1, properties2);
     }
+
+    [Fact]
+    public async Task GetProperties_MultiThreads_ShoudReturnFromCache()
+    {
+        // Arrange && Act
+        var tasks = new List<Task<IList<ColumnInfor>>>();
+        for (int i = 0; i < 100; i++)
+        {
+            tasks.Add(Task.Run(() =>
+            {
+                using var dbct = GetDbContext("Tests", "");
+                return dbct.GetProperties(typeof(ConfigurationEntry));
+            }));
+        }
+
+        await Task.WhenAll(tasks.ToArray());
+
+        var dbContext = GetDbContext("Tests", "");
+
+        var properties = dbContext.GetProperties(typeof(ConfigurationEntry));
+
+        foreach (var task in tasks)
+        {
+            // Assert
+            Assert.Equal(properties, task.Result);
+        }
+    }
 }
