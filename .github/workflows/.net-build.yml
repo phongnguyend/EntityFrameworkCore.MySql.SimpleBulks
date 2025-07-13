@@ -27,7 +27,7 @@ jobs:
         dotnet-version: 8.0.100
 
     - name: Test
-      run: dotnet test EntityFrameworkCore.MySql.SimpleBulks.Tests/EntityFrameworkCore.MySql.SimpleBulks.Tests.csproj
+      run: dotnet test EntityFrameworkCore.MySql.SimpleBulks.Tests/EntityFrameworkCore.MySql.SimpleBulks.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
 
     - name: Build
       run: dotnet build EntityFrameworkCore.MySql.SimpleBulks/EntityFrameworkCore.MySql.SimpleBulks.csproj --configuration Release
