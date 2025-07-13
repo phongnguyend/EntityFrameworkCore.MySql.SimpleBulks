@@ -7,12 +7,13 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.DbContextExtensions;
 public abstract class BaseTest : IDisposable
 {
     protected readonly ITestOutputHelper _output;
-
+    protected readonly MySqlFixture _fixture;
     protected readonly TestDbContext _context;
 
-    protected BaseTest(ITestOutputHelper output, string dbPrefixName, string schema = "")
+    protected BaseTest(ITestOutputHelper output, MySqlFixture fixture, string dbPrefixName, string schema = "")
     {
         _output = output;
+        _fixture = fixture;
         _context = GetDbContext(dbPrefixName, schema);
         _context.Database.EnsureCreated();
         _context.Database.ExecuteSqlRaw("SET GLOBAL local_infile = 1;");
@@ -23,13 +24,8 @@ public abstract class BaseTest : IDisposable
         _context.Database.EnsureDeleted();
     }
 
-    protected string GetConnectionString(string dbPrefixName)
-    {
-        return $"server=localhost;database={dbPrefixName}.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true";
-    }
-
     protected TestDbContext GetDbContext(string dbPrefixName, string schema)
     {
-        return new TestDbContext(GetConnectionString(dbPrefixName), schema);
+        return new TestDbContext(_fixture.GetConnectionString(dbPrefixName), schema);
     }
 }

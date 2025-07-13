@@ -6,11 +6,12 @@ using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.MySqlConnectionExtensions;
 
+[Collection("MySqlCollection")]
 public class BulkDeleteTests : BaseTest
 {
     private string _schema = "";
 
-    public BulkDeleteTests(ITestOutputHelper output) : base(output, "SimpleBulks.BulkDelete")
+    public BulkDeleteTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkDelete")
     {
         TableMapper.Register(typeof(SingleKeyRow<int>), _schema, "SingleKeyRows");
         TableMapper.Register(typeof(CompositeKeyRow<int, int>), _schema, "CompositeKeyRows");

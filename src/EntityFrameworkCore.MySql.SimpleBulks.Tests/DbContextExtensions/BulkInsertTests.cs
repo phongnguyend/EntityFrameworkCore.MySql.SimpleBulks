@@ -6,9 +6,10 @@ using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.DbContextExtensions;
 
+[Collection("MySqlCollection")]
 public class BulkInsertTests : BaseTest
 {
-    public BulkInsertTests(ITestOutputHelper output) : base(output, "SimpleBulks.BulkInsert")
+    public BulkInsertTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkInsert")
     {
     }
 

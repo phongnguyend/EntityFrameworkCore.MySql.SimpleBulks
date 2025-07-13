@@ -7,9 +7,10 @@ using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.DbContextExtensions;
 
+[Collection("MySqlCollection")]
 public class DirectUpdateTests : BaseTest
 {
-    public DirectUpdateTests(ITestOutputHelper output) : base(output, "SimpleBulks.DirectUpdate")
+    public DirectUpdateTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.DirectUpdate")
     {
     }
 

@@ -6,9 +6,10 @@ using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.DbContextExtensions;
 
+[Collection("MySqlCollection")]
 public class BulkDeleteTests : BaseTest
 {
-    public BulkDeleteTests(ITestOutputHelper output) : base(output, "SimpleBulks.BulkDelete")
+    public BulkDeleteTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkDelete")
     {
         var tran = _context.Database.BeginTransaction();
 

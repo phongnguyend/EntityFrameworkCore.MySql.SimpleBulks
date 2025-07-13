@@ -5,12 +5,13 @@ using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.DbContextExtensions;
 
+[Collection("MySqlCollection")]
 public class BulkMatchTests : BaseTest
 {
     private readonly List<Customer> _customers;
     private readonly List<Contact> _contacts;
 
-    public BulkMatchTests(ITestOutputHelper output) : base(output, "SimpleBulks.BulkMatch")
+    public BulkMatchTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkMatch")
     {
         var tran = _context.Database.BeginTransaction();
 

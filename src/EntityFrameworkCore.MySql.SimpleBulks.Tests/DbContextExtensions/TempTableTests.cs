@@ -6,6 +6,7 @@ using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.DbContextExtensions;
 
+[Collection("MySqlCollection")]
 public class TempTableTests : BaseTest
 {
     private readonly static List<CustomerDto> _customers = new List<CustomerDto>
@@ -58,7 +59,7 @@ public class TempTableTests : BaseTest
         }
     };
 
-    public TempTableTests(ITestOutputHelper output) : base(output, "SimpleBulks.TempTable")
+    public TempTableTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.TempTable")
     {
     }
 

@@ -8,11 +8,12 @@ using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.MySqlConnectionExtensions;
 
+[Collection("MySqlCollection")]
 public class BulkUpdateTests : BaseTest
 {
     private string _schema = "";
 
-    public BulkUpdateTests(ITestOutputHelper output) : base(output, "SimpleBulks.BulkUpdate")
+    public BulkUpdateTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkUpdate")
     {
         TableMapper.Register(typeof(SingleKeyRow<int>), _schema, "SingleKeyRows");
         TableMapper.Register(typeof(CompositeKeyRow<int, int>), _schema, "CompositeKeyRows");

@@ -8,15 +8,15 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.MySqlConnectionExtensions;
 public abstract class BaseTest: IDisposable
 {
     protected readonly ITestOutputHelper _output;
-
+    protected readonly MySqlFixture _fixture;
     protected readonly TestDbContext _context;
     protected readonly MySqlConnection _connection;
 
-    protected BaseTest(ITestOutputHelper output, string dbPrefixName, string schema = "")
+    protected BaseTest(ITestOutputHelper output, MySqlFixture fixture, string dbPrefixName, string schema = "")
     {
         _output = output;
-
-        var connectionString = GetConnectionString(dbPrefixName);
+        _fixture = fixture;
+        var connectionString = _fixture.GetConnectionString(dbPrefixName);
 
         _context = GetDbContext(connectionString, schema);
         _context.Database.EnsureCreated();
@@ -27,11 +27,6 @@ public abstract class BaseTest: IDisposable
     public void Dispose()
     {
         _context.Database.EnsureDeleted();
-    }
-
-    protected string GetConnectionString(string dbPrefixName)
-    {
-        return $"server=localhost;database={dbPrefixName}.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true";
     }
 
     protected TestDbContext GetDbContext(string connectionString, string schema)
