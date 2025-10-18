@@ -3,12 +3,14 @@ using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.DirectDelete;
 
-public static class DbContextExtensions
+public static class DbContextAsyncExtensions
 {
-    public static BulkDeleteResult DirectDelete<T>(this DbContext dbContext, T data, Action<BulkDeleteOptions> configureOptions = null)
+    public static Task<BulkDeleteResult> DirectDeleteAsync<T>(this DbContext dbContext, T data, Action<BulkDeleteOptions> configureOptions = null, CancellationToken cancellationToken = default)
     {
         var table = dbContext.GetTableInfor(typeof(T));
         var connection = dbContext.GetMySqlConnection();
@@ -24,6 +26,6 @@ public static class DbContextExtensions
              .WithDbColumnTypeMappings(properties.ToDictionary(x => x.PropertyName, x => x.ColumnType))
              .ToTable(table)
              .ConfigureBulkOptions(configureOptions)
-             .SingleDelete(data);
+             .SingleDeleteAsync(data, cancellationToken);
     }
 }
