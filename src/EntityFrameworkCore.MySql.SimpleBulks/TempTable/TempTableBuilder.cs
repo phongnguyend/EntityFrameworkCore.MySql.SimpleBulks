@@ -117,7 +117,7 @@ public class TempTableBuilder<T>
     public async Task<string> ExecuteAsync(CancellationToken cancellationToken = default)
     {
         var tempTableName = $"`{GetTableName()}`";
-        var dataTable = _data.ToDataTable(_columnNames);
+        var dataTable = await _data.ToDataTableAsync(_columnNames, cancellationToken: cancellationToken);
         var sqlCreateTempTable = dataTable.GenerateTempTableDefinition(tempTableName, _columnNameMappings, _columnTypeMappings);
 
         Log($"Begin creating temp table:{Environment.NewLine}{sqlCreateTempTable}");
