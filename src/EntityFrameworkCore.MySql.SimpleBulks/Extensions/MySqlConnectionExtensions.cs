@@ -3,14 +3,9 @@ using System.Data;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 
-public static class IDbConnectionExtensions
+public static class MySqlConnectionExtensions
 {
-    public static MySqlConnection AsMySqlConnection(this IDbConnection connection)
-    {
-        return connection as MySqlConnection;
-    }
-
-    public static void EnsureOpen(this IDbConnection connection)
+    public static void EnsureOpen(this MySqlConnection connection)
     {
         var connectionState = connection.State;
 
@@ -20,7 +15,7 @@ public static class IDbConnectionExtensions
         }
     }
 
-    public static void EnsureClosed(this IDbConnection connection)
+    public static void EnsureClosed(this MySqlConnection connection)
     {
         var connectionState = connection.State;
 
@@ -30,7 +25,7 @@ public static class IDbConnectionExtensions
         }
     }
 
-    public static IDbCommand CreateTextCommand(this IDbConnection connection, IDbTransaction transaction, string commandText, BulkOptions options = null)
+    public static MySqlCommand CreateTextCommand(this MySqlConnection connection, MySqlTransaction transaction, string commandText, BulkOptions options = null)
     {
         options ??= new BulkOptions()
         {

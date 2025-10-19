@@ -46,7 +46,7 @@ public static class DbContextExtensions
 
     public static MySqlConnection GetMySqlConnection(this DbContext dbContext)
     {
-        return dbContext.Database.GetDbConnection().AsMySqlConnection();
+        return dbContext.Database.GetDbConnection() as MySqlConnection;
     }
 
     public static MySqlTransaction GetCurrentMySqlTransaction(this DbContext dbContext)
