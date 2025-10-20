@@ -246,8 +246,98 @@ public class BulkMergeBuilder<T>
         _options?.LogTo?.Invoke($"{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss.fff zzz} [BulkMerge]: {message}");
     }
 
-    public Task<BulkMergeResult> ExecuteAsync(IEnumerable<T> data, CancellationToken cancellationToken = default)
+    public async Task<BulkMergeResult> ExecuteAsync(IEnumerable<T> data, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(Execute(data));
+        if (!_updateColumnNames.Any() && !_insertColumnNames.Any())
+        {
+            return new BulkMergeResult();
+        }
+
+        var temptableName = $"`{Guid.NewGuid()}`";
+
+        var propertyNames = _updateColumnNames.Select(RemoveOperator).ToList();
+        propertyNames.AddRange(_idColumns);
+        propertyNames.AddRange(_insertColumnNames);
+        propertyNames = propertyNames.Distinct().ToList();
+
+        var dataTable = await data.ToDataTableAsync(propertyNames, cancellationToken: cancellationToken);
+        var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _columnTypeMappings);
+        sqlCreateTemptable += $"\nCREATE INDEX Idx_Id ON {temptableName} ({string.Join(",", _idColumns.Select(x => $"`{x}`"))});";
+
+        var joinCondition = string.Join(" and ", _idColumns.Select(x =>
+        {
+            string collation = !string.IsNullOrEmpty(_options.Collation) && dataTable.Columns[x].DataType == typeof(string) ?
+            $" collate {_options.Collation}" : string.Empty;
+            return $"s.`{x}`{collation} = t.`{GetDbColumnName(x)}`{collation}";
+        }));
+
+        var whereCondition = string.Join(" and ", _idColumns.Select(x =>
+        {
+            return $"t.`{GetDbColumnName(x)}` IS NULL";
+        }));
+
+        var insertStatementBuilder = new StringBuilder();
+        var updateStatementBuilder = new StringBuilder();
+
+        if (_updateColumnNames.Any())
+        {
+            updateStatementBuilder.AppendLine($"UPDATE {_table.SchemaQualifiedTableName} t JOIN {temptableName} s ON " + joinCondition);
+            updateStatementBuilder.AppendLine($"SET {string.Join("," + Environment.NewLine, _updateColumnNames.Select(x => CreateSetStatement(x, "t", "s")))};");
+        }
+
+        if (_insertColumnNames.Any())
+        {
+            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{GetDbColumnName(x)}`"))})");
+            insertStatementBuilder.AppendLine($"SELECT {string.Join(", ", _insertColumnNames.Select(x => $"s.`{x}`"))}");
+            insertStatementBuilder.AppendLine($"FROM {temptableName} s");
+            insertStatementBuilder.AppendLine($"LEFT JOIN {_table.SchemaQualifiedTableName} t ON {joinCondition}");
+            insertStatementBuilder.AppendLine($"WHERE {whereCondition};");
+        }
+
+        await _connection.EnsureOpenAsync(cancellationToken);
+
+        Log($"Begin creating temp table:{Environment.NewLine}{sqlCreateTemptable}");
+
+        using (var createTemptableCommand = _connection.CreateTextCommand(_transaction, sqlCreateTemptable, _options))
+        {
+            await createTemptableCommand.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        Log("End creating temp table.");
+
+        Log($"Begin executing SqlBulkCopy. TableName: {temptableName}");
+        await dataTable.SqlBulkCopyAsync(temptableName, null, _connection, _transaction, _options, cancellationToken);
+        Log("End executing SqlBulkCopy.");
+
+        var result = new BulkMergeResult();
+
+        if (_updateColumnNames.Any())
+        {
+            var sqlUpdateStatement = updateStatementBuilder.ToString();
+
+            Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
+
+            using var updateCommand = _connection.CreateTextCommand(_transaction, sqlUpdateStatement, _options);
+
+            result.UpdatedRows = await updateCommand.ExecuteNonQueryAsync(cancellationToken);
+
+            Log("End updating.");
+        }
+
+        if (_insertColumnNames.Any())
+        {
+            var sqlInsertStatement = insertStatementBuilder.ToString();
+
+            Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
+
+            using var insertCommand = _connection.CreateTextCommand(_transaction, sqlInsertStatement, _options);
+
+            result.InsertedRows = await insertCommand.ExecuteNonQueryAsync(cancellationToken);
+
+            Log("End inserting.");
+        }
+
+        result.AffectedRows = result.UpdatedRows + result.InsertedRows;
+        return result;
     }
 }

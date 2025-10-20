@@ -1,5 +1,7 @@
 ﻿using MySqlConnector;
 using System.Data;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 
@@ -12,6 +14,16 @@ public static class MySqlConnectionExtensions
         if (connectionState != ConnectionState.Open)
         {
             connection.Open();
+        }
+    }
+
+    public static async Task EnsureOpenAsync(this MySqlConnection connection, CancellationToken cancellationToken = default)
+    {
+        var connectionState = connection.State;
+
+        if (connectionState != ConnectionState.Open)
+        {
+            await connection.OpenAsync(cancellationToken);
         }
     }
 

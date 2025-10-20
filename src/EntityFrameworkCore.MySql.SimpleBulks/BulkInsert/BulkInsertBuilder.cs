@@ -236,15 +236,121 @@ public class BulkInsertBuilder<T>
         _options?.LogTo?.Invoke($"{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss.fff zzz} [BulkInsert]: {message}");
     }
 
-    public Task ExecuteAsync(IEnumerable<T> data, CancellationToken cancellationToken = default)
+    public async Task ExecuteAsync(IEnumerable<T> data, CancellationToken cancellationToken = default)
     {
-        Execute(data);
-        return Task.CompletedTask;
+        if (data.Count() == 1)
+        {
+            await SingleInsertAsync(data.First(), cancellationToken);
+            return;
+        }
+
+        DataTable dataTable;
+        if (string.IsNullOrWhiteSpace(_outputIdColumn))
+        {
+            dataTable = await data.ToDataTableAsync(_columnNames, cancellationToken: cancellationToken);
+
+            await _connection.EnsureOpenAsync(cancellationToken);
+
+            Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
+            await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _columnNameMappings, _connection, _transaction, _options, cancellationToken);
+            Log("End executing SqlBulkCopy.");
+            return;
+        }
+
+        if (_options.KeepIdentity)
+        {
+            var columnsToInsert = _columnNames.Select(x => x).ToList();
+            if (!columnsToInsert.Contains(_outputIdColumn))
+            {
+                columnsToInsert.Add(_outputIdColumn);
+            }
+
+            dataTable = await data.ToDataTableAsync(columnsToInsert, cancellationToken: cancellationToken);
+
+            await _connection.EnsureOpenAsync(cancellationToken);
+
+            Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
+            await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _columnNameMappings, _connection, _transaction, _options, cancellationToken);
+            Log("End executing SqlBulkCopy.");
+            return;
+        }
+
+        if (_outputIdMode == OutputIdMode.ClientGenerated)
+        {
+            var columnsToInsert = _columnNames.Select(x => x).ToList();
+            if (!columnsToInsert.Contains(_outputIdColumn))
+            {
+                columnsToInsert.Add(_outputIdColumn);
+            }
+
+            var idProperty = GetIdProperty();
+            var setId = GetSetIdMethod(idProperty);
+
+            foreach (var row in data)
+            {
+                setId(row, SequentialGuidGenerator.Next());
+            }
+
+            dataTable = await data.ToDataTableAsync(columnsToInsert, cancellationToken: cancellationToken);
+
+            await _connection.EnsureOpenAsync(cancellationToken);
+
+            Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
+            await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _columnNameMappings, _connection, _transaction, _options, cancellationToken);
+            Log("End executing SqlBulkCopy.");
+            return;
+        }
+
+        dataTable = await data.ToDataTableAsync(_columnNames, cancellationToken: cancellationToken);
+
+        await _connection.EnsureOpenAsync(cancellationToken);
+
+        Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
+        await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _columnNameMappings, _connection, _transaction, _options, cancellationToken);
+        Log("End executing SqlBulkCopy.");
+        return;
     }
 
-    public Task SingleInsertAsync(T dataToInsert, CancellationToken cancellationToken = default)
+    public async Task SingleInsertAsync(T dataToInsert, CancellationToken cancellationToken = default)
     {
-        SingleInsert(dataToInsert);
-        return Task.CompletedTask;
+        var insertStatementBuilder = new StringBuilder();
+
+        var columnsToInsert = _columnNames.Select(x => x).ToList();
+
+        if (_options.KeepIdentity)
+        {
+            if (!columnsToInsert.Contains(_outputIdColumn))
+            {
+                columnsToInsert.Add(_outputIdColumn);
+            }
+        }
+        else if (_outputIdMode == OutputIdMode.ClientGenerated)
+        {
+            if (!columnsToInsert.Contains(_outputIdColumn))
+            {
+                columnsToInsert.Add(_outputIdColumn);
+            }
+
+            var idProperty = GetIdProperty();
+            var setId = GetSetIdMethod(idProperty);
+
+            setId(dataToInsert, SequentialGuidGenerator.Next());
+        }
+
+        insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName} ({string.Join(", ", columnsToInsert.Select(x => $"`{GetDbColumnName(x)}`"))})");
+        insertStatementBuilder.AppendLine($"VALUES ({string.Join(", ", columnsToInsert.Select(x => $"@{x}"))})");
+
+        var insertStatement = insertStatementBuilder.ToString();
+
+        using var insertCommand = _connection.CreateTextCommand(_transaction, insertStatement, _options);
+        dataToInsert.ToMySqlParameters(columnsToInsert).ForEach(x => insertCommand.Parameters.Add(x));
+
+        Log($"Begin inserting: {Environment.NewLine}{insertStatement}");
+
+        await _connection.EnsureOpenAsync(cancellationToken);
+
+        var affectedRow = await insertCommand.ExecuteNonQueryAsync(cancellationToken);
+
+        Log($"End inserting.");
     }
 }
