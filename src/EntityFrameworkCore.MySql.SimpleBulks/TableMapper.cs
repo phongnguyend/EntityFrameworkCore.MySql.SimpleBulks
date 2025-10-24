@@ -10,14 +10,9 @@ public static class TableMapper
 
     public static void Register(Type type, string tableName)
     {
-        Register(type, null, tableName);
-    }
-
-    public static void Register(Type type, string schema, string tableName)
-    {
         lock (_lock)
         {
-            _mappings[type] = new TableInfor(schema, tableName);
+            _mappings[type] = new TableInfor(tableName);
         }
     }
 

@@ -11,12 +11,10 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.MySqlConnectionAsyncExtens
 [Collection("MySqlCollection")]
 public class BulkUpdateTests : BaseTest
 {
-    private string _schema = "";
-
     public BulkUpdateTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkUpdate")
     {
-        TableMapper.Register(typeof(SingleKeyRow<int>), _schema, "SingleKeyRows");
-        TableMapper.Register(typeof(CompositeKeyRow<int, int>), _schema, "CompositeKeyRows");
+        TableMapper.Register(typeof(SingleKeyRow<int>), GetTableName("SingleKeyRows"));
+        TableMapper.Register(typeof(CompositeKeyRow<int, int>), GetTableName("CompositeKeyRows"));
 
         var tran = _context.Database.BeginTransaction();
 
@@ -95,7 +93,7 @@ public class BulkUpdateTests : BaseTest
             }
             else
             {
-                await _connection.BulkUpdateAsync(rows, new TableInfor(_schema, "SingleKeyRows"),
+                await _connection.BulkUpdateAsync(rows, new TableInfor(GetTableName("SingleKeyRows")),
                     row => row.Id,
                     row => new { row.Column3, row.Column2 },
                     options =>
@@ -103,7 +101,7 @@ public class BulkUpdateTests : BaseTest
                         options.LogTo = _output.WriteLine;
                     });
 
-                await _connection.BulkUpdateAsync(compositeKeyRows, new TableInfor(_schema, "CompositeKeyRows"),
+                await _connection.BulkUpdateAsync(compositeKeyRows, new TableInfor(GetTableName("CompositeKeyRows")),
                     row => new { row.Id1, row.Id2 },
                     row => new { row.Column3, row.Column2 },
                     options =>
@@ -158,7 +156,7 @@ public class BulkUpdateTests : BaseTest
             }
             else
             {
-                await _connection.BulkMergeAsync(rows, new TableInfor(_schema, "SingleKeyRows"),
+                await _connection.BulkMergeAsync(rows, new TableInfor(GetTableName("SingleKeyRows")),
                     row => row.Id,
                     row => new { row.Column1, row.Column2 },
                     row => new { row.Column1, row.Column2, row.Column3, row.BulkId },
@@ -167,7 +165,7 @@ public class BulkUpdateTests : BaseTest
                         options.LogTo = _output.WriteLine;
                     });
 
-                await _connection.BulkMergeAsync(compositeKeyRows, new TableInfor(_schema, "CompositeKeyRows"),
+                await _connection.BulkMergeAsync(compositeKeyRows, new TableInfor(GetTableName("CompositeKeyRows")),
                     row => new { row.Id1, row.Id2 },
                     row => new { row.Column1, row.Column2, row.Column3 },
                     row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 },
@@ -202,7 +200,7 @@ public class BulkUpdateTests : BaseTest
             }
             else
             {
-                await _connection.BulkUpdateAsync(rows, new TableInfor(_schema, "SingleKeyRows"),
+                await _connection.BulkUpdateAsync(rows, new TableInfor(GetTableName("SingleKeyRows")),
                     "Id",
                     ["Column3", "Column2"],
                     options =>
@@ -210,7 +208,7 @@ public class BulkUpdateTests : BaseTest
                         options.LogTo = _output.WriteLine;
                     });
 
-                await _connection.BulkUpdateAsync(compositeKeyRows, new TableInfor(_schema, "CompositeKeyRows"),
+                await _connection.BulkUpdateAsync(compositeKeyRows, new TableInfor(GetTableName("CompositeKeyRows")),
                     ["Id1", "Id2"],
                     ["Column3", "Column2"],
                     options =>
@@ -265,7 +263,7 @@ public class BulkUpdateTests : BaseTest
             }
             else
             {
-                await _connection.BulkMergeAsync(rows, new TableInfor(_schema, "SingleKeyRows"),
+                await _connection.BulkMergeAsync(rows, new TableInfor(GetTableName("SingleKeyRows")),
                     "Id",
                     ["Column1", "Column2"],
                     ["Column1", "Column2", "Column3", "BulkId"],
@@ -274,7 +272,7 @@ public class BulkUpdateTests : BaseTest
                         options.LogTo = _output.WriteLine;
                     });
 
-                await _connection.BulkMergeAsync(compositeKeyRows, new TableInfor(_schema, "CompositeKeyRows"),
+                await _connection.BulkMergeAsync(compositeKeyRows, new TableInfor(GetTableName("CompositeKeyRows")),
                     ["Id1", "Id2"],
                     ["Column1", "Column2", "Column3"],
                     ["Id1", "Id2", "Column1", "Column2", "Column3"],

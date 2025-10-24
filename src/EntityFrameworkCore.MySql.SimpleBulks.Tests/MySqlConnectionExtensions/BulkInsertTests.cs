@@ -9,12 +9,10 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.MySqlConnectionExtensions;
 [Collection("MySqlCollection")]
 public class BulkInsertTests : BaseTest
 {
-    private string _schema = "";
-
     public BulkInsertTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkInsert")
     {
-        TableMapper.Register(typeof(SingleKeyRow<int>), _schema, "SingleKeyRows");
-        TableMapper.Register(typeof(CompositeKeyRow<int, int>), _schema, "CompositeKeyRows");
+        TableMapper.Register(typeof(SingleKeyRow<int>), GetTableName("SingleKeyRows"));
+        TableMapper.Register(typeof(CompositeKeyRow<int, int>), GetTableName("CompositeKeyRows"));
     }
 
     [Theory]
@@ -70,14 +68,14 @@ public class BulkInsertTests : BaseTest
             }
             else
             {
-                _connection.BulkInsert(rows, new TableInfor(_schema, "SingleKeyRows"),
+                _connection.BulkInsert(rows, new TableInfor(GetTableName("SingleKeyRows")),
                     row => new { row.Column1, row.Column2, row.Column3, row.BulkId, row.BulkIndex },
                     options =>
                     {
                         options.LogTo = _output.WriteLine;
                     });
 
-                _connection.BulkInsert(compositeKeyRows, new TableInfor(_schema, "CompositeKeyRows"),
+                _connection.BulkInsert(compositeKeyRows, new TableInfor(GetTableName("CompositeKeyRows")),
                     row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 },
                     options =>
                     {
@@ -106,14 +104,14 @@ public class BulkInsertTests : BaseTest
             }
             else
             {
-                _connection.BulkInsert(rows, new TableInfor(_schema, "SingleKeyRows"),
+                _connection.BulkInsert(rows, new TableInfor(GetTableName("SingleKeyRows")),
                     ["Column1", "Column2", "Column3", "BulkId", "BulkIndex"],
                     options =>
                     {
                         options.LogTo = _output.WriteLine;
                     });
 
-                _connection.BulkInsert(compositeKeyRows, new TableInfor(_schema, "CompositeKeyRows"),
+                _connection.BulkInsert(compositeKeyRows, new TableInfor(GetTableName("CompositeKeyRows")),
                     ["Id1", "Id2", "Column1", "Column2", "Column3"],
                     options =>
                     {

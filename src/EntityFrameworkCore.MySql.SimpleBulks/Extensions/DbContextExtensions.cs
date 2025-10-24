@@ -15,6 +15,7 @@ public static class DbContextExtensions
 {
     private readonly record struct CacheKey(Type DbContextType, Type EntityType);
 
+    private static readonly ConcurrentDictionary<Type, Func<string, string, string>> _schemaNameTranslators = new ConcurrentDictionary<Type, Func<string, string, string>>();
     private static readonly ConcurrentDictionary<CacheKey, IReadOnlyList<ColumnInfor>> _propertiesCache = [];
     private static readonly ConcurrentDictionary<CacheKey, TableInfor> _tableInfoCache = [];
     private static readonly ConcurrentDictionary<CacheKey, IReadOnlyDictionary<string, string>> _columnNamesCache = [];
@@ -26,6 +27,11 @@ public static class DbContextExtensions
     private static readonly ConcurrentDictionary<CacheKey, IReadOnlyList<string>> _allPropertyNamesWithoutRowVersionsCache = [];
     private static readonly ConcurrentDictionary<CacheKey, IReadOnlyDictionary<string, ValueConverter>> _valueConvertersCache = [];
 
+    public static void RegisterSchemaNameTranslator(this DbContext dbContext, Func<string, string, string> translator)
+    {
+        _schemaNameTranslators[dbContext.GetType()] = translator;
+    }
+
     public static TableInfor GetTableInfor(this DbContext dbContext, Type type)
     {
         var cacheKey = new CacheKey(dbContext.GetType(), type);
@@ -36,7 +42,10 @@ public static class DbContextExtensions
             var schema = entityType.GetSchema();
             var tableName = entityType.GetTableName();
 
-            var tableInfo = new TableInfor(schema, tableName);
+            _schemaNameTranslators.TryGetValue(dbContext.GetType(), out var schemaNameTranslator);
+
+            var tableInfo = new TableInfor(schema, tableName, schemaNameTranslator);
+            
             return tableInfo;
         });
     }

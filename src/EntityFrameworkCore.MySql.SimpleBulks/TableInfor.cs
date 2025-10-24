@@ -1,4 +1,6 @@
-﻿namespace EntityFrameworkCore.MySql.SimpleBulks;
+﻿using System;
+
+namespace EntityFrameworkCore.MySql.SimpleBulks;
 
 public class TableInfor
 {
@@ -8,15 +10,15 @@ public class TableInfor
 
     public string SchemaQualifiedTableName { get; private set; }
 
-    public TableInfor(string schema, string tableName)
+    public TableInfor(string schema, string tableName, Func<string, string, string> schemaTranslator)
     {
         Schema = schema;
         Name = tableName;
 
-        SchemaQualifiedTableName = string.IsNullOrEmpty(schema) ? $"`{tableName}`" : $"`{schema}_{tableName}`";
+        SchemaQualifiedTableName = string.IsNullOrEmpty(schema) ? $"`{tableName}`" : $"`{schemaTranslator(schema, tableName)}`";
     }
 
-    public TableInfor(string tableName) : this(null, tableName)
+    public TableInfor(string tableName) : this(null, tableName, null)
     {
     }
 }

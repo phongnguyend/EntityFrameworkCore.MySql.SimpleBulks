@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.Database;
 
@@ -29,6 +30,8 @@ public class TestDbContext : DbContext
         if (!string.IsNullOrEmpty(_schema))
         {
             optionsBuilder.UseMySql(_connectionString, serverVersion, o => o.SchemaBehavior(MySqlSchemaBehavior.Translate, (schema, table) => $"{schema}_{table}"));
+
+            this.RegisterSchemaNameTranslator((schema, table) => $"{schema}_{table}");
         }
         else
         {
