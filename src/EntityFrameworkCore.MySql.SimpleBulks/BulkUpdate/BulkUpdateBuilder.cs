@@ -184,7 +184,7 @@ public class BulkUpdateBuilder<T>
 
         using var updateCommand = _connection.CreateTextCommand(_transaction, sqlUpdateStatement, _options);
 
-        dataToUpdate.ToMySqlParameters(propertyNamesIncludeId).ForEach(x => updateCommand.Parameters.Add(x));
+        dataToUpdate.ToMySqlParameters(propertyNamesIncludeId, valueConverters: _valueConverters).ForEach(x => updateCommand.Parameters.Add(x));
 
         _connection.EnsureOpen();
 
@@ -309,7 +309,7 @@ public class BulkUpdateBuilder<T>
 
         using var updateCommand = _connection.CreateTextCommand(_transaction, sqlUpdateStatement, _options);
 
-        dataToUpdate.ToMySqlParameters(propertyNamesIncludeId).ForEach(x => updateCommand.Parameters.Add(x));
+        dataToUpdate.ToMySqlParameters(propertyNamesIncludeId, valueConverters: _valueConverters).ForEach(x => updateCommand.Parameters.Add(x));
 
         await _connection.EnsureOpenAsync(cancellationToken);
 

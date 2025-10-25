@@ -228,7 +228,7 @@ public class BulkInsertBuilder<T>
         var insertStatement = insertStatementBuilder.ToString();
 
         using var insertCommand = _connection.CreateTextCommand(_transaction, insertStatement, _options);
-        dataToInsert.ToMySqlParameters(columnsToInsert).ForEach(x => insertCommand.Parameters.Add(x));
+        dataToInsert.ToMySqlParameters(columnsToInsert, valueConverters: _valueConverters).ForEach(x => insertCommand.Parameters.Add(x));
 
         Log($"Begin inserting: {Environment.NewLine}{insertStatement}");
 
@@ -351,7 +351,7 @@ public class BulkInsertBuilder<T>
         var insertStatement = insertStatementBuilder.ToString();
 
         using var insertCommand = _connection.CreateTextCommand(_transaction, insertStatement, _options);
-        dataToInsert.ToMySqlParameters(columnsToInsert).ForEach(x => insertCommand.Parameters.Add(x));
+        dataToInsert.ToMySqlParameters(columnsToInsert, valueConverters: _valueConverters).ForEach(x => insertCommand.Parameters.Add(x));
 
         Log($"Begin inserting: {Environment.NewLine}{insertStatement}");
 
