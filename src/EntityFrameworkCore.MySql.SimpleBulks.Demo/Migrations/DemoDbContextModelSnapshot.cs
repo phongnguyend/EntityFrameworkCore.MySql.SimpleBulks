@@ -66,6 +66,12 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.Demo.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("timestamp(6)");
 
+                    b.Property<int?>("SeasonAsInt")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SeasonAsString")
+                        .HasColumnType("longtext");
+
                     b.Property<DateTimeOffset?>("UpdatedDateTime")
                         .HasColumnType("datetime(6)");
 

@@ -1,4 +1,5 @@
 ﻿using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ public class BulkDeleteBuilder<T>
     private IEnumerable<string> _idColumns;
     private IReadOnlyDictionary<string, string> _columnNameMappings;
     private IReadOnlyDictionary<string, string> _columnTypeMappings;
+    private IReadOnlyDictionary<string, ValueConverter> _valueConverters;
     private BulkDeleteOptions _options;
     private readonly MySqlConnection _connection;
     private readonly MySqlTransaction _transaction;
@@ -67,6 +69,12 @@ public class BulkDeleteBuilder<T>
         return this;
     }
 
+    public BulkDeleteBuilder<T> WithValueConverters(IReadOnlyDictionary<string, ValueConverter> valueConverters)
+    {
+        _valueConverters = valueConverters;
+        return this;
+    }
+
     public BulkDeleteBuilder<T> ConfigureBulkOptions(Action<BulkDeleteOptions> configureOptions)
     {
         _options = new BulkDeleteOptions();
@@ -95,7 +103,7 @@ public class BulkDeleteBuilder<T>
         }
 
         var temptableName = $"`{Guid.NewGuid()}`";
-        var dataTable = data.ToDataTable(_idColumns);
+        var dataTable = data.ToDataTable(_idColumns, valueConverters: _valueConverters);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _columnTypeMappings);
         sqlCreateTemptable += $"\nCREATE UNIQUE INDEX Idx_Id ON {temptableName} ({string.Join(",", _idColumns.Select(x => $"`{x}`"))});";
 
@@ -180,7 +188,7 @@ public class BulkDeleteBuilder<T>
         }
 
         var temptableName = $"`{Guid.NewGuid()}`";
-        var dataTable = await data.ToDataTableAsync(_idColumns, cancellationToken: cancellationToken);
+        var dataTable = await data.ToDataTableAsync(_idColumns, valueConverters: _valueConverters, cancellationToken: cancellationToken);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _columnTypeMappings);
         sqlCreateTemptable += $"\nCREATE UNIQUE INDEX Idx_Id ON {temptableName} ({string.Join(",", _idColumns.Select(x => $"`{x}`"))});";
 

@@ -47,7 +47,10 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.Demo.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Description = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IsSensitive = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                    IsSensitive = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    SeasonAsInt = table.Column<int>(type: "int", nullable: true),
+                    SeasonAsString = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {

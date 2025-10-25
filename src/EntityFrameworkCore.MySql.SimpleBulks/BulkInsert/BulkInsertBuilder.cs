@@ -1,4 +1,5 @@
 ﻿using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,7 @@ public class BulkInsertBuilder<T>
     private IEnumerable<string> _columnNames;
     private IReadOnlyDictionary<string, string> _columnNameMappings;
     private IReadOnlyDictionary<string, string> _columnTypeMappings;
+    private IReadOnlyDictionary<string, ValueConverter> _valueConverters;
     private BulkInsertOptions _options;
     private readonly MySqlConnection _connection;
     private readonly MySqlTransaction _transaction;
@@ -83,6 +85,12 @@ public class BulkInsertBuilder<T>
         return this;
     }
 
+    public BulkInsertBuilder<T> WithValueConverters(IReadOnlyDictionary<string, ValueConverter> valueConverters)
+    {
+        _valueConverters = valueConverters;
+        return this;
+    }
+
     public BulkInsertBuilder<T> ConfigureBulkOptions(Action<BulkInsertOptions> configureOptions)
     {
         _options = new BulkInsertOptions();
@@ -124,7 +132,7 @@ public class BulkInsertBuilder<T>
         DataTable dataTable;
         if (string.IsNullOrWhiteSpace(_outputIdColumn))
         {
-            dataTable = data.ToDataTable(_columnNames);
+            dataTable = data.ToDataTable(_columnNames, valueConverters: _valueConverters);
 
             _connection.EnsureOpen();
 
@@ -142,7 +150,7 @@ public class BulkInsertBuilder<T>
                 columnsToInsert.Add(_outputIdColumn);
             }
 
-            dataTable = data.ToDataTable(columnsToInsert);
+            dataTable = data.ToDataTable(columnsToInsert, valueConverters: _valueConverters);
 
             _connection.EnsureOpen();
 
@@ -168,7 +176,7 @@ public class BulkInsertBuilder<T>
                 setId(row, SequentialGuidGenerator.Next());
             }
 
-            dataTable = data.ToDataTable(columnsToInsert);
+            dataTable = data.ToDataTable(columnsToInsert, valueConverters: _valueConverters);
 
             _connection.EnsureOpen();
 
@@ -178,7 +186,7 @@ public class BulkInsertBuilder<T>
             return;
         }
 
-        dataTable = data.ToDataTable(_columnNames);
+        dataTable = data.ToDataTable(_columnNames, valueConverters: _valueConverters);
 
         _connection.EnsureOpen();
 
@@ -247,7 +255,7 @@ public class BulkInsertBuilder<T>
         DataTable dataTable;
         if (string.IsNullOrWhiteSpace(_outputIdColumn))
         {
-            dataTable = await data.ToDataTableAsync(_columnNames, cancellationToken: cancellationToken);
+            dataTable = await data.ToDataTableAsync(_columnNames, valueConverters: _valueConverters, cancellationToken: cancellationToken);
 
             await _connection.EnsureOpenAsync(cancellationToken);
 
@@ -265,7 +273,7 @@ public class BulkInsertBuilder<T>
                 columnsToInsert.Add(_outputIdColumn);
             }
 
-            dataTable = await data.ToDataTableAsync(columnsToInsert, cancellationToken: cancellationToken);
+            dataTable = await data.ToDataTableAsync(columnsToInsert, valueConverters: _valueConverters, cancellationToken: cancellationToken);
 
             await _connection.EnsureOpenAsync(cancellationToken);
 
@@ -291,7 +299,7 @@ public class BulkInsertBuilder<T>
                 setId(row, SequentialGuidGenerator.Next());
             }
 
-            dataTable = await data.ToDataTableAsync(columnsToInsert, cancellationToken: cancellationToken);
+            dataTable = await data.ToDataTableAsync(columnsToInsert, valueConverters: _valueConverters, cancellationToken: cancellationToken);
 
             await _connection.EnsureOpenAsync(cancellationToken);
 
@@ -301,7 +309,7 @@ public class BulkInsertBuilder<T>
             return;
         }
 
-        dataTable = await data.ToDataTableAsync(_columnNames, cancellationToken: cancellationToken);
+        dataTable = await data.ToDataTableAsync(_columnNames, valueConverters: _valueConverters, cancellationToken: cancellationToken);
 
         await _connection.EnsureOpenAsync(cancellationToken);
 

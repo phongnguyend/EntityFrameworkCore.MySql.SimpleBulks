@@ -30,6 +30,7 @@ public class DemoDbContext : DbContext
         modelBuilder.Entity<CompositeKeyRow>().HasKey(x => new { x.Id1, x.Id2 });
         modelBuilder.Entity<ConfigurationEntry>().Property(x => x.Key).HasColumnName("Key1");
         modelBuilder.Entity<ConfigurationEntry>().Property(x => x.Id).HasColumnName("Id1");
+        modelBuilder.Entity<ConfigurationEntry>().Property(x => x.SeasonAsString).HasConversion(v => v.ToString(), v => (Season)Enum.Parse(typeof(Season), v));
 
         base.OnModelCreating(modelBuilder);
     }

@@ -31,6 +31,8 @@ using (var dbct = new DemoDbContext())
             Key = $"Key{i}",
             Value = $"Value{i}",
             CreatedDateTime = DateTimeOffset.Now,
+            SeasonAsInt = Season.Spring,
+            SeasonAsString = Season.Spring,
         });
     }
 
@@ -44,12 +46,14 @@ using (var dbct = new DemoDbContext())
     {
         row.Key += "xx";
         row.UpdatedDateTime = DateTimeOffset.Now;
+        row.SeasonAsInt = Season.Winter;
+        row.SeasonAsString = Season.Winter;
         row.IsSensitive = true;
         row.Description = row.Id.ToString();
     }
 
     var updateResult = await dbct.BulkUpdateAsync(configurationEntries,
-        x => new { x.Key, x.UpdatedDateTime, x.IsSensitive, x.Description },
+        x => new { x.Key, x.UpdatedDateTime, x.IsSensitive, x.Description, x.SeasonAsInt, x.SeasonAsString },
         opt =>
         {
             opt.LogTo = Console.WriteLine;
@@ -63,12 +67,14 @@ using (var dbct = new DemoDbContext())
         Key = $"Key{1001}",
         Value = $"Value{1001}",
         CreatedDateTime = DateTimeOffset.Now,
+        SeasonAsInt = Season.Summer,
+        SeasonAsString = Season.Summer,
     });
 
     var mergeResult = await dbct.BulkMergeAsync(configurationEntries,
         x => x.Id,
         x => new { x.Key, x.UpdatedDateTime, x.IsSensitive, x.Description },
-        x => new { x.Id, x.Key, x.Value, x.IsSensitive, x.CreatedDateTime },
+        x => new { x.Id, x.Key, x.Value, x.IsSensitive, x.CreatedDateTime, x.SeasonAsInt, x.SeasonAsString },
         opt =>
         {
             opt.LogTo = Console.WriteLine;

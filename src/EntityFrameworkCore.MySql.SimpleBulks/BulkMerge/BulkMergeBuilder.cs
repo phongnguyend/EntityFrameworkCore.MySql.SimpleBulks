@@ -1,4 +1,5 @@
 ﻿using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ public class BulkMergeBuilder<T>
     private IEnumerable<string> _insertColumnNames;
     private IReadOnlyDictionary<string, string> _columnNameMappings;
     private IReadOnlyDictionary<string, string> _columnTypeMappings;
+    private IReadOnlyDictionary<string, ValueConverter> _valueConverters;
     private string _outputIdColumn;
     private BulkMergeOptions _options;
     private readonly MySqlConnection _connection;
@@ -95,6 +97,12 @@ public class BulkMergeBuilder<T>
         return this;
     }
 
+    public BulkMergeBuilder<T> WithValueConverters(IReadOnlyDictionary<string, ValueConverter> valueConverters)
+    {
+        _valueConverters = valueConverters;
+        return this;
+    }
+
     public BulkMergeBuilder<T> WithOutputId(string idColumn)
     {
         _outputIdColumn = idColumn;
@@ -141,7 +149,7 @@ public class BulkMergeBuilder<T>
         propertyNames.AddRange(_insertColumnNames);
         propertyNames = propertyNames.Distinct().ToList();
 
-        var dataTable = data.ToDataTable(propertyNames);
+        var dataTable = data.ToDataTable(propertyNames, valueConverters: _valueConverters);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _columnTypeMappings);
         sqlCreateTemptable += $"\nCREATE INDEX Idx_Id ON {temptableName} ({string.Join(",", _idColumns.Select(x => $"`{x}`"))});";
 
@@ -250,7 +258,7 @@ public class BulkMergeBuilder<T>
     {
         if (!_updateColumnNames.Any() && !_insertColumnNames.Any())
         {
-            return new BulkMergeResult();
+          return new BulkMergeResult();
         }
 
         var temptableName = $"`{Guid.NewGuid()}`";
@@ -260,7 +268,7 @@ public class BulkMergeBuilder<T>
         propertyNames.AddRange(_insertColumnNames);
         propertyNames = propertyNames.Distinct().ToList();
 
-        var dataTable = await data.ToDataTableAsync(propertyNames, cancellationToken: cancellationToken);
+        var dataTable = await data.ToDataTableAsync(propertyNames, valueConverters: _valueConverters, cancellationToken: cancellationToken);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _columnTypeMappings);
         sqlCreateTemptable += $"\nCREATE INDEX Idx_Id ON {temptableName} ({string.Join(",", _idColumns.Select(x => $"`{x}`"))});";
 

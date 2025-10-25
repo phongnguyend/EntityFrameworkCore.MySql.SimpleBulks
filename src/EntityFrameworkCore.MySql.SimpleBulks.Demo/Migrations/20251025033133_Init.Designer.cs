@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EntityFrameworkCore.MySql.SimpleBulks.Demo.Migrations
 {
     [DbContext(typeof(DemoDbContext))]
-    [Migration("20241004131228_Init")]
+    [Migration("20251025033133_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -68,6 +68,12 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.Demo.Migrations
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("timestamp(6)");
+
+                    b.Property<int?>("SeasonAsInt")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SeasonAsString")
+                        .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset?>("UpdatedDateTime")
                         .HasColumnType("datetime(6)");

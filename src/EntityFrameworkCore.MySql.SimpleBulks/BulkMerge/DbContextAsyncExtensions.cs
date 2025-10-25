@@ -12,26 +12,25 @@ public static class DbContextAsyncExtensions
 {
     public static Task<BulkMergeResult> BulkMergeAsync<T>(this DbContext dbContext, IEnumerable<T> data, Expression<Func<T, object>> idSelector, Expression<Func<T, object>> updateColumnNamesSelector, Expression<Func<T, object>> insertColumnNamesSelector, Action<BulkMergeOptions> configureOptions = null, CancellationToken cancellationToken = default)
     {
-        var table = dbContext.GetTableInfor(typeof(T));
         var connection = dbContext.GetMySqlConnection();
         var transaction = dbContext.GetCurrentMySqlTransaction();
         var outputIdColumn = dbContext.GetOutputId(typeof(T))?.PropertyName;
 
         return new BulkMergeBuilder<T>(connection, transaction)
-             .WithId(idSelector)
-             .WithUpdateColumns(updateColumnNamesSelector)
-             .WithInsertColumns(insertColumnNamesSelector)
-             .WithDbColumnMappings(dbContext.GetColumnNames(typeof(T)))
-             .WithDbColumnTypeMappings(dbContext.GetColumnTypes(typeof(T)))
-             .WithOutputId(outputIdColumn)
-             .ToTable(table)
-             .ConfigureBulkOptions(configureOptions)
-             .ExecuteAsync(data, cancellationToken);
+            .WithId(idSelector)
+            .WithUpdateColumns(updateColumnNamesSelector)
+            .WithInsertColumns(insertColumnNamesSelector)
+            .WithDbColumnMappings(dbContext.GetColumnNames(typeof(T)))
+            .WithDbColumnTypeMappings(dbContext.GetColumnTypes(typeof(T)))
+            .WithValueConverters(dbContext.GetValueConverters(typeof(T)))
+            .WithOutputId(outputIdColumn)
+            .ToTable(dbContext.GetTableInfor(typeof(T)))
+            .ConfigureBulkOptions(configureOptions)
+            .ExecuteAsync(data, cancellationToken);
     }
 
     public static Task<BulkMergeResult> BulkMergeAsync<T>(this DbContext dbContext, IEnumerable<T> data, string idColumn, IEnumerable<string> updateColumnNames, IEnumerable<string> insertColumnNames, Action<BulkMergeOptions> configureOptions = null, CancellationToken cancellationToken = default)
     {
-        var table = dbContext.GetTableInfor(typeof(T));
         var connection = dbContext.GetMySqlConnection();
         var transaction = dbContext.GetCurrentMySqlTransaction();
         var outputIdColumn = dbContext.GetOutputId(typeof(T))?.PropertyName;
@@ -42,15 +41,15 @@ public static class DbContextAsyncExtensions
             .WithInsertColumns(insertColumnNames)
             .WithDbColumnMappings(dbContext.GetColumnNames(typeof(T)))
             .WithDbColumnTypeMappings(dbContext.GetColumnTypes(typeof(T)))
+            .WithValueConverters(dbContext.GetValueConverters(typeof(T)))
             .WithOutputId(outputIdColumn)
-            .ToTable(table)
+            .ToTable(dbContext.GetTableInfor(typeof(T)))
             .ConfigureBulkOptions(configureOptions)
             .ExecuteAsync(data, cancellationToken);
     }
 
     public static Task<BulkMergeResult> BulkMergeAsync<T>(this DbContext dbContext, IEnumerable<T> data, IEnumerable<string> idColumns, IEnumerable<string> updateColumnNames, IEnumerable<string> insertColumnNames, Action<BulkMergeOptions> configureOptions = null, CancellationToken cancellationToken = default)
     {
-        var table = dbContext.GetTableInfor(typeof(T));
         var connection = dbContext.GetMySqlConnection();
         var transaction = dbContext.GetCurrentMySqlTransaction();
         var outputIdColumn = dbContext.GetOutputId(typeof(T))?.PropertyName;
@@ -61,8 +60,9 @@ public static class DbContextAsyncExtensions
             .WithInsertColumns(insertColumnNames)
             .WithDbColumnMappings(dbContext.GetColumnNames(typeof(T)))
             .WithDbColumnTypeMappings(dbContext.GetColumnTypes(typeof(T)))
+            .WithValueConverters(dbContext.GetValueConverters(typeof(T)))
             .WithOutputId(outputIdColumn)
-            .ToTable(table)
+            .ToTable(dbContext.GetTableInfor(typeof(T)))
             .ConfigureBulkOptions(configureOptions)
             .ExecuteAsync(data, cancellationToken);
     }
