@@ -12,6 +12,8 @@ public class SingleKeyRow<TId>
 
     public Season? Season { get; set; }
 
+    public Season? SeasonAsString { get; set; }
+
     public Guid? BulkId { get; set; }
 
     public int? BulkIndex { get; set; }
