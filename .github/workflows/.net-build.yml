@@ -26,8 +26,14 @@ jobs:
       with:
         dotnet-version: 8.0.100
 
-    - name: Test
+    - name: Tests
       run: dotnet test EntityFrameworkCore.MySql.SimpleBulks.Tests/EntityFrameworkCore.MySql.SimpleBulks.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+
+    - name: DbContextExtensionsTests
+      run: dotnet test EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests/EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+      
+    - name: ConnectionExtensionsTests
+      run: dotnet test EntityFrameworkCore.MySql.SimpleBulks.ConnectionExtensionsTests/EntityFrameworkCore.MySql.SimpleBulks.ConnectionExtensionsTests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
 
     - name: Build
       run: dotnet build EntityFrameworkCore.MySql.SimpleBulks/EntityFrameworkCore.MySql.SimpleBulks.csproj --configuration Release

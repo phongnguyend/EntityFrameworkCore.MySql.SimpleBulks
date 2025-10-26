@@ -9,6 +9,8 @@
     <Project Path="EntityFrameworkCore.MySql.SimpleBulks/EntityFrameworkCore.MySql.SimpleBulks.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="EntityFrameworkCore.MySql.SimpleBulks.ConnectionExtensionsTests/EntityFrameworkCore.MySql.SimpleBulks.ConnectionExtensionsTests.csproj" Id="dd272b1c-7111-4bf1-9a91-d647b564f9d5" />
+    <Project Path="EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests/EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.csproj" Id="130ad7e5-e05e-4c4c-a1d6-b6f9205d7c6b" />
     <Project Path="EntityFrameworkCore.MySql.SimpleBulks.Tests/EntityFrameworkCore.MySql.SimpleBulks.Tests.csproj" />
   </Folder>
 </Solution>
