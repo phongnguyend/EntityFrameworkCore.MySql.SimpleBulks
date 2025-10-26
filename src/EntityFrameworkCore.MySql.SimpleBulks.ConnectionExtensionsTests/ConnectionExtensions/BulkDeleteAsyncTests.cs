@@ -4,12 +4,12 @@ using EntityFrameworkCore.MySql.SimpleBulks.ConnectionExtensionsTests.Database;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
-namespace EntityFrameworkCore.MySql.SimpleBulks.ConnectionExtensionsTests.ConnectionAsyncExtensions;
+namespace EntityFrameworkCore.MySql.SimpleBulks.ConnectionExtensionsTests.ConnectionExtensions;
 
 [Collection("MySqlCollection")]
-public class BulkDeleteTests : BaseTest
+public class BulkDeleteAsyncTests : BaseTest
 {
-    public BulkDeleteTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkDelete")
+    public BulkDeleteAsyncTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkDelete")
     {
         TableMapper.Register(typeof(SingleKeyRow<int>), GetTableName("SingleKeyRows"));
         TableMapper.Register(typeof(CompositeKeyRow<int, int>), GetTableName("CompositeKeyRows"));
@@ -17,7 +17,7 @@ public class BulkDeleteTests : BaseTest
         var rows = new List<SingleKeyRow<int>>();
         var compositeKeyRows = new List<CompositeKeyRow<int, int>>();
 
-        for (int i = 0; i < 100; i++)
+        for (var i = 0; i < 100; i++)
         {
             rows.Add(new SingleKeyRow<int>
             {

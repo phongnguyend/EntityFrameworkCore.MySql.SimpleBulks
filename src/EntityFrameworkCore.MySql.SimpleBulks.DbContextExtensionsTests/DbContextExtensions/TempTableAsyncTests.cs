@@ -4,10 +4,10 @@ using EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.Database;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
-namespace EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.DbContextAsyncExtensions;
+namespace EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.DbContextExtensions;
 
 [Collection("MySqlCollection")]
-public class TempTableTests : BaseTest
+public class TempTableAsyncTests : BaseTest
 {
     private readonly static List<CustomerDto> _customers = new List<CustomerDto>
     {
@@ -59,7 +59,7 @@ public class TempTableTests : BaseTest
         }
     };
 
-    public TempTableTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.TempTable")
+    public TempTableAsyncTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.TempTable")
     {
     }
 
@@ -81,7 +81,7 @@ public class TempTableTests : BaseTest
                    options.LogTo = _output.WriteLine;
                });
 
-        string sql = $"select * from {tableName}";
+        var sql = $"select * from {tableName}";
 
         _context.ExecuteReader(sql, reader =>
         {
@@ -95,7 +95,7 @@ public class TempTableTests : BaseTest
         });
 
         // Assert
-        for (int i = 0; i < _customers.Count; i++)
+        for (var i = 0; i < _customers.Count; i++)
         {
             Assert.Equal(_customers[i].IdNumber, customers[i].IdNumber);
             Assert.Equal(_customers[i].FirstName, customers[i].FirstName);
@@ -135,7 +135,7 @@ public class TempTableTests : BaseTest
                             options.LogTo = _output.WriteLine;
                         });
 
-        string sql = $"select * from {contactTableName} contact join {customerTableName} customer on contact.CustomerIdNumber = customer.IdNumber";
+        var sql = $"select * from {contactTableName} contact join {customerTableName} customer on contact.CustomerIdNumber = customer.IdNumber";
 
         result = result.OrderBy(x => x.IdNumber)
                 .ThenBy(x => x.CurrentCountryIsoCode)
@@ -195,7 +195,7 @@ public class TempTableTests : BaseTest
                    options.LogTo = _output.WriteLine;
                });
 
-        string sql = $"select * from {tableName}";
+        var sql = $"select * from {tableName}";
 
         _context.ExecuteReader(sql, reader =>
         {
@@ -209,7 +209,7 @@ public class TempTableTests : BaseTest
         });
 
         // Assert
-        for (int i = 0; i < _customers.Count; i++)
+        for (var i = 0; i < _customers.Count; i++)
         {
             Assert.Equal(_customers[i].IdNumber, customers[i].IdNumber);
             Assert.Equal(_customers[i].FirstName, customers[i].FirstName);
@@ -239,7 +239,7 @@ public class TempTableTests : BaseTest
                    options.LogTo = _output.WriteLine;
                });
 
-        string sql = $"select * from {contactTableName} contact join {customerTableName} customer on contact.CustomerIdNumber = customer.IdNumber";
+        var sql = $"select * from {contactTableName} contact join {customerTableName} customer on contact.CustomerIdNumber = customer.IdNumber";
 
         _context.ExecuteReader(sql, reader =>
         {
@@ -291,7 +291,7 @@ public class TempTableTests : BaseTest
         // Arange
         var customers = new List<Customer>(100);
 
-        for (int i = 0; i < 100; i++)
+        for (var i = 0; i < 100; i++)
         {
             var customer = new Customer
             {
@@ -303,7 +303,7 @@ public class TempTableTests : BaseTest
 
             customer.Contacts = new List<Contact>();
 
-            for (int j = 0; j < 5; j++)
+            for (var j = 0; j < 5; j++)
             {
                 customer.Contacts.Add(new Contact
                 {
@@ -372,7 +372,7 @@ public class TempTableTests : BaseTest
         // Arange
         var configurationEntries = new List<ConfigurationEntry>();
 
-        for (int i = 0; i < 100; i++)
+        for (var i = 0; i < 100; i++)
         {
             configurationEntries.Add(new ConfigurationEntry
             {
@@ -404,36 +404,37 @@ public class TempTableTests : BaseTest
         }
     }
 
-}
-
-class CustomerDto
-{
-    public string IdNumber { get; set; }
-
-    public string FirstName { get; set; }
-
-    public string LastName { get; set; }
-
-    public string CurrentCountryIsoCode { get; set; }
-
-    public override string ToString()
+    class CustomerDto
     {
-        return $"{IdNumber}\t{FirstName}\t{LastName}";
+        public string IdNumber { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public string CurrentCountryIsoCode { get; set; }
+
+        public override string ToString()
+        {
+            return $"{IdNumber}\t{FirstName}\t{LastName}";
+        }
+    }
+
+    class ContactDto
+    {
+        public string EmailAddress { get; set; }
+
+        public string PhoneNumber { get; set; }
+
+        public string CustomerIdNumber { get; set; }
+
+        public string CountryIsoCode { get; set; }
+
+        public override string ToString()
+        {
+            return $"{CustomerIdNumber}\t{EmailAddress}\t{PhoneNumber}";
+        }
     }
 }
 
-class ContactDto
-{
-    public string EmailAddress { get; set; }
 
-    public string PhoneNumber { get; set; }
-
-    public string CustomerIdNumber { get; set; }
-
-    public string CountryIsoCode { get; set; }
-
-    public override string ToString()
-    {
-        return $"{CustomerIdNumber}\t{EmailAddress}\t{PhoneNumber}";
-    }
-}

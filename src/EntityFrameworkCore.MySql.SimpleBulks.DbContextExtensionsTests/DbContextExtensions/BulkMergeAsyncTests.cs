@@ -5,12 +5,12 @@ using EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.Database;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
-namespace EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.DbContextAsyncExtensions;
+namespace EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.DbContextExtensions;
 
 [Collection("MySqlCollection")]
-public class BulkMergeTests : BaseTest
+public class BulkMergeAsyncTests : BaseTest
 {
-    public BulkMergeTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkMerge")
+    public BulkMergeAsyncTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkMerge")
     {
     }
 
@@ -21,7 +21,7 @@ public class BulkMergeTests : BaseTest
         var rows = new List<SingleKeyRow<int>>();
         var compositeKeyRows = new List<CompositeKeyRow<int, int>>();
 
-        for (int i = 0; i < length; i++)
+        for (var i = 0; i < length; i++)
         {
             rows.Add(new SingleKeyRow<int>
             {
@@ -133,7 +133,7 @@ public class BulkMergeTests : BaseTest
         var dbRows = _context.SingleKeyRows.AsNoTracking().ToList();
         var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
 
-        for (int i = 0; i < length + 1; i++)
+        for (var i = 0; i < length + 1; i++)
         {
             Assert.Equal(rows[i].Id, dbRows[i].Id);
             Assert.Equal(rows[i].Column1, dbRows[i].Column1);
@@ -232,7 +232,7 @@ public class BulkMergeTests : BaseTest
         var dbRows = _context.SingleKeyRows.AsNoTracking().ToList();
         var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
 
-        for (int i = 0; i < length + 1; i++)
+        for (var i = 0; i < length + 1; i++)
         {
             Assert.Equal(rows[i].Id, dbRows[i].Id);
             Assert.Equal(rows[i].Column1, dbRows[i].Column1);
@@ -258,7 +258,7 @@ public class BulkMergeTests : BaseTest
     {
         var configurationEntries = new List<ConfigurationEntry>();
 
-        for (int i = 0; i < length; i++)
+        for (var i = 0; i < length; i++)
         {
             configurationEntries.Add(new ConfigurationEntry
             {
@@ -280,7 +280,7 @@ public class BulkMergeTests : BaseTest
             entry.UpdatedDateTime = DateTimeOffset.Now;
         }
 
-        for (int i = length; i < length * 2; i++)
+        for (var i = length; i < length * 2; i++)
         {
             configurationEntries.Add(new ConfigurationEntry
             {
@@ -308,7 +308,7 @@ public class BulkMergeTests : BaseTest
         Assert.Equal(length, result.UpdatedRows);
         Assert.Equal(length, configurationEntriesInDb.Count);
 
-        for (int i = 0; i < length; i++)
+        for (var i = 0; i < length; i++)
         {
             Assert.Equal(configurationEntries[i].Id, configurationEntriesInDb[i].Id);
             Assert.Equal(configurationEntries[i].Key, configurationEntriesInDb[i].Key);
@@ -326,7 +326,7 @@ public class BulkMergeTests : BaseTest
     {
         var configurationEntries = new List<ConfigurationEntry>();
 
-        for (int i = 0; i < length; i++)
+        for (var i = 0; i < length; i++)
         {
             configurationEntries.Add(new ConfigurationEntry
             {
@@ -348,7 +348,7 @@ public class BulkMergeTests : BaseTest
             entry.UpdatedDateTime = DateTimeOffset.Now;
         }
 
-        for (int i = length; i < length * 2; i++)
+        for (var i = length; i < length * 2; i++)
         {
             configurationEntries.Add(new ConfigurationEntry
             {
@@ -377,7 +377,7 @@ public class BulkMergeTests : BaseTest
         Assert.Equal(0, result.UpdatedRows);
         Assert.Equal(length * 2, configurationEntriesInDb.Count);
 
-        for (int i = 0; i < length; i++)
+        for (var i = 0; i < length; i++)
         {
             Assert.Equal(configurationEntries[i].Id, configurationEntriesInDb[i].Id);
             Assert.Equal(configurationEntries[i].Key, configurationEntriesInDb[i].Key);
@@ -387,7 +387,7 @@ public class BulkMergeTests : BaseTest
             Assert.NotEqual(configurationEntries[i].UpdatedDateTime.TruncateToMicroseconds(), configurationEntriesInDb[i].UpdatedDateTime);
         }
 
-        for (int i = length; i < length * 2; i++)
+        for (var i = length; i < length * 2; i++)
         {
             Assert.Equal(configurationEntries[i].Id, configurationEntriesInDb[i].Id);
             Assert.Equal(configurationEntries[i].Key, configurationEntriesInDb[i].Key);
@@ -405,7 +405,7 @@ public class BulkMergeTests : BaseTest
     {
         var configurationEntries = new List<ConfigurationEntry>();
 
-        for (int i = 0; i < length; i++)
+        for (var i = 0; i < length; i++)
         {
             configurationEntries.Add(new ConfigurationEntry
             {
@@ -427,7 +427,7 @@ public class BulkMergeTests : BaseTest
             entry.UpdatedDateTime = DateTimeOffset.Now;
         }
 
-        for (int i = length; i < length * 2; i++)
+        for (var i = length; i < length * 2; i++)
         {
             configurationEntries.Add(new ConfigurationEntry
             {
@@ -455,7 +455,7 @@ public class BulkMergeTests : BaseTest
         Assert.Equal(0, result.UpdatedRows);
         Assert.Equal(length, configurationEntriesInDb.Count);
 
-        for (int i = 0; i < length; i++)
+        for (var i = 0; i < length; i++)
         {
             Assert.Equal(configurationEntries[i].Id, configurationEntriesInDb[i].Id);
             Assert.Equal(configurationEntries[i].Key, configurationEntriesInDb[i].Key);

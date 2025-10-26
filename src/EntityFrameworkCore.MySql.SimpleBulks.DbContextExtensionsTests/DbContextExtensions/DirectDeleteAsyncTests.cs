@@ -4,19 +4,19 @@ using EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.Database;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
-namespace EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.DbContextAsyncExtensions;
+namespace EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.DbContextExtensions;
 
 [Collection("MySqlCollection")]
-public class DirectDeleteTests : BaseTest
+public class DirectDeleteAsyncTests : BaseTest
 {
-    public DirectDeleteTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.DirectDelete")
+    public DirectDeleteAsyncTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.DirectDelete")
     {
         var tran = _context.Database.BeginTransaction();
 
         var rows = new List<SingleKeyRow<int>>();
         var compositeKeyRows = new List<CompositeKeyRow<int, int>>();
 
-        for (int i = 0; i < 100; i++)
+        for (var i = 0; i < 100; i++)
         {
             rows.Add(new SingleKeyRow<int>
             {

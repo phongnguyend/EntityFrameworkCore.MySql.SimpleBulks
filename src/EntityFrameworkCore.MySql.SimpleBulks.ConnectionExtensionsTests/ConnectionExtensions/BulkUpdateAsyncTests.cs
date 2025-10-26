@@ -6,12 +6,12 @@ using EntityFrameworkCore.MySql.SimpleBulks.ConnectionExtensionsTests.Database;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
-namespace EntityFrameworkCore.MySql.SimpleBulks.ConnectionExtensionsTests.ConnectionAsyncExtensions;
+namespace EntityFrameworkCore.MySql.SimpleBulks.ConnectionExtensionsTests.ConnectionExtensions;
 
 [Collection("MySqlCollection")]
-public class BulkUpdateTests : BaseTest
+public class BulkUpdateAsyncTests : BaseTest
 {
-    public BulkUpdateTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkUpdate")
+    public BulkUpdateAsyncTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkUpdate")
     {
         TableMapper.Register(typeof(SingleKeyRow<int>), GetTableName("SingleKeyRows"));
         TableMapper.Register(typeof(CompositeKeyRow<int, int>), GetTableName("CompositeKeyRows"));
@@ -21,7 +21,7 @@ public class BulkUpdateTests : BaseTest
         var rows = new List<SingleKeyRow<int>>();
         var compositeKeyRows = new List<CompositeKeyRow<int, int>>();
 
-        for (int i = 0; i < 100; i++)
+        for (var i = 0; i < 100; i++)
         {
             rows.Add(new SingleKeyRow<int>
             {
@@ -289,7 +289,7 @@ public class BulkUpdateTests : BaseTest
         var dbRows = _context.SingleKeyRows.AsNoTracking().ToList();
         var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
 
-        for (int i = 0; i < 101; i++)
+        for (var i = 0; i < 101; i++)
         {
             Assert.Equal(rows[i].Id, dbRows[i].Id);
             Assert.Equal(rows[i].Column1, dbRows[i].Column1);
