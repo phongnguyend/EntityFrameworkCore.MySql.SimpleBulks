@@ -348,4 +348,14 @@ public class BulkMergeBuilder<T>
         result.AffectedRows = result.UpdatedRows + result.InsertedRows;
         return result;
     }
+
+    public BulkMergeResult SingleMerge(T data)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<BulkMergeResult> SingleMergeAsync(T data, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
 }
