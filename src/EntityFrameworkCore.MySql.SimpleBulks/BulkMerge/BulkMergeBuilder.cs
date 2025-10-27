@@ -137,6 +137,11 @@ public class BulkMergeBuilder<T>
 
     public BulkMergeResult Execute(IEnumerable<T> data)
     {
+        if (data.Count() == 1)
+        {
+            return SingleMerge(data.First());
+        }
+
         if (!_updateColumnNames.Any() && !_insertColumnNames.Any())
         {
             return new BulkMergeResult();
@@ -243,6 +248,19 @@ public class BulkMergeBuilder<T>
         return $"{leftTable}.`{GetDbColumnName(sqlProp)}` {sqlOperator} {rightTable}.`{sqlProp}`";
     }
 
+    private string CreateSetStatement(string prop)
+    {
+        string sqlOperator = "=";
+        string sqlProp = RemoveOperator(prop);
+
+        if (prop.EndsWith("+="))
+        {
+            sqlOperator = "+=";
+        }
+
+        return $"`{GetDbColumnName(sqlProp)}` {sqlOperator} @{sqlProp}";
+    }
+
     private static string RemoveOperator(string prop)
     {
         var rs = prop.Replace("+=", "");
@@ -256,9 +274,14 @@ public class BulkMergeBuilder<T>
 
     public async Task<BulkMergeResult> ExecuteAsync(IEnumerable<T> data, CancellationToken cancellationToken = default)
     {
+        if (data.Count() == 1)
+        {
+            return await SingleMergeAsync(data.First(), cancellationToken);
+        }
+
         if (!_updateColumnNames.Any() && !_insertColumnNames.Any())
         {
-          return new BulkMergeResult();
+            return new BulkMergeResult();
         }
 
         var temptableName = $"`{Guid.NewGuid()}`";
@@ -351,11 +374,135 @@ public class BulkMergeBuilder<T>
 
     public BulkMergeResult SingleMerge(T data)
     {
-        throw new NotImplementedException();
+        if (!_updateColumnNames.Any() && !_insertColumnNames.Any())
+        {
+            return new BulkMergeResult();
+        }
+
+        var insertStatementBuilder = new StringBuilder();
+        var updateStatementBuilder = new StringBuilder();
+
+        if (_updateColumnNames.Any())
+        {
+            var whereCondition = string.Join(" AND ", _idColumns.Select(x =>
+            {
+                return CreateSetStatement(x);
+            }));
+
+            updateStatementBuilder.AppendLine($"UPDATE {_table.SchemaQualifiedTableName} SET");
+            updateStatementBuilder.AppendLine(string.Join("," + Environment.NewLine, _updateColumnNames.Select(x => CreateSetStatement(x))));
+            updateStatementBuilder.AppendLine($"WHERE {whereCondition}");
+        }
+
+        if (_insertColumnNames.Any())
+        {
+            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName} ({string.Join(", ", _insertColumnNames.Select(x => $"`{GetDbColumnName(x)}`"))})");
+            insertStatementBuilder.AppendLine($"VALUES ({string.Join(", ", _insertColumnNames.Select(x => $"@{x}"))})");
+        }
+
+        _connection.EnsureOpen();
+
+        var result = new BulkMergeResult();
+
+        if (_updateColumnNames.Any())
+        {
+            var sqlUpdateStatement = updateStatementBuilder.ToString();
+
+            var propertyNamesIncludeId = _updateColumnNames.Select(RemoveOperator).ToList();
+            propertyNamesIncludeId.AddRange(_idColumns);
+
+            Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
+
+            using var updateCommand = _connection.CreateTextCommand(_transaction, sqlUpdateStatement, _options);
+            data.ToMySqlParameters(propertyNamesIncludeId, valueConverters: _valueConverters).ForEach(x => updateCommand.Parameters.Add(x));
+
+            result.UpdatedRows = updateCommand.ExecuteNonQuery();
+
+            Log("End updating.");
+        }
+
+        if (_insertColumnNames.Any() && result.UpdatedRows == 0)
+        {
+            var sqlInsertStatement = insertStatementBuilder.ToString();
+
+            Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
+
+            using var insertCommand = _connection.CreateTextCommand(_transaction, sqlInsertStatement, _options);
+            data.ToMySqlParameters(_insertColumnNames, valueConverters: _valueConverters).ForEach(x => insertCommand.Parameters.Add(x));
+            
+            result.InsertedRows = insertCommand.ExecuteNonQuery();
+
+            Log("End inserting.");
+        }
+
+        result.AffectedRows = result.UpdatedRows + result.InsertedRows;
+        return result;
     }
 
     public async Task<BulkMergeResult> SingleMergeAsync(T data, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        if (!_updateColumnNames.Any() && !_insertColumnNames.Any())
+        {
+            return new BulkMergeResult();
+        }
+
+        var insertStatementBuilder = new StringBuilder();
+        var updateStatementBuilder = new StringBuilder();
+
+        if (_updateColumnNames.Any())
+        {
+            var whereCondition = string.Join(" AND ", _idColumns.Select(x =>
+            {
+                return CreateSetStatement(x);
+            }));
+
+            updateStatementBuilder.AppendLine($"UPDATE {_table.SchemaQualifiedTableName} SET");
+            updateStatementBuilder.AppendLine(string.Join("," + Environment.NewLine, _updateColumnNames.Select(x => CreateSetStatement(x))));
+            updateStatementBuilder.AppendLine($"WHERE {whereCondition}");
+        }
+
+        if (_insertColumnNames.Any())
+        {
+            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName} ({string.Join(", ", _insertColumnNames.Select(x => $"`{GetDbColumnName(x)}`"))})");
+            insertStatementBuilder.AppendLine($"VALUES ({string.Join(", ", _insertColumnNames.Select(x => $"@{x}"))})");
+        }
+
+        await _connection.EnsureOpenAsync(cancellationToken: cancellationToken);
+
+        var result = new BulkMergeResult();
+
+        if (_updateColumnNames.Any())
+        {
+            var sqlUpdateStatement = updateStatementBuilder.ToString();
+
+            var propertyNamesIncludeId = _updateColumnNames.Select(RemoveOperator).ToList();
+            propertyNamesIncludeId.AddRange(_idColumns);
+
+            Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
+
+            using var updateCommand = _connection.CreateTextCommand(_transaction, sqlUpdateStatement, _options);
+            data.ToMySqlParameters(propertyNamesIncludeId, valueConverters: _valueConverters).ForEach(x => updateCommand.Parameters.Add(x));
+
+            result.UpdatedRows = await updateCommand.ExecuteNonQueryAsync(cancellationToken);
+
+            Log("End updating.");
+        }
+
+        if (_insertColumnNames.Any() && result.UpdatedRows == 0)
+        {
+            var sqlInsertStatement = insertStatementBuilder.ToString();
+
+            Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
+
+            using var insertCommand = _connection.CreateTextCommand(_transaction, sqlInsertStatement, _options);
+            data.ToMySqlParameters(_insertColumnNames, valueConverters: _valueConverters).ForEach(x => insertCommand.Parameters.Add(x));
+            
+            result.InsertedRows = await insertCommand.ExecuteNonQueryAsync(cancellationToken);
+
+            Log("End inserting.");
+        }
+
+        result.AffectedRows = result.UpdatedRows + result.InsertedRows;
+        return result;
     }
 }
