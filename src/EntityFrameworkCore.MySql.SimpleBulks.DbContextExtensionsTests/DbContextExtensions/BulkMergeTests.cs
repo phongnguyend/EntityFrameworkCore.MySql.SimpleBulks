@@ -54,9 +54,11 @@ public class BulkMergeTests : BaseTest
     }
 
     [Theory]
-    [InlineData(1)]
-    [InlineData(100)]
-    public void BulkMerge_Using_Linq_With_Transaction(int length)
+    [InlineData(0, 1)]
+    [InlineData(1, 0)]
+    [InlineData(1, 1)]
+    [InlineData(100, 100)]
+    public void BulkMerge_Using_Linq_With_Transaction(int length, int insertLength)
     {
         SeedData(length);
 
@@ -83,29 +85,29 @@ public class BulkMergeTests : BaseTest
 
         var bulkId = SequentialGuidGenerator.Next();
 
-        rows.Add(new SingleKeyRow<int>
+        for (int i = length; i < length + insertLength; i++)
         {
-            Column1 = length,
-            Column2 = "Inserted using Merge" + length,
-            Column3 = DateTime.Now,
-            Season = Season.Winter,
-            SeasonAsString = Season.Spring,
-            BulkId = bulkId
-        });
+            rows.Add(new SingleKeyRow<int>
+            {
+                Column1 = i,
+                Column2 = "Inserted using Merge" + i,
+                Column3 = DateTime.Now,
+                Season = Season.Summer,
+                SeasonAsString = Season.Summer,
+                BulkId = bulkId
+            });
 
-        var newId1 = length;
-        var newId2 = length;
-
-        compositeKeyRows.Add(new CompositeKeyRow<int, int>
-        {
-            Id1 = newId1,
-            Id2 = newId2,
-            Column1 = newId2,
-            Column2 = "Inserted using Merge" + newId2,
-            Column3 = DateTime.Now,
-            Season = Season.Winter,
-            SeasonAsString = Season.Spring
-        });
+            compositeKeyRows.Add(new CompositeKeyRow<int, int>
+            {
+                Id1 = i,
+                Id2 = i,
+                Column1 = i,
+                Column2 = "Inserted using Merge" + i,
+                Column3 = DateTime.Now,
+                Season = Season.Summer,
+                SeasonAsString = Season.Summer
+            });
+        }
 
         _context.BulkMerge(rows,
                 row => row.Id,
@@ -115,8 +117,6 @@ public class BulkMergeTests : BaseTest
                 {
                     options.LogTo = _output.WriteLine;
                 });
-
-        rows.First(x => x.BulkId == bulkId).Id = _context.SingleKeyRows.Where(x => x.BulkId == bulkId).Select(x => x.Id).FirstOrDefault();
 
         _context.BulkMerge(compositeKeyRows,
                 row => new { row.Id1, row.Id2 },
@@ -133,7 +133,11 @@ public class BulkMergeTests : BaseTest
         var dbRows = _context.SingleKeyRows.AsNoTracking().ToList();
         var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
 
-        for (int i = 0; i < length + 1; i++)
+        rows.Where(x => x.BulkId == bulkId)
+            .ToList()
+            .ForEach(x => x.Id = dbRows.First(y => y.BulkId == bulkId && y.Column1 == x.Column1).Id);
+
+        for (int i = 0; i < length + insertLength; i++)
         {
             Assert.Equal(rows[i].Id, dbRows[i].Id);
             Assert.Equal(rows[i].Column1, dbRows[i].Column1);
@@ -153,9 +157,11 @@ public class BulkMergeTests : BaseTest
     }
 
     [Theory]
-    [InlineData(1)]
-    [InlineData(100)]
-    public void BulkMerge_Using_Dynamic_String_With_Transaction(int length)
+    [InlineData(0, 1)]
+    [InlineData(1, 0)]
+    [InlineData(1, 1)]
+    [InlineData(100, 100)]
+    public void BulkMerge_Using_Dynamic_String_With_Transaction(int length, int insertLength)
     {
         SeedData(length);
 
@@ -182,29 +188,29 @@ public class BulkMergeTests : BaseTest
 
         var bulkId = SequentialGuidGenerator.Next();
 
-        rows.Add(new SingleKeyRow<int>
+        for (int i = length; i < length + insertLength; i++)
         {
-            Column1 = length,
-            Column2 = "Inserted using Merge" + length,
-            Column3 = DateTime.Now,
-            Season = Season.Winter,
-            SeasonAsString = Season.Spring,
-            BulkId = bulkId
-        });
+            rows.Add(new SingleKeyRow<int>
+            {
+                Column1 = i,
+                Column2 = "Inserted using Merge" + i,
+                Column3 = DateTime.Now,
+                Season = Season.Summer,
+                SeasonAsString = Season.Summer,
+                BulkId = bulkId
+            });
 
-        var newId1 = length;
-        var newId2 = length;
-
-        compositeKeyRows.Add(new CompositeKeyRow<int, int>
-        {
-            Id1 = newId1,
-            Id2 = newId2,
-            Column1 = newId2,
-            Column2 = "Inserted using Merge" + newId2,
-            Column3 = DateTime.Now,
-            Season = Season.Winter,
-            SeasonAsString = Season.Spring
-        });
+            compositeKeyRows.Add(new CompositeKeyRow<int, int>
+            {
+                Id1 = i,
+                Id2 = i,
+                Column1 = i,
+                Column2 = "Inserted using Merge" + i,
+                Column3 = DateTime.Now,
+                Season = Season.Summer,
+                SeasonAsString = Season.Summer
+            });
+        }
 
         _context.BulkMerge(rows,
             "Id",
@@ -214,8 +220,6 @@ public class BulkMergeTests : BaseTest
             {
                 options.LogTo = _output.WriteLine;
             });
-
-        rows.First(x => x.BulkId == bulkId).Id = _context.SingleKeyRows.Where(x => x.BulkId == bulkId).Select(x => x.Id).FirstOrDefault();
 
         _context.BulkMerge(compositeKeyRows,
             ["Id1", "Id2"],
@@ -232,7 +236,11 @@ public class BulkMergeTests : BaseTest
         var dbRows = _context.SingleKeyRows.AsNoTracking().ToList();
         var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
 
-        for (int i = 0; i < length + 1; i++)
+        rows.Where(x => x.BulkId == bulkId)
+            .ToList()
+            .ForEach(x => x.Id = dbRows.First(y => y.BulkId == bulkId && y.Column1 == x.Column1).Id);
+
+        for (int i = 0; i < length + insertLength; i++)
         {
             Assert.Equal(rows[i].Id, dbRows[i].Id);
             Assert.Equal(rows[i].Column1, dbRows[i].Column1);
@@ -252,6 +260,7 @@ public class BulkMergeTests : BaseTest
     }
 
     [Theory]
+    [InlineData(0)]
     [InlineData(1)]
     [InlineData(100)]
     public void BulkMerge_UpdateOnly(int length)
@@ -320,6 +329,7 @@ public class BulkMergeTests : BaseTest
     }
 
     [Theory]
+    [InlineData(0)]
     [InlineData(1)]
     [InlineData(100)]
     public void BulkMerge_InsertOnly(int length)
@@ -399,6 +409,7 @@ public class BulkMergeTests : BaseTest
     }
 
     [Theory]
+    [InlineData(0)]
     [InlineData(1)]
     [InlineData(100)]
     public void BulkMerge_DoNothing(int length)
