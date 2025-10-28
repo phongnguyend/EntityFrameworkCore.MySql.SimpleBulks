@@ -44,8 +44,13 @@ public static class DbContextExtensions
 
             _schemaNameTranslators.TryGetValue(dbContext.GetType(), out var schemaNameTranslator);
 
-            var tableInfo = new TableInfor(schema, tableName, schemaNameTranslator);
-            
+            var tableInfo = new DbContextTableInfor(schema, tableName, schemaNameTranslator, dbContext)
+            {
+                ColumnNameMappings = dbContext.GetColumnNames(key.EntityType),
+                ColumnTypeMappings = dbContext.GetColumnTypes(key.EntityType),
+                ValueConverters = dbContext.GetValueConverters(key.EntityType)
+            };
+
             return tableInfo;
         });
     }

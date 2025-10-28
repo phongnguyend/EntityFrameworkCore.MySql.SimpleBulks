@@ -414,7 +414,7 @@ public class BulkMergeBuilder<T>
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
             using var updateCommand = _connection.CreateTextCommand(_transaction, sqlUpdateStatement, _options);
-            data.ToMySqlParameters(propertyNamesIncludeId, valueConverters: _valueConverters).ForEach(x => updateCommand.Parameters.Add(x));
+            _table.CreateMySqlParameters(updateCommand, data, propertyNamesIncludeId).ForEach(x => updateCommand.Parameters.Add(x));
 
             result.UpdatedRows = updateCommand.ExecuteNonQuery();
 
@@ -428,8 +428,8 @@ public class BulkMergeBuilder<T>
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
             using var insertCommand = _connection.CreateTextCommand(_transaction, sqlInsertStatement, _options);
-            data.ToMySqlParameters(_insertColumnNames, valueConverters: _valueConverters).ForEach(x => insertCommand.Parameters.Add(x));
-            
+            _table.CreateMySqlParameters(insertCommand, data, _insertColumnNames).ForEach(x => insertCommand.Parameters.Add(x));
+
             result.InsertedRows = insertCommand.ExecuteNonQuery();
 
             Log("End inserting.");
@@ -481,7 +481,7 @@ public class BulkMergeBuilder<T>
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
             using var updateCommand = _connection.CreateTextCommand(_transaction, sqlUpdateStatement, _options);
-            data.ToMySqlParameters(propertyNamesIncludeId, valueConverters: _valueConverters).ForEach(x => updateCommand.Parameters.Add(x));
+            _table.CreateMySqlParameters(updateCommand, data, propertyNamesIncludeId).ForEach(x => updateCommand.Parameters.Add(x));
 
             result.UpdatedRows = await updateCommand.ExecuteNonQueryAsync(cancellationToken);
 
@@ -495,8 +495,8 @@ public class BulkMergeBuilder<T>
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
             using var insertCommand = _connection.CreateTextCommand(_transaction, sqlInsertStatement, _options);
-            data.ToMySqlParameters(_insertColumnNames, valueConverters: _valueConverters).ForEach(x => insertCommand.Parameters.Add(x));
-            
+            _table.CreateMySqlParameters(insertCommand, data, _insertColumnNames).ForEach(x => insertCommand.Parameters.Add(x));
+
             result.InsertedRows = await insertCommand.ExecuteNonQueryAsync(cancellationToken);
 
             Log("End inserting.");

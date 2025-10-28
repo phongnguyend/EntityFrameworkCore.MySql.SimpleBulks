@@ -12,7 +12,7 @@ public static class TableMapper
     {
         lock (_lock)
         {
-            _mappings[type] = new TableInfor(tableName);
+            _mappings[type] = new MySqlTableInfor(tableName);
         }
     }
 

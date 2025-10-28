@@ -70,12 +70,12 @@ public class BulkDeleteAsyncTests : BaseTest
             }
             else
             {
-                await _connection.BulkDeleteAsync(rows, new TableInfor(GetTableName("SingleKeyRows")), row => row.Id,
+                await _connection.BulkDeleteAsync(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")), row => row.Id,
                 options =>
                 {
                     options.LogTo = _output.WriteLine;
                 });
-                await _connection.BulkDeleteAsync(compositeKeyRows, new TableInfor(GetTableName("CompositeKeyRows")), row => new { row.Id1, row.Id2 },
+                await _connection.BulkDeleteAsync(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")), row => new { row.Id1, row.Id2 },
                 options =>
                 {
                     options.LogTo = _output.WriteLine;
@@ -99,12 +99,12 @@ public class BulkDeleteAsyncTests : BaseTest
             }
             else
             {
-                await _connection.BulkDeleteAsync(rows, new TableInfor(GetTableName("SingleKeyRows")), "Id",
+                await _connection.BulkDeleteAsync(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")), "Id",
                 options =>
                 {
                     options.LogTo = _output.WriteLine;
                 });
-                await _connection.BulkDeleteAsync(compositeKeyRows, new TableInfor(GetTableName("CompositeKeyRows")), ["Id1", "Id2"],
+                await _connection.BulkDeleteAsync(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")), ["Id1", "Id2"],
                 options =>
                 {
                     options.LogTo = _output.WriteLine;

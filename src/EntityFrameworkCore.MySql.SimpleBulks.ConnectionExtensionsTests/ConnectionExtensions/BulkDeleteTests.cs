@@ -70,12 +70,12 @@ public class BulkDeleteTests : BaseTest
             }
             else
             {
-                _connection.BulkDelete(rows, new TableInfor(GetTableName("SingleKeyRows")), row => row.Id,
+                _connection.BulkDelete(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")), row => row.Id,
                 options =>
                 {
                     options.LogTo = _output.WriteLine;
                 });
-                _connection.BulkDelete(compositeKeyRows, new TableInfor(GetTableName("CompositeKeyRows")), row => new { row.Id1, row.Id2 },
+                _connection.BulkDelete(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")), row => new { row.Id1, row.Id2 },
                 options =>
                 {
                     options.LogTo = _output.WriteLine;
@@ -99,12 +99,12 @@ public class BulkDeleteTests : BaseTest
             }
             else
             {
-                _connection.BulkDelete(rows, new TableInfor(GetTableName("SingleKeyRows")), "Id",
+                _connection.BulkDelete(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")), "Id",
                 options =>
                 {
                     options.LogTo = _output.WriteLine;
                 });
-                _connection.BulkDelete(compositeKeyRows, new TableInfor(GetTableName("CompositeKeyRows")), ["Id1", "Id2"],
+                _connection.BulkDelete(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")), ["Id1", "Id2"],
                 options =>
                 {
                     options.LogTo = _output.WriteLine;

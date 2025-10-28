@@ -68,14 +68,14 @@ public class BulkInsertAsyncTests : BaseTest
             }
             else
             {
-                await _connection.BulkInsertAsync(rows, new TableInfor(GetTableName("SingleKeyRows")),
+                await _connection.BulkInsertAsync(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")),
                     row => new { row.Column1, row.Column2, row.Column3, row.BulkId, row.BulkIndex },
                     options =>
                     {
                         options.LogTo = _output.WriteLine;
                     });
 
-                await _connection.BulkInsertAsync(compositeKeyRows, new TableInfor(GetTableName("CompositeKeyRows")),
+                await _connection.BulkInsertAsync(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")),
                     row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 },
                     options =>
                     {
@@ -104,14 +104,14 @@ public class BulkInsertAsyncTests : BaseTest
             }
             else
             {
-                await _connection.BulkInsertAsync(rows, new TableInfor(GetTableName("SingleKeyRows")),
+                await _connection.BulkInsertAsync(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")),
                     ["Column1", "Column2", "Column3", "BulkId", "BulkIndex"],
                     options =>
                     {
                         options.LogTo = _output.WriteLine;
                     });
 
-                await _connection.BulkInsertAsync(compositeKeyRows, new TableInfor(GetTableName("CompositeKeyRows")),
+                await _connection.BulkInsertAsync(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")),
                     ["Id1", "Id2", "Column1", "Column2", "Column3"],
                     options =>
                     {
