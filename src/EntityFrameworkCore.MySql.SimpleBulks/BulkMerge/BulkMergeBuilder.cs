@@ -1,5 +1,4 @@
 ﻿using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
@@ -17,9 +16,6 @@ public class BulkMergeBuilder<T>
     private IEnumerable<string> _idColumns;
     private IEnumerable<string> _updateColumnNames;
     private IEnumerable<string> _insertColumnNames;
-    private IReadOnlyDictionary<string, string> _columnNameMappings;
-    private IReadOnlyDictionary<string, string> _columnTypeMappings;
-    private IReadOnlyDictionary<string, ValueConverter> _valueConverters;
     private string _outputIdColumn;
     private BulkMergeOptions _options;
     private readonly MySqlConnection _connection;
@@ -85,24 +81,6 @@ public class BulkMergeBuilder<T>
         return this;
     }
 
-    public BulkMergeBuilder<T> WithDbColumnMappings(IReadOnlyDictionary<string, string> columnNameMappings)
-    {
-        _columnNameMappings = columnNameMappings;
-        return this;
-    }
-
-    public BulkMergeBuilder<T> WithDbColumnTypeMappings(IReadOnlyDictionary<string, string> columnTypeMappings)
-    {
-        _columnTypeMappings = columnTypeMappings;
-        return this;
-    }
-
-    public BulkMergeBuilder<T> WithValueConverters(IReadOnlyDictionary<string, ValueConverter> valueConverters)
-    {
-        _valueConverters = valueConverters;
-        return this;
-    }
-
     public BulkMergeBuilder<T> WithOutputId(string idColumn)
     {
         _outputIdColumn = idColumn;
@@ -127,12 +105,12 @@ public class BulkMergeBuilder<T>
 
     private string GetDbColumnName(string columnName)
     {
-        if (_columnNameMappings == null)
+        if (_table.ColumnNameMappings == null)
         {
             return columnName;
         }
 
-        return _columnNameMappings.TryGetValue(columnName, out string value) ? value : columnName;
+        return _table.ColumnNameMappings.TryGetValue(columnName, out string value) ? value : columnName;
     }
 
     public BulkMergeResult Execute(IEnumerable<T> data)
@@ -154,21 +132,21 @@ public class BulkMergeBuilder<T>
         propertyNames.AddRange(_insertColumnNames);
         propertyNames = propertyNames.Distinct().ToList();
 
-        var dataTable = data.ToDataTable(propertyNames, valueConverters: _valueConverters);
-        var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _columnTypeMappings);
+        var dataTable = data.ToDataTable(propertyNames, valueConverters: _table.ValueConverters);
+        var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _table.ColumnTypeMappings);
         sqlCreateTemptable += $"\nCREATE INDEX Idx_Id ON {temptableName} ({string.Join(",", _idColumns.Select(x => $"`{x}`"))});";
 
         var joinCondition = string.Join(" and ", _idColumns.Select(x =>
-        {
-            string collation = !string.IsNullOrEmpty(_options.Collation) && dataTable.Columns[x].DataType == typeof(string) ?
-            $" collate {_options.Collation}" : string.Empty;
-            return $"s.`{x}`{collation} = t.`{GetDbColumnName(x)}`{collation}";
-        }));
+              {
+                  string collation = !string.IsNullOrEmpty(_options.Collation) && dataTable.Columns[x].DataType == typeof(string) ?
+           $" collate {_options.Collation}" : string.Empty;
+                  return $"s.`{x}`{collation} = t.`{GetDbColumnName(x)}`{collation}";
+              }));
 
         var whereCondition = string.Join(" and ", _idColumns.Select(x =>
-        {
-            return $"t.`{GetDbColumnName(x)}` IS NULL";
-        }));
+         {
+             return $"t.`{GetDbColumnName(x)}` IS NULL";
+         }));
 
         var insertStatementBuilder = new StringBuilder();
         var updateStatementBuilder = new StringBuilder();
@@ -291,14 +269,14 @@ public class BulkMergeBuilder<T>
         propertyNames.AddRange(_insertColumnNames);
         propertyNames = propertyNames.Distinct().ToList();
 
-        var dataTable = await data.ToDataTableAsync(propertyNames, valueConverters: _valueConverters, cancellationToken: cancellationToken);
-        var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _columnTypeMappings);
+        var dataTable = await data.ToDataTableAsync(propertyNames, valueConverters: _table.ValueConverters, cancellationToken: cancellationToken);
+        var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _table.ColumnTypeMappings);
         sqlCreateTemptable += $"\nCREATE INDEX Idx_Id ON {temptableName} ({string.Join(",", _idColumns.Select(x => $"`{x}`"))});";
 
         var joinCondition = string.Join(" and ", _idColumns.Select(x =>
         {
             string collation = !string.IsNullOrEmpty(_options.Collation) && dataTable.Columns[x].DataType == typeof(string) ?
-            $" collate {_options.Collation}" : string.Empty;
+        $" collate {_options.Collation}" : string.Empty;
             return $"s.`{x}`{collation} = t.`{GetDbColumnName(x)}`{collation}";
         }));
 
@@ -385,9 +363,9 @@ public class BulkMergeBuilder<T>
         if (_updateColumnNames.Any())
         {
             var whereCondition = string.Join(" AND ", _idColumns.Select(x =>
-            {
-                return CreateSetStatement(x);
-            }));
+                  {
+                      return CreateSetStatement(x);
+                  }));
 
             updateStatementBuilder.AppendLine($"UPDATE {_table.SchemaQualifiedTableName} SET");
             updateStatementBuilder.AppendLine(string.Join("," + Environment.NewLine, _updateColumnNames.Select(x => CreateSetStatement(x))));
@@ -452,9 +430,9 @@ public class BulkMergeBuilder<T>
         if (_updateColumnNames.Any())
         {
             var whereCondition = string.Join(" AND ", _idColumns.Select(x =>
-            {
-                return CreateSetStatement(x);
-            }));
+          {
+              return CreateSetStatement(x);
+          }));
 
             updateStatementBuilder.AppendLine($"UPDATE {_table.SchemaQualifiedTableName} SET");
             updateStatementBuilder.AppendLine(string.Join("," + Environment.NewLine, _updateColumnNames.Select(x => CreateSetStatement(x))));
