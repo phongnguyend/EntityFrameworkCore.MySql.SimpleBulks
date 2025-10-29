@@ -363,9 +363,9 @@ public class BulkMergeBuilder<T>
         if (_updateColumnNames.Any())
         {
             var whereCondition = string.Join(" AND ", _idColumns.Select(x =>
-                  {
-                      return CreateSetStatement(x);
-                  }));
+            {
+                return CreateSetStatement(x);
+            }));
 
             updateStatementBuilder.AppendLine($"UPDATE {_table.SchemaQualifiedTableName} SET");
             updateStatementBuilder.AppendLine(string.Join("," + Environment.NewLine, _updateColumnNames.Select(x => CreateSetStatement(x))));
@@ -374,8 +374,14 @@ public class BulkMergeBuilder<T>
 
         if (_insertColumnNames.Any())
         {
-            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName} ({string.Join(", ", _insertColumnNames.Select(x => $"`{GetDbColumnName(x)}`"))})");
-            insertStatementBuilder.AppendLine($"VALUES ({string.Join(", ", _insertColumnNames.Select(x => $"@{x}"))})");
+            var whereCondition = $"SELECT 1 FROM {_table.SchemaQualifiedTableName} WHERE " + string.Join(" AND ", _idColumns.Select(x =>
+            {
+                return CreateSetStatement(x);
+            }));
+
+            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{GetDbColumnName(x)}`"))})");
+            insertStatementBuilder.AppendLine($"SELECT {string.Join(", ", _insertColumnNames.Select(x => $"@{x}"))}");
+            insertStatementBuilder.AppendLine($"WHERE NOT EXISTS ({whereCondition});");
         }
 
         _connection.EnsureOpen();
@@ -403,10 +409,13 @@ public class BulkMergeBuilder<T>
         {
             var sqlInsertStatement = insertStatementBuilder.ToString();
 
+            var propertyNamesIncludeId = _insertColumnNames.ToList();
+            propertyNamesIncludeId.AddRange(_idColumns);
+
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
             using var insertCommand = _connection.CreateTextCommand(_transaction, sqlInsertStatement, _options);
-            _table.CreateMySqlParameters(insertCommand, data, _insertColumnNames).ForEach(x => insertCommand.Parameters.Add(x));
+            _table.CreateMySqlParameters(insertCommand, data, propertyNamesIncludeId).ForEach(x => insertCommand.Parameters.Add(x));
 
             result.InsertedRows = insertCommand.ExecuteNonQuery();
 
@@ -441,8 +450,14 @@ public class BulkMergeBuilder<T>
 
         if (_insertColumnNames.Any())
         {
-            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName} ({string.Join(", ", _insertColumnNames.Select(x => $"`{GetDbColumnName(x)}`"))})");
-            insertStatementBuilder.AppendLine($"VALUES ({string.Join(", ", _insertColumnNames.Select(x => $"@{x}"))})");
+            var whereCondition = $"SELECT 1 FROM {_table.SchemaQualifiedTableName} WHERE " + string.Join(" AND ", _idColumns.Select(x =>
+            {
+                return CreateSetStatement(x);
+            }));
+
+            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{GetDbColumnName(x)}`"))})");
+            insertStatementBuilder.AppendLine($"SELECT {string.Join(", ", _insertColumnNames.Select(x => $"@{x}"))}");
+            insertStatementBuilder.AppendLine($"WHERE NOT EXISTS ({whereCondition});");
         }
 
         await _connection.EnsureOpenAsync(cancellationToken: cancellationToken);
@@ -470,10 +485,13 @@ public class BulkMergeBuilder<T>
         {
             var sqlInsertStatement = insertStatementBuilder.ToString();
 
+            var propertyNamesIncludeId = _insertColumnNames.ToList();
+            propertyNamesIncludeId.AddRange(_idColumns);
+
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
             using var insertCommand = _connection.CreateTextCommand(_transaction, sqlInsertStatement, _options);
-            _table.CreateMySqlParameters(insertCommand, data, _insertColumnNames).ForEach(x => insertCommand.Parameters.Add(x));
+            _table.CreateMySqlParameters(insertCommand, data, propertyNamesIncludeId).ForEach(x => insertCommand.Parameters.Add(x));
 
             result.InsertedRows = await insertCommand.ExecuteNonQueryAsync(cancellationToken);
 
