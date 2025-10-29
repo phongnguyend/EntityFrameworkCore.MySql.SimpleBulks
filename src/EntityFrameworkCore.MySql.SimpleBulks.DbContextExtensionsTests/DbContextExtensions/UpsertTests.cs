@@ -53,347 +53,361 @@ public class UpsertTests : BaseTest
         tran.Commit();
     }
 
-    //[Theory]
-    //[InlineData(1)]
-    //[InlineData(100)]
-    //public void Upsert_Existing_Using_Linq_With_Transaction(int length)
-    //{
-    //    SeedData(length);
+    [Theory]
+    [InlineData(1)]
+    [InlineData(100)]
+    public void Upsert_Existing_Using_Linq_With_Transaction(int length)
+    {
+        SeedData(length);
 
-    //    var tran = _context.Database.BeginTransaction();
+        var tran = _context.Database.BeginTransaction();
 
-    //    var rows = _context.SingleKeyRows.AsNoTracking().ToList();
-    //    var compositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
+        var rows = _context.SingleKeyRows.AsNoTracking().ToList();
+        var compositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
 
-    //    var existingRow = rows.First();
+        var existingRow = rows.First();
 
-    //    existingRow.Column2 = "abc";
-    //    existingRow.Column3 = DateTime.Now;
-    //    existingRow.Season = Season.Spring;
-    //    existingRow.SeasonAsString = Season.Spring;
-
-
-    //    var existingCompositeKeyRows = compositeKeyRows.First();
-
-    //    existingCompositeKeyRows.Column2 = "abc";
-    //    existingCompositeKeyRows.Column3 = DateTime.Now;
-    //    existingCompositeKeyRows.Season = Season.Spring;
-    //    existingCompositeKeyRows.SeasonAsString = Season.Spring;
-
-    //    var result1 = _context.Upsert(existingRow,
-    //            row => row.Id,
-    //            row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-    //            row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-    //            options =>
-    //            {
-    //                options.LogTo = _output.WriteLine;
-    //            });
-
-    //    var result2 = _context.Upsert(existingCompositeKeyRows,
-    //            row => new { row.Id1, row.Id2 },
-    //            row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-    //            row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-    //            options =>
-    //            {
-    //                options.LogTo = _output.WriteLine;
-    //            });
-
-    //    tran.Commit();
-
-    //    // Assert
-    //    var dbRows = _context.SingleKeyRows.AsNoTracking().ToList();
-    //    var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
-
-    //    Assert.Equal(1, result1.AffectedRows);
-    //    Assert.Equal(0, result1.InsertedRows);
-    //    Assert.Equal(1, result1.UpdatedRows);
-
-    //    Assert.Equal(1, result2.AffectedRows);
-    //    Assert.Equal(0, result2.InsertedRows);
-    //    Assert.Equal(1, result2.UpdatedRows);
-
-    //    Assert.Equal(rows.Count, dbRows.Count);
-    //    Assert.Equal(compositeKeyRows.Count, dbCompositeKeyRows.Count);
-
-    //    for (int i = 0; i < length; i++)
-    //    {
-    //        Assert.Equal(rows[i].Id, dbRows[i].Id);
-    //        Assert.Equal(rows[i].Column1, dbRows[i].Column1);
-    //        Assert.Equal(rows[i].Column2, dbRows[i].Column2);
-    //        Assert.Equal(rows[i].Column3.TruncateToMicroseconds(), dbRows[i].Column3);
-    //        Assert.Equal(rows[i].Season, dbRows[i].Season);
-    //        Assert.Equal(rows[i].SeasonAsString, dbRows[i].SeasonAsString);
-
-    //        Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
-    //        Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);
-    //        Assert.Equal(compositeKeyRows[i].Column1, dbCompositeKeyRows[i].Column1);
-    //        Assert.Equal(compositeKeyRows[i].Column2, dbCompositeKeyRows[i].Column2);
-    //        Assert.Equal(compositeKeyRows[i].Column3.TruncateToMicroseconds(), dbCompositeKeyRows[i].Column3);
-    //        Assert.Equal(compositeKeyRows[i].Season, dbCompositeKeyRows[i].Season);
-    //        Assert.Equal(compositeKeyRows[i].SeasonAsString, dbCompositeKeyRows[i].SeasonAsString);
-    //    }
-    //}
-
-    //[Theory]
-    //[InlineData(0)]
-    //[InlineData(1)]
-    //[InlineData(100)]
-    //public void Upsert_NonExisting_Using_Linq_With_Transaction(int length)
-    //{
-    //    SeedData(length);
-
-    //    var tran = _context.Database.BeginTransaction();
-
-    //    var rows = _context.SingleKeyRows.AsNoTracking().ToList();
-    //    var compositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
-
-    //    var newRow = new SingleKeyRow<int>
-    //    {
-    //        Column1 = length,
-    //        Column2 = "Inserted using Upsert" + length,
-    //        Column3 = DateTime.Now,
-    //        Season = Season.Summer,
-    //        SeasonAsString = Season.Summer
-    //    };
-
-    //    var newCompositeKeyRow = new CompositeKeyRow<int, int>
-    //    {
-    //        Id1 = length,
-    //        Id2 = length,
-    //        Column1 = length,
-    //        Column2 = "Inserted using Upsert" + length,
-    //        Column3 = DateTime.Now,
-    //        Season = Season.Summer,
-    //        SeasonAsString = Season.Summer
-    //    };
-
-    //    var result1 = _context.Upsert(newRow,
-    //            row => row.Id,
-    //            row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-    //            row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-    //            options =>
-    //            {
-    //                options.LogTo = _output.WriteLine;
-    //            });
-
-    //    var result2 = _context.Upsert(newCompositeKeyRow,
-    //            row => new { row.Id1, row.Id2 },
-    //            row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-    //            row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-    //            options =>
-    //            {
-    //                options.LogTo = _output.WriteLine;
-    //            });
-
-    //    tran.Commit();
-
-    //    rows.Add(newRow);
-    //    compositeKeyRows.Add(newCompositeKeyRow);
-
-    //    // Assert
-    //    var dbRows = _context.SingleKeyRows.AsNoTracking().ToList();
-    //    var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
-
-    //    Assert.Equal(1, result1.AffectedRows);
-    //    Assert.Equal(1, result1.InsertedRows);
-    //    Assert.Equal(0, result1.UpdatedRows);
-
-    //    Assert.Equal(1, result2.AffectedRows);
-    //    Assert.Equal(1, result2.InsertedRows);
-    //    Assert.Equal(0, result2.UpdatedRows);
-
-    //    Assert.Equal(rows.Count, dbRows.Count);
-    //    Assert.Equal(compositeKeyRows.Count, dbCompositeKeyRows.Count);
-
-    //    for (int i = 0; i < length + 1; i++)
-    //    {
-    //        Assert.Equal(rows[i].Id, dbRows[i].Id);
-    //        Assert.Equal(rows[i].Column1, dbRows[i].Column1);
-    //        Assert.Equal(rows[i].Column2, dbRows[i].Column2);
-    //        Assert.Equal(rows[i].Column3.TruncateToMicroseconds(), dbRows[i].Column3);
-    //        Assert.Equal(rows[i].Season, dbRows[i].Season);
-    //        Assert.Equal(rows[i].SeasonAsString, dbRows[i].SeasonAsString);
-
-    //        Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
-    //        Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);
-    //        Assert.Equal(compositeKeyRows[i].Column1, dbCompositeKeyRows[i].Column1);
-    //        Assert.Equal(compositeKeyRows[i].Column2, dbCompositeKeyRows[i].Column2);
-    //        Assert.Equal(compositeKeyRows[i].Column3.TruncateToMicroseconds(), dbCompositeKeyRows[i].Column3);
-    //        Assert.Equal(compositeKeyRows[i].Season, dbCompositeKeyRows[i].Season);
-    //        Assert.Equal(compositeKeyRows[i].SeasonAsString, dbCompositeKeyRows[i].SeasonAsString);
-    //    }
-    //}
-
-    //[Theory]
-    //[InlineData(1)]
-    //[InlineData(100)]
-    //public void Upsert_Existing_Using_Dynamic_String_With_Transaction(int length)
-    //{
-    //    SeedData(length);
-
-    //    var tran = _context.Database.BeginTransaction();
-
-    //    var rows = _context.SingleKeyRows.AsNoTracking().ToList();
-    //    var compositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
-
-    //    var existingRow = rows.First();
-
-    //    existingRow.Column2 = "abc";
-    //    existingRow.Column3 = DateTime.Now;
-    //    existingRow.Season = Season.Spring;
-    //    existingRow.SeasonAsString = Season.Spring;
+        existingRow.Column2 = "abc";
+        existingRow.Column3 = DateTime.Now;
+        existingRow.Season = Season.Spring;
+        existingRow.SeasonAsString = Season.Spring;
 
 
-    //    var existingCompositeKeyRows = compositeKeyRows.First();
+        var existingCompositeKeyRows = compositeKeyRows.First();
 
-    //    existingCompositeKeyRows.Column2 = "abc";
-    //    existingCompositeKeyRows.Column3 = DateTime.Now;
-    //    existingCompositeKeyRows.Season = Season.Spring;
-    //    existingCompositeKeyRows.SeasonAsString = Season.Spring;
+        existingCompositeKeyRows.Column2 = "abc";
+        existingCompositeKeyRows.Column3 = DateTime.Now;
+        existingCompositeKeyRows.Season = Season.Spring;
+        existingCompositeKeyRows.SeasonAsString = Season.Spring;
 
-    //    var result1 = _context.Upsert(existingRow,
-    //        "Id",
-    //        ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
-    //        ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
-    //        options =>
-    //        {
-    //            options.LogTo = _output.WriteLine;
-    //        });
+        var result1 = _context.Upsert(existingRow,
+                row => row.Id,
+                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
+                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
+                options =>
+                {
+                    options.LogTo = _output.WriteLine;
+                });
 
-    //    var result2 = _context.Upsert(existingCompositeKeyRows,
-    //        ["Id1", "Id2"],
-    //        ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
-    //        ["Id1", "Id2", "Column1", "Column2", "Column3", "Season", "SeasonAsString"],
-    //        options =>
-    //        {
-    //            options.LogTo = _output.WriteLine;
-    //        });
+        var result2 = _context.Upsert(existingCompositeKeyRows,
+                row => new { row.Id1, row.Id2 },
+                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
+                row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
+                options =>
+                {
+                    options.LogTo = _output.WriteLine;
+                });
 
-    //    tran.Commit();
+        tran.Commit();
 
-    //    // Assert
-    //    var dbRows = _context.SingleKeyRows.AsNoTracking().ToList();
-    //    var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
+        // Assert
+        var dbRows = _context.SingleKeyRows.AsNoTracking().ToList();
+        var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
 
-    //    Assert.Equal(1, result1.AffectedRows);
-    //    Assert.Equal(0, result1.InsertedRows);
-    //    Assert.Equal(1, result1.UpdatedRows);
+        Assert.Equal(1, result1.AffectedRows);
+        Assert.Equal(0, result1.InsertedRows);
+        Assert.Equal(1, result1.UpdatedRows);
 
-    //    Assert.Equal(1, result2.AffectedRows);
-    //    Assert.Equal(0, result2.InsertedRows);
-    //    Assert.Equal(1, result2.UpdatedRows);
+        Assert.Equal(1, result2.AffectedRows);
+        Assert.Equal(0, result2.InsertedRows);
+        Assert.Equal(1, result2.UpdatedRows);
 
-    //    Assert.Equal(rows.Count, dbRows.Count);
-    //    Assert.Equal(compositeKeyRows.Count, dbCompositeKeyRows.Count);
+        Assert.Equal(rows.Count, dbRows.Count);
+        Assert.Equal(compositeKeyRows.Count, dbCompositeKeyRows.Count);
 
-    //    for (int i = 0; i < length; i++)
-    //    {
-    //        Assert.Equal(rows[i].Id, dbRows[i].Id);
-    //        Assert.Equal(rows[i].Column1, dbRows[i].Column1);
-    //        Assert.Equal(rows[i].Column2, dbRows[i].Column2);
-    //        Assert.Equal(rows[i].Column3.TruncateToMicroseconds(), dbRows[i].Column3);
-    //        Assert.Equal(rows[i].Season, dbRows[i].Season);
-    //        Assert.Equal(rows[i].SeasonAsString, dbRows[i].SeasonAsString);
+        for (int i = 0; i < length; i++)
+        {
+            Assert.Equal(rows[i].Id, dbRows[i].Id);
+            Assert.Equal(rows[i].Column1, dbRows[i].Column1);
+            Assert.Equal(rows[i].Column2, dbRows[i].Column2);
+            Assert.Equal(rows[i].Column3.TruncateToMicroseconds(), dbRows[i].Column3);
+            Assert.Equal(rows[i].Season, dbRows[i].Season);
+            Assert.Equal(rows[i].SeasonAsString, dbRows[i].SeasonAsString);
 
-    //        Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
-    //        Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);
-    //        Assert.Equal(compositeKeyRows[i].Column1, dbCompositeKeyRows[i].Column1);
-    //        Assert.Equal(compositeKeyRows[i].Column2, dbCompositeKeyRows[i].Column2);
-    //        Assert.Equal(compositeKeyRows[i].Column3.TruncateToMicroseconds(), dbCompositeKeyRows[i].Column3);
-    //        Assert.Equal(compositeKeyRows[i].Season, dbCompositeKeyRows[i].Season);
-    //        Assert.Equal(compositeKeyRows[i].SeasonAsString, dbCompositeKeyRows[i].SeasonAsString);
-    //    }
-    //}
+            Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
+            Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);
+            Assert.Equal(compositeKeyRows[i].Column1, dbCompositeKeyRows[i].Column1);
+            Assert.Equal(compositeKeyRows[i].Column2, dbCompositeKeyRows[i].Column2);
+            Assert.Equal(compositeKeyRows[i].Column3.TruncateToMicroseconds(), dbCompositeKeyRows[i].Column3);
+            Assert.Equal(compositeKeyRows[i].Season, dbCompositeKeyRows[i].Season);
+            Assert.Equal(compositeKeyRows[i].SeasonAsString, dbCompositeKeyRows[i].SeasonAsString);
+        }
+    }
 
-    //[Theory]
-    //[InlineData(0)]
-    //[InlineData(1)]
-    //[InlineData(100)]
-    //public void Upsert_NonExisting_Using_Dynamic_String_With_Transaction(int length)
-    //{
-    //    SeedData(length);
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(100)]
+    public void Upsert_NonExisting_Using_Linq_With_Transaction(int length)
+    {
+        SeedData(length);
 
-    //    var tran = _context.Database.BeginTransaction();
+        var tran = _context.Database.BeginTransaction();
 
-    //    var rows = _context.SingleKeyRows.AsNoTracking().ToList();
-    //    var compositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
+        var rows = _context.SingleKeyRows.AsNoTracking().ToList();
+        var compositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
 
-    //    var newRow = new SingleKeyRow<int>
-    //    {
-    //        Column1 = length,
-    //        Column2 = "Inserted using Upsert" + length,
-    //        Column3 = DateTime.Now,
-    //        Season = Season.Summer,
-    //        SeasonAsString = Season.Summer
-    //    };
+        var bulkId = SequentialGuidGenerator.Next();
 
-    //    var newCompositeKeyRow = new CompositeKeyRow<int, int>
-    //    {
-    //        Id1 = length,
-    //        Id2 = length,
-    //        Column1 = length,
-    //        Column2 = "Inserted using Upsert" + length,
-    //        Column3 = DateTime.Now,
-    //        Season = Season.Summer,
-    //        SeasonAsString = Season.Summer
-    //    };
+        var newRow = new SingleKeyRow<int>
+        {
+            Column1 = length,
+            Column2 = "Inserted using Upsert" + length,
+            Column3 = DateTime.Now,
+            Season = Season.Summer,
+            SeasonAsString = Season.Summer,
+            BulkId = bulkId
+        };
 
-    //    var result1 = _context.Upsert(newRow,
-    //        "Id",
-    //        ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
-    //        ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
-    //        options =>
-    //        {
-    //            options.LogTo = _output.WriteLine;
-    //        });
+        var newCompositeKeyRow = new CompositeKeyRow<int, int>
+        {
+            Id1 = length,
+            Id2 = length,
+            Column1 = length,
+            Column2 = "Inserted using Upsert" + length,
+            Column3 = DateTime.Now,
+            Season = Season.Summer,
+            SeasonAsString = Season.Summer
+        };
 
-    //    var result2 = _context.Upsert(newCompositeKeyRow,
-    //        ["Id1", "Id2"],
-    //        ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
-    //        ["Id1", "Id2", "Column1", "Column2", "Column3", "Season", "SeasonAsString"],
-    //        options =>
-    //        {
-    //            options.LogTo = _output.WriteLine;
-    //        });
+        var result1 = _context.Upsert(newRow,
+                row => row.Id,
+                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
+                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString, row.BulkId},
+                options =>
+                {
+                    options.LogTo = _output.WriteLine;
+                });
 
-    //    tran.Commit();
+        var result2 = _context.Upsert(newCompositeKeyRow,
+                row => new { row.Id1, row.Id2 },
+                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
+                row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
+                options =>
+                {
+                    options.LogTo = _output.WriteLine;
+                });
 
-    //    rows.Add(newRow);
-    //    compositeKeyRows.Add(newCompositeKeyRow);
+        tran.Commit();
 
-    //    // Assert
-    //    var dbRows = _context.SingleKeyRows.AsNoTracking().ToList();
-    //    var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
+        rows.Add(newRow);
+        compositeKeyRows.Add(newCompositeKeyRow);
 
-    //    Assert.Equal(1, result1.AffectedRows);
-    //    Assert.Equal(1, result1.InsertedRows);
-    //    Assert.Equal(0, result1.UpdatedRows);
+        // Assert
+        var dbRows = _context.SingleKeyRows.AsNoTracking().ToList();
+        var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
 
-    //    Assert.Equal(1, result2.AffectedRows);
-    //    Assert.Equal(1, result2.InsertedRows);
-    //    Assert.Equal(0, result2.UpdatedRows);
+        rows.Where(x => x.BulkId == bulkId)
+            .ToList()
+            .ForEach(x => x.Id = dbRows.First(y => y.BulkId == bulkId && y.Column1 == x.Column1).Id);
 
-    //    Assert.Equal(rows.Count, dbRows.Count);
-    //    Assert.Equal(compositeKeyRows.Count, dbCompositeKeyRows.Count);
+        Assert.Equal(1, result1.AffectedRows);
+        Assert.Equal(1, result1.InsertedRows);
+        Assert.Equal(0, result1.UpdatedRows);
 
-    //    for (int i = 0; i < length + 1; i++)
-    //    {
-    //        Assert.Equal(rows[i].Id, dbRows[i].Id);
-    //        Assert.Equal(rows[i].Column1, dbRows[i].Column1);
-    //        Assert.Equal(rows[i].Column2, dbRows[i].Column2);
-    //        Assert.Equal(rows[i].Column3.TruncateToMicroseconds(), dbRows[i].Column3);
-    //        Assert.Equal(rows[i].Season, dbRows[i].Season);
-    //        Assert.Equal(rows[i].SeasonAsString, dbRows[i].SeasonAsString);
+        Assert.Equal(1, result2.AffectedRows);
+        Assert.Equal(1, result2.InsertedRows);
+        Assert.Equal(0, result2.UpdatedRows);
 
-    //        Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
-    //        Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);
-    //        Assert.Equal(compositeKeyRows[i].Column1, dbCompositeKeyRows[i].Column1);
-    //        Assert.Equal(compositeKeyRows[i].Column2, dbCompositeKeyRows[i].Column2);
-    //        Assert.Equal(compositeKeyRows[i].Column3.TruncateToMicroseconds(), dbCompositeKeyRows[i].Column3);
-    //        Assert.Equal(compositeKeyRows[i].Season, dbCompositeKeyRows[i].Season);
-    //        Assert.Equal(compositeKeyRows[i].SeasonAsString, dbCompositeKeyRows[i].SeasonAsString);
-    //    }
-    //}
+        Assert.Equal(rows.Count, dbRows.Count);
+        Assert.Equal(compositeKeyRows.Count, dbCompositeKeyRows.Count);
+
+        for (int i = 0; i < length + 1; i++)
+        {
+            Assert.Equal(rows[i].Id, dbRows[i].Id);
+            Assert.Equal(rows[i].Column1, dbRows[i].Column1);
+            Assert.Equal(rows[i].Column2, dbRows[i].Column2);
+            Assert.Equal(rows[i].Column3.TruncateToMicroseconds(), dbRows[i].Column3);
+            Assert.Equal(rows[i].Season, dbRows[i].Season);
+            Assert.Equal(rows[i].SeasonAsString, dbRows[i].SeasonAsString);
+
+            Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
+            Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);
+            Assert.Equal(compositeKeyRows[i].Column1, dbCompositeKeyRows[i].Column1);
+            Assert.Equal(compositeKeyRows[i].Column2, dbCompositeKeyRows[i].Column2);
+            Assert.Equal(compositeKeyRows[i].Column3.TruncateToMicroseconds(), dbCompositeKeyRows[i].Column3);
+            Assert.Equal(compositeKeyRows[i].Season, dbCompositeKeyRows[i].Season);
+            Assert.Equal(compositeKeyRows[i].SeasonAsString, dbCompositeKeyRows[i].SeasonAsString);
+        }
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(100)]
+    public void Upsert_Existing_Using_Dynamic_String_With_Transaction(int length)
+    {
+        SeedData(length);
+
+        var tran = _context.Database.BeginTransaction();
+
+        var rows = _context.SingleKeyRows.AsNoTracking().ToList();
+        var compositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
+
+        var existingRow = rows.First();
+
+        existingRow.Column2 = "abc";
+        existingRow.Column3 = DateTime.Now;
+        existingRow.Season = Season.Spring;
+        existingRow.SeasonAsString = Season.Spring;
+
+
+        var existingCompositeKeyRows = compositeKeyRows.First();
+
+        existingCompositeKeyRows.Column2 = "abc";
+        existingCompositeKeyRows.Column3 = DateTime.Now;
+        existingCompositeKeyRows.Season = Season.Spring;
+        existingCompositeKeyRows.SeasonAsString = Season.Spring;
+
+        var result1 = _context.Upsert(existingRow,
+            "Id",
+            ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
+            ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
+            options =>
+            {
+                options.LogTo = _output.WriteLine;
+            });
+
+        var result2 = _context.Upsert(existingCompositeKeyRows,
+            ["Id1", "Id2"],
+            ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
+            ["Id1", "Id2", "Column1", "Column2", "Column3", "Season", "SeasonAsString"],
+            options =>
+            {
+                options.LogTo = _output.WriteLine;
+            });
+
+        tran.Commit();
+
+        // Assert
+        var dbRows = _context.SingleKeyRows.AsNoTracking().ToList();
+        var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
+
+        Assert.Equal(1, result1.AffectedRows);
+        Assert.Equal(0, result1.InsertedRows);
+        Assert.Equal(1, result1.UpdatedRows);
+
+        Assert.Equal(1, result2.AffectedRows);
+        Assert.Equal(0, result2.InsertedRows);
+        Assert.Equal(1, result2.UpdatedRows);
+
+        Assert.Equal(rows.Count, dbRows.Count);
+        Assert.Equal(compositeKeyRows.Count, dbCompositeKeyRows.Count);
+
+        for (int i = 0; i < length; i++)
+        {
+            Assert.Equal(rows[i].Id, dbRows[i].Id);
+            Assert.Equal(rows[i].Column1, dbRows[i].Column1);
+            Assert.Equal(rows[i].Column2, dbRows[i].Column2);
+            Assert.Equal(rows[i].Column3.TruncateToMicroseconds(), dbRows[i].Column3);
+            Assert.Equal(rows[i].Season, dbRows[i].Season);
+            Assert.Equal(rows[i].SeasonAsString, dbRows[i].SeasonAsString);
+
+            Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
+            Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);
+            Assert.Equal(compositeKeyRows[i].Column1, dbCompositeKeyRows[i].Column1);
+            Assert.Equal(compositeKeyRows[i].Column2, dbCompositeKeyRows[i].Column2);
+            Assert.Equal(compositeKeyRows[i].Column3.TruncateToMicroseconds(), dbCompositeKeyRows[i].Column3);
+            Assert.Equal(compositeKeyRows[i].Season, dbCompositeKeyRows[i].Season);
+            Assert.Equal(compositeKeyRows[i].SeasonAsString, dbCompositeKeyRows[i].SeasonAsString);
+        }
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(100)]
+    public void Upsert_NonExisting_Using_Dynamic_String_With_Transaction(int length)
+    {
+        SeedData(length);
+
+        var tran = _context.Database.BeginTransaction();
+
+        var rows = _context.SingleKeyRows.AsNoTracking().ToList();
+        var compositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
+
+        var bulkId = SequentialGuidGenerator.Next();
+
+        var newRow = new SingleKeyRow<int>
+        {
+            Column1 = length,
+            Column2 = "Inserted using Upsert" + length,
+            Column3 = DateTime.Now,
+            Season = Season.Summer,
+            SeasonAsString = Season.Summer,
+            BulkId = bulkId
+        };
+
+        var newCompositeKeyRow = new CompositeKeyRow<int, int>
+        {
+            Id1 = length,
+            Id2 = length,
+            Column1 = length,
+            Column2 = "Inserted using Upsert" + length,
+            Column3 = DateTime.Now,
+            Season = Season.Summer,
+            SeasonAsString = Season.Summer
+        };
+
+        var result1 = _context.Upsert(newRow,
+            "Id",
+            ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
+            ["Column1", "Column2", "Column3", "Season", "SeasonAsString", "BulkId"],
+            options =>
+            {
+                options.LogTo = _output.WriteLine;
+            });
+
+        var result2 = _context.Upsert(newCompositeKeyRow,
+            ["Id1", "Id2"],
+            ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
+            ["Id1", "Id2", "Column1", "Column2", "Column3", "Season", "SeasonAsString"],
+            options =>
+            {
+                options.LogTo = _output.WriteLine;
+            });
+
+        tran.Commit();
+
+        rows.Add(newRow);
+        compositeKeyRows.Add(newCompositeKeyRow);
+
+        // Assert
+        var dbRows = _context.SingleKeyRows.AsNoTracking().ToList();
+        var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
+
+        rows.Where(x => x.BulkId == bulkId)
+            .ToList()
+            .ForEach(x => x.Id = dbRows.First(y => y.BulkId == bulkId && y.Column1 == x.Column1).Id);
+
+        Assert.Equal(1, result1.AffectedRows);
+        Assert.Equal(1, result1.InsertedRows);
+        Assert.Equal(0, result1.UpdatedRows);
+
+        Assert.Equal(1, result2.AffectedRows);
+        Assert.Equal(1, result2.InsertedRows);
+        Assert.Equal(0, result2.UpdatedRows);
+
+        Assert.Equal(rows.Count, dbRows.Count);
+        Assert.Equal(compositeKeyRows.Count, dbCompositeKeyRows.Count);
+
+        for (int i = 0; i < length + 1; i++)
+        {
+            Assert.Equal(rows[i].Id, dbRows[i].Id);
+            Assert.Equal(rows[i].Column1, dbRows[i].Column1);
+            Assert.Equal(rows[i].Column2, dbRows[i].Column2);
+            Assert.Equal(rows[i].Column3.TruncateToMicroseconds(), dbRows[i].Column3);
+            Assert.Equal(rows[i].Season, dbRows[i].Season);
+            Assert.Equal(rows[i].SeasonAsString, dbRows[i].SeasonAsString);
+
+            Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
+            Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);
+            Assert.Equal(compositeKeyRows[i].Column1, dbCompositeKeyRows[i].Column1);
+            Assert.Equal(compositeKeyRows[i].Column2, dbCompositeKeyRows[i].Column2);
+            Assert.Equal(compositeKeyRows[i].Column3.TruncateToMicroseconds(), dbCompositeKeyRows[i].Column3);
+            Assert.Equal(compositeKeyRows[i].Season, dbCompositeKeyRows[i].Season);
+            Assert.Equal(compositeKeyRows[i].SeasonAsString, dbCompositeKeyRows[i].SeasonAsString);
+        }
+    }
 
     [Theory]
     [InlineData(1)]
