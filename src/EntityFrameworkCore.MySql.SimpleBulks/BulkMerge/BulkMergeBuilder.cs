@@ -21,11 +21,6 @@ public class BulkMergeBuilder<T>
     private readonly MySqlConnection _connection;
     private readonly MySqlTransaction _transaction;
 
-    public BulkMergeBuilder(MySqlConnection connection)
-    {
-        _connection = connection;
-    }
-
     public BulkMergeBuilder(MySqlConnection connection, MySqlTransaction transaction)
     {
         _connection = connection;

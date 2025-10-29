@@ -22,11 +22,6 @@ public class BulkMatchBuilder<T>
     private readonly MySqlConnection _connection;
     private readonly MySqlTransaction _transaction;
 
-    public BulkMatchBuilder(MySqlConnection connection)
-    {
-        _connection = connection;
-    }
-
     public BulkMatchBuilder(MySqlConnection connection, MySqlTransaction transaction)
     {
         _connection = connection;

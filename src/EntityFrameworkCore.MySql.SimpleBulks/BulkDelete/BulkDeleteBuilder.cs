@@ -17,11 +17,6 @@ public class BulkDeleteBuilder<T>
     private readonly MySqlConnection _connection;
     private readonly MySqlTransaction _transaction;
 
-    public BulkDeleteBuilder(MySqlConnection connection)
-    {
-        _connection = connection;
-    }
-
     public BulkDeleteBuilder(MySqlConnection connection, MySqlTransaction transaction)
     {
         _connection = connection;

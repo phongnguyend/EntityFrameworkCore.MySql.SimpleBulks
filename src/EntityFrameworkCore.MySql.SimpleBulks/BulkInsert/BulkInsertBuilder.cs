@@ -22,11 +22,6 @@ public class BulkInsertBuilder<T>
     private readonly MySqlConnection _connection;
     private readonly MySqlTransaction _transaction;
 
-    public BulkInsertBuilder(MySqlConnection connection)
-    {
-        _connection = connection;
-    }
-
     public BulkInsertBuilder(MySqlConnection connection, MySqlTransaction transaction)
     {
         _connection = connection;

@@ -16,11 +16,6 @@ public class TempTableBuilder<T>
     private readonly MySqlConnection _connection;
     private readonly MySqlTransaction _transaction;
 
-    public TempTableBuilder(MySqlConnection connection)
-    {
-        _connection = connection;
-    }
-
     public TempTableBuilder(MySqlConnection connection, MySqlTransaction transaction)
     {
         _connection = connection;

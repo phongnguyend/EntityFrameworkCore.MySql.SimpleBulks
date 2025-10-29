@@ -20,11 +20,6 @@ public class BulkUpdateBuilder<T>
     private readonly MySqlConnection _connection;
     private readonly MySqlTransaction _transaction;
 
-    public BulkUpdateBuilder(MySqlConnection connection)
-    {
-        _connection = connection;
-    }
-
     public BulkUpdateBuilder(MySqlConnection connection, MySqlTransaction transaction)
     {
         _connection = connection;
