@@ -48,18 +48,20 @@ public class BulkInsertTests : BaseTest
             });
         }
 
+        var connectionContext = new ConnectionContext(_connection, null);
+
         if (useLinq)
         {
             if (omitTableName)
             {
-                _connection.BulkInsert(rows,
+                connectionContext.BulkInsert(rows,
                     row => new { row.Column1, row.Column2, row.Column3, row.BulkId, row.BulkIndex },
                     options =>
                     {
                         options.LogTo = _output.WriteLine;
                     });
 
-                _connection.BulkInsert(compositeKeyRows,
+                connectionContext.BulkInsert(compositeKeyRows,
                     row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 },
                     options =>
                     {
@@ -68,14 +70,14 @@ public class BulkInsertTests : BaseTest
             }
             else
             {
-                _connection.BulkInsert(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                connectionContext.BulkInsert(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")),
                     row => new { row.Column1, row.Column2, row.Column3, row.BulkId, row.BulkIndex },
                     options =>
                     {
                         options.LogTo = _output.WriteLine;
                     });
 
-                _connection.BulkInsert(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                connectionContext.BulkInsert(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")),
                     row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 },
                     options =>
                     {
@@ -88,14 +90,14 @@ public class BulkInsertTests : BaseTest
         {
             if (omitTableName)
             {
-                _connection.BulkInsert(rows,
+                connectionContext.BulkInsert(rows,
                     ["Column1", "Column2", "Column3", "BulkId", "BulkIndex"],
                     options =>
                     {
                         options.LogTo = _output.WriteLine;
                     });
 
-                _connection.BulkInsert(compositeKeyRows,
+                connectionContext.BulkInsert(compositeKeyRows,
                     ["Id1", "Id2", "Column1", "Column2", "Column3"],
                     options =>
                     {
@@ -104,14 +106,14 @@ public class BulkInsertTests : BaseTest
             }
             else
             {
-                _connection.BulkInsert(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                connectionContext.BulkInsert(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")),
                     ["Column1", "Column2", "Column3", "BulkId", "BulkIndex"],
                     options =>
                     {
                         options.LogTo = _output.WriteLine;
                     });
 
-                _connection.BulkInsert(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                connectionContext.BulkInsert(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")),
                     ["Id1", "Id2", "Column1", "Column2", "Column3"],
                     options =>
                     {

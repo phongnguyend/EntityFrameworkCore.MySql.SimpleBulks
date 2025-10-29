@@ -50,6 +50,7 @@ public class BulkDeleteTests : BaseTest
     [InlineData(false, false)]
     public void Bulk_Delete_Without_Transaction(bool useLinq, bool omitTableName)
     {
+        var connectionContext = new ConnectionContext(_connection, null);
         var rows = _context.SingleKeyRows.AsNoTracking().Take(99).ToList();
         var compositeKeyRows = _context.CompositeKeyRows.AsNoTracking().Take(99).ToList();
 
@@ -57,12 +58,12 @@ public class BulkDeleteTests : BaseTest
         {
             if (omitTableName)
             {
-                _connection.BulkDelete(rows, row => row.Id,
+                connectionContext.BulkDelete(rows, row => row.Id,
                 options =>
                 {
                     options.LogTo = _output.WriteLine;
                 });
-                _connection.BulkDelete(compositeKeyRows, row => new { row.Id1, row.Id2 },
+                connectionContext.BulkDelete(compositeKeyRows, row => new { row.Id1, row.Id2 },
                 options =>
                 {
                     options.LogTo = _output.WriteLine;
@@ -70,12 +71,12 @@ public class BulkDeleteTests : BaseTest
             }
             else
             {
-                _connection.BulkDelete(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")), row => row.Id,
+                connectionContext.BulkDelete(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")), row => row.Id,
                 options =>
                 {
                     options.LogTo = _output.WriteLine;
                 });
-                _connection.BulkDelete(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")), row => new { row.Id1, row.Id2 },
+                connectionContext.BulkDelete(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")), row => new { row.Id1, row.Id2 },
                 options =>
                 {
                     options.LogTo = _output.WriteLine;
@@ -86,12 +87,12 @@ public class BulkDeleteTests : BaseTest
         {
             if (omitTableName)
             {
-                _connection.BulkDelete(rows, "Id",
+                connectionContext.BulkDelete(rows, "Id",
                 options =>
                 {
                     options.LogTo = _output.WriteLine;
                 });
-                _connection.BulkDelete(compositeKeyRows, ["Id1", "Id2"],
+                connectionContext.BulkDelete(compositeKeyRows, ["Id1", "Id2"],
                 options =>
                 {
                     options.LogTo = _output.WriteLine;
@@ -99,12 +100,12 @@ public class BulkDeleteTests : BaseTest
             }
             else
             {
-                _connection.BulkDelete(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")), "Id",
+                connectionContext.BulkDelete(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")), "Id",
                 options =>
                 {
                     options.LogTo = _output.WriteLine;
                 });
-                _connection.BulkDelete(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")), ["Id1", "Id2"],
+                connectionContext.BulkDelete(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")), ["Id1", "Id2"],
                 options =>
                 {
                     options.LogTo = _output.WriteLine;
