@@ -9,6 +9,12 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 
 public static class DataTableExtensions
 {
+    private static readonly BulkOptions DefaultBulkOptions = new BulkOptions()
+    {
+        BatchSize = 0,
+        Timeout = 30,
+    };
+
     public static string GenerateTempTableDefinition(this DataTable table, string tableName, IReadOnlyDictionary<string, string> columnNameMappings, IReadOnlyDictionary<string, string> columnTypeMappings)
     {
         var sql = new StringBuilder();
@@ -34,11 +40,7 @@ public static class DataTableExtensions
 
     public static void SqlBulkCopy(this DataTable dataTable, string tableName, IReadOnlyDictionary<string, string> columnNameMappings, MySqlConnection connection, MySqlTransaction transaction, BulkOptions options = null)
     {
-        options ??= new BulkOptions()
-        {
-            BatchSize = 0,
-            Timeout = 30,
-        };
+        options ??= DefaultBulkOptions;
 
         var bulkCopy = new MySqlBulkCopy(connection, transaction)
         {
@@ -59,11 +61,7 @@ public static class DataTableExtensions
 
     public static async Task SqlBulkCopyAsync(this DataTable dataTable, string tableName, IReadOnlyDictionary<string, string> columnNameMappings, MySqlConnection connection, MySqlTransaction transaction, BulkOptions options = null, CancellationToken cancellationToken = default)
     {
-        options ??= new BulkOptions()
-        {
-            BatchSize = 0,
-            Timeout = 30,
-        };
+        options ??= DefaultBulkOptions;
 
         var bulkCopy = new MySqlBulkCopy(connection, transaction)
         {
