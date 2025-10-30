@@ -107,7 +107,7 @@ public class BulkInsertBuilder<T>
             _connectionContext.EnsureOpen();
 
             Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
-            dataTable.SqlBulkCopy(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext.Connection, _connectionContext.Transaction, _options);
+            dataTable.SqlBulkCopy(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext, _options);
             Log("End executing SqlBulkCopy.");
             return;
         }
@@ -125,7 +125,7 @@ public class BulkInsertBuilder<T>
             _connectionContext.EnsureOpen();
 
             Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
-            dataTable.SqlBulkCopy(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext.Connection, _connectionContext.Transaction, _options);
+            dataTable.SqlBulkCopy(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext, _options);
             Log("End executing SqlBulkCopy.");
             return;
         }
@@ -151,7 +151,7 @@ public class BulkInsertBuilder<T>
             _connectionContext.EnsureOpen();
 
             Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
-            dataTable.SqlBulkCopy(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext.Connection, _connectionContext.Transaction, _options);
+            dataTable.SqlBulkCopy(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext, _options);
             Log("End executing SqlBulkCopy.");
             return;
         }
@@ -161,7 +161,7 @@ public class BulkInsertBuilder<T>
         _connectionContext.EnsureOpen();
 
         Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
-        dataTable.SqlBulkCopy(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext.Connection, _connectionContext.Transaction, _options);
+        dataTable.SqlBulkCopy(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext, _options);
         Log("End executing SqlBulkCopy.");
         return;
     }
@@ -230,7 +230,7 @@ public class BulkInsertBuilder<T>
             await _connectionContext.EnsureOpenAsync(cancellationToken);
 
             Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
-            await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext.Connection, _connectionContext.Transaction, _options, cancellationToken);
+            await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext, _options, cancellationToken);
             Log("End executing SqlBulkCopy.");
             return;
         }
@@ -248,7 +248,7 @@ public class BulkInsertBuilder<T>
             await _connectionContext.EnsureOpenAsync(cancellationToken);
 
             Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
-            await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext.Connection, _connectionContext.Transaction, _options, cancellationToken);
+            await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext, _options, cancellationToken);
             Log("End executing SqlBulkCopy.");
             return;
         }
@@ -274,7 +274,7 @@ public class BulkInsertBuilder<T>
             await _connectionContext.EnsureOpenAsync(cancellationToken);
 
             Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
-            await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext.Connection, _connectionContext.Transaction, _options, cancellationToken);
+            await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext, _options, cancellationToken);
             Log("End executing SqlBulkCopy.");
             return;
         }
@@ -284,7 +284,7 @@ public class BulkInsertBuilder<T>
         await _connectionContext.EnsureOpenAsync(cancellationToken);
 
         Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
-        await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext.Connection, _connectionContext.Transaction, _options, cancellationToken);
+        await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext, _options, cancellationToken);
         Log("End executing SqlBulkCopy.");
         return;
     }

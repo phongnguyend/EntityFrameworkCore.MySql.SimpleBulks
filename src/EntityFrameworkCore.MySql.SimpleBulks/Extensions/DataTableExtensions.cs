@@ -38,11 +38,11 @@ public static class DataTableExtensions
         return sql.ToString();
     }
 
-    public static void SqlBulkCopy(this DataTable dataTable, string tableName, IReadOnlyDictionary<string, string> columnNameMappings, MySqlConnection connection, MySqlTransaction transaction, BulkOptions options = null)
+    public static void SqlBulkCopy(this DataTable dataTable, string tableName, IReadOnlyDictionary<string, string> columnNameMappings, ConnectionContext connectionContext, BulkOptions options = null)
     {
         options ??= DefaultBulkOptions;
 
-        var bulkCopy = new MySqlBulkCopy(connection, transaction)
+        var bulkCopy = new MySqlBulkCopy(connectionContext.Connection, connectionContext.Transaction)
         {
             BulkCopyTimeout = options.Timeout,
             DestinationTableName = $"{tableName}"
@@ -59,11 +59,11 @@ public static class DataTableExtensions
         bulkCopy.WriteToServer(dataTable);
     }
 
-    public static async Task SqlBulkCopyAsync(this DataTable dataTable, string tableName, IReadOnlyDictionary<string, string> columnNameMappings, MySqlConnection connection, MySqlTransaction transaction, BulkOptions options = null, CancellationToken cancellationToken = default)
+    public static async Task SqlBulkCopyAsync(this DataTable dataTable, string tableName, IReadOnlyDictionary<string, string> columnNameMappings, ConnectionContext connectionContext, BulkOptions options = null, CancellationToken cancellationToken = default)
     {
         options ??= DefaultBulkOptions;
 
-        var bulkCopy = new MySqlBulkCopy(connection, transaction)
+        var bulkCopy = new MySqlBulkCopy(connectionContext.Connection, connectionContext.Transaction)
         {
             BulkCopyTimeout = options.Timeout,
             DestinationTableName = $"{tableName}"
