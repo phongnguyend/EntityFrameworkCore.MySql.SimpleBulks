@@ -185,7 +185,7 @@ public class BulkUpdateAsyncTests : BaseTest
             if (omitTableName)
             {
                 await connectionContext.BulkUpdateAsync(rows,
-                    "Id",
+                    ["Id"],
                     ["Column3", "Column2"],
                     options =>
                     {
@@ -203,7 +203,7 @@ public class BulkUpdateAsyncTests : BaseTest
             else
             {
                 await connectionContext.BulkUpdateAsync(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")),
-                    "Id",
+                    ["Id"],
                     ["Column3", "Column2"],
                     options =>
                     {
@@ -246,7 +246,7 @@ public class BulkUpdateAsyncTests : BaseTest
             if (omitTableName)
             {
                 await connectionContext.BulkMergeAsync(rows,
-                    "Id",
+                    ["Id"],
                     ["Column1", "Column2"],
                     ["Column1", "Column2", "Column3", "BulkId"],
                     options =>
@@ -266,7 +266,7 @@ public class BulkUpdateAsyncTests : BaseTest
             else
             {
                 await connectionContext.BulkMergeAsync(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")),
-                    "Id",
+                    ["Id"],
                     ["Column1", "Column2"],
                     ["Column1", "Column2", "Column3", "BulkId"],
                     options =>

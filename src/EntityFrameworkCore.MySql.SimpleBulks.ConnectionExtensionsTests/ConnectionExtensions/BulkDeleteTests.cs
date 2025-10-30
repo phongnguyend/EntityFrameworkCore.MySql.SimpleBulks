@@ -87,7 +87,7 @@ public class BulkDeleteTests : BaseTest
         {
             if (omitTableName)
             {
-                connectionContext.BulkDelete(rows, "Id",
+                connectionContext.BulkDelete(rows, ["Id"],
                 options =>
                 {
                     options.LogTo = _output.WriteLine;
@@ -100,7 +100,7 @@ public class BulkDeleteTests : BaseTest
             }
             else
             {
-                connectionContext.BulkDelete(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")), "Id",
+                connectionContext.BulkDelete(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")), ["Id"],
                 options =>
                 {
                     options.LogTo = _output.WriteLine;

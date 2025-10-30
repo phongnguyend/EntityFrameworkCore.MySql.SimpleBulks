@@ -259,7 +259,7 @@ public class UpsertAsyncTests : BaseTest
         existingCompositeKeyRows.SeasonAsString = Season.Spring;
 
         var result1 = await _context.UpsertAsync(existingRow,
-            "Id",
+            ["Id"],
             ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
             ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
             options =>
@@ -349,7 +349,7 @@ public class UpsertAsyncTests : BaseTest
         };
 
         var result1 = await _context.UpsertAsync(newRow,
-            "Id",
+            ["Id"],
             ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
             ["Column1", "Column2", "Column3", "Season", "SeasonAsString", "BulkId"],
             options =>
