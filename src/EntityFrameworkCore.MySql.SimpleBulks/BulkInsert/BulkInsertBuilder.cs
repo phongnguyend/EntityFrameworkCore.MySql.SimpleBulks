@@ -1,5 +1,4 @@
 ﻿using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
-using MySqlConnector;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -19,13 +18,11 @@ public class BulkInsertBuilder<T>
     private OutputIdMode _outputIdMode = OutputIdMode.ServerGenerated;
     private IEnumerable<string> _columnNames;
     private BulkInsertOptions _options;
-    private readonly MySqlConnection _connection;
-    private readonly MySqlTransaction _transaction;
+    private readonly ConnectionContext _connectionContext;
 
-    public BulkInsertBuilder(MySqlConnection connection, MySqlTransaction transaction)
+    public BulkInsertBuilder(ConnectionContext connectionContext)
     {
-        _connection = connection;
-        _transaction = transaction;
+        _connectionContext = connectionContext;
     }
 
     public BulkInsertBuilder<T> ToTable(TableInfor table)
@@ -107,10 +104,10 @@ public class BulkInsertBuilder<T>
         {
             dataTable = data.ToDataTable(_columnNames, valueConverters: _table.ValueConverters);
 
-            _connection.EnsureOpen();
+            _connectionContext.Connection.EnsureOpen();
 
             Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
-            dataTable.SqlBulkCopy(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connection, _transaction, _options);
+            dataTable.SqlBulkCopy(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext.Connection, _connectionContext.Transaction, _options);
             Log("End executing SqlBulkCopy.");
             return;
         }
@@ -125,10 +122,10 @@ public class BulkInsertBuilder<T>
 
             dataTable = data.ToDataTable(columnsToInsert, valueConverters: _table.ValueConverters);
 
-            _connection.EnsureOpen();
+            _connectionContext.Connection.EnsureOpen();
 
             Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
-            dataTable.SqlBulkCopy(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connection, _transaction, _options);
+            dataTable.SqlBulkCopy(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext.Connection, _connectionContext.Transaction, _options);
             Log("End executing SqlBulkCopy.");
             return;
         }
@@ -151,20 +148,20 @@ public class BulkInsertBuilder<T>
 
             dataTable = data.ToDataTable(columnsToInsert, valueConverters: _table.ValueConverters);
 
-            _connection.EnsureOpen();
+            _connectionContext.Connection.EnsureOpen();
 
             Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
-            dataTable.SqlBulkCopy(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connection, _transaction, _options);
+            dataTable.SqlBulkCopy(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext.Connection, _connectionContext.Transaction, _options);
             Log("End executing SqlBulkCopy.");
             return;
         }
 
         dataTable = data.ToDataTable(_columnNames, valueConverters: _table.ValueConverters);
 
-        _connection.EnsureOpen();
+        _connectionContext.Connection.EnsureOpen();
 
         Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
-        dataTable.SqlBulkCopy(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connection, _transaction, _options);
+        dataTable.SqlBulkCopy(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext.Connection, _connectionContext.Transaction, _options);
         Log("End executing SqlBulkCopy.");
         return;
     }
@@ -200,12 +197,12 @@ public class BulkInsertBuilder<T>
 
         var insertStatement = insertStatementBuilder.ToString();
 
-        using var insertCommand = _connection.CreateTextCommand(_transaction, insertStatement, _options);
+        using var insertCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, insertStatement, _options);
         _table.CreateMySqlParameters(insertCommand, dataToInsert, columnsToInsert).ForEach(x => insertCommand.Parameters.Add(x));
 
         Log($"Begin inserting: {Environment.NewLine}{insertStatement}");
 
-        _connection.EnsureOpen();
+        _connectionContext.Connection.EnsureOpen();
 
         var affectedRow = insertCommand.ExecuteNonQuery();
 
@@ -230,10 +227,10 @@ public class BulkInsertBuilder<T>
         {
             dataTable = await data.ToDataTableAsync(_columnNames, valueConverters: _table.ValueConverters, cancellationToken: cancellationToken);
 
-            await _connection.EnsureOpenAsync(cancellationToken);
+            await _connectionContext.Connection.EnsureOpenAsync(cancellationToken);
 
             Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
-            await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connection, _transaction, _options, cancellationToken);
+            await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext.Connection, _connectionContext.Transaction, _options, cancellationToken);
             Log("End executing SqlBulkCopy.");
             return;
         }
@@ -248,10 +245,10 @@ public class BulkInsertBuilder<T>
 
             dataTable = await data.ToDataTableAsync(columnsToInsert, valueConverters: _table.ValueConverters, cancellationToken: cancellationToken);
 
-            await _connection.EnsureOpenAsync(cancellationToken);
+            await _connectionContext.Connection.EnsureOpenAsync(cancellationToken);
 
             Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
-            await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connection, _transaction, _options, cancellationToken);
+            await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext.Connection, _connectionContext.Transaction, _options, cancellationToken);
             Log("End executing SqlBulkCopy.");
             return;
         }
@@ -274,20 +271,20 @@ public class BulkInsertBuilder<T>
 
             dataTable = await data.ToDataTableAsync(columnsToInsert, valueConverters: _table.ValueConverters, cancellationToken: cancellationToken);
 
-            await _connection.EnsureOpenAsync(cancellationToken);
+            await _connectionContext.Connection.EnsureOpenAsync(cancellationToken);
 
             Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
-            await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connection, _transaction, _options, cancellationToken);
+            await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext.Connection, _connectionContext.Transaction, _options, cancellationToken);
             Log("End executing SqlBulkCopy.");
             return;
         }
 
         dataTable = await data.ToDataTableAsync(_columnNames, valueConverters: _table.ValueConverters, cancellationToken: cancellationToken);
 
-        await _connection.EnsureOpenAsync(cancellationToken);
+        await _connectionContext.Connection.EnsureOpenAsync(cancellationToken);
 
         Log($"Begin executing SqlBulkCopy. TableName: {_table.SchemaQualifiedTableName}");
-        await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connection, _transaction, _options, cancellationToken);
+        await dataTable.SqlBulkCopyAsync(_table.SchemaQualifiedTableName, _table.ColumnNameMappings, _connectionContext.Connection, _connectionContext.Transaction, _options, cancellationToken);
         Log("End executing SqlBulkCopy.");
         return;
     }
@@ -323,12 +320,12 @@ public class BulkInsertBuilder<T>
 
         var insertStatement = insertStatementBuilder.ToString();
 
-        using var insertCommand = _connection.CreateTextCommand(_transaction, insertStatement, _options);
+        using var insertCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, insertStatement, _options);
         _table.CreateMySqlParameters(insertCommand, dataToInsert, columnsToInsert).ForEach(x => insertCommand.Parameters.Add(x));
 
         Log($"Begin inserting: {Environment.NewLine}{insertStatement}");
 
-        await _connection.EnsureOpenAsync(cancellationToken);
+        await _connectionContext.Connection.EnsureOpenAsync(cancellationToken);
 
         var affectedRow = await insertCommand.ExecuteNonQueryAsync(cancellationToken);
 

@@ -1,5 +1,4 @@
 ﻿using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
-using MySqlConnector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,13 +17,11 @@ public class BulkMergeBuilder<T>
     private IEnumerable<string> _insertColumnNames;
     private string _outputIdColumn;
     private BulkMergeOptions _options;
-    private readonly MySqlConnection _connection;
-    private readonly MySqlTransaction _transaction;
+    private readonly ConnectionContext _connectionContext;
 
-    public BulkMergeBuilder(MySqlConnection connection, MySqlTransaction transaction)
+    public BulkMergeBuilder(ConnectionContext connectionContext)
     {
-        _connection = connection;
-        _transaction = transaction;
+        _connectionContext = connectionContext;
     }
 
     public BulkMergeBuilder<T> ToTable(TableInfor table)
@@ -134,14 +131,14 @@ public class BulkMergeBuilder<T>
         var joinCondition = string.Join(" and ", _idColumns.Select(x =>
               {
                   string collation = !string.IsNullOrEmpty(_options.Collation) && dataTable.Columns[x].DataType == typeof(string) ?
-           $" collate {_options.Collation}" : string.Empty;
+                 $" collate {_options.Collation}" : string.Empty;
                   return $"s.`{x}`{collation} = t.`{GetDbColumnName(x)}`{collation}";
               }));
 
         var whereCondition = string.Join(" and ", _idColumns.Select(x =>
-         {
-             return $"t.`{GetDbColumnName(x)}` IS NULL";
-         }));
+        {
+            return $"t.`{GetDbColumnName(x)}` IS NULL";
+        }));
 
         var insertStatementBuilder = new StringBuilder();
         var updateStatementBuilder = new StringBuilder();
@@ -161,11 +158,11 @@ public class BulkMergeBuilder<T>
             insertStatementBuilder.AppendLine($"WHERE {whereCondition};");
         }
 
-        _connection.EnsureOpen();
+        _connectionContext.Connection.EnsureOpen();
 
         Log($"Begin creating temp table:{Environment.NewLine}{sqlCreateTemptable}");
 
-        using (var createTemptableCommand = _connection.CreateTextCommand(_transaction, sqlCreateTemptable, _options))
+        using (var createTemptableCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlCreateTemptable, _options))
         {
             createTemptableCommand.ExecuteNonQuery();
         }
@@ -173,7 +170,7 @@ public class BulkMergeBuilder<T>
         Log("End creating temp table.");
 
         Log($"Begin executing SqlBulkCopy. TableName: {temptableName}");
-        dataTable.SqlBulkCopy(temptableName, null, _connection, _transaction, _options);
+        dataTable.SqlBulkCopy(temptableName, null, _connectionContext.Connection, _connectionContext.Transaction, _options);
         Log("End executing SqlBulkCopy.");
 
         var result = new BulkMergeResult();
@@ -184,7 +181,7 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
-            using var updateCommand = _connection.CreateTextCommand(_transaction, sqlUpdateStatement, _options);
+            using var updateCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlUpdateStatement, _options);
 
             result.UpdatedRows = updateCommand.ExecuteNonQuery();
 
@@ -197,7 +194,7 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
-            using var insertCommand = _connection.CreateTextCommand(_transaction, sqlInsertStatement, _options);
+            using var insertCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlInsertStatement, _options);
 
             result.InsertedRows = insertCommand.ExecuteNonQuery();
 
@@ -271,7 +268,7 @@ public class BulkMergeBuilder<T>
         var joinCondition = string.Join(" and ", _idColumns.Select(x =>
         {
             string collation = !string.IsNullOrEmpty(_options.Collation) && dataTable.Columns[x].DataType == typeof(string) ?
-        $" collate {_options.Collation}" : string.Empty;
+           $" collate {_options.Collation}" : string.Empty;
             return $"s.`{x}`{collation} = t.`{GetDbColumnName(x)}`{collation}";
         }));
 
@@ -298,11 +295,11 @@ public class BulkMergeBuilder<T>
             insertStatementBuilder.AppendLine($"WHERE {whereCondition};");
         }
 
-        await _connection.EnsureOpenAsync(cancellationToken);
+        await _connectionContext.Connection.EnsureOpenAsync(cancellationToken);
 
         Log($"Begin creating temp table:{Environment.NewLine}{sqlCreateTemptable}");
 
-        using (var createTemptableCommand = _connection.CreateTextCommand(_transaction, sqlCreateTemptable, _options))
+        using (var createTemptableCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlCreateTemptable, _options))
         {
             await createTemptableCommand.ExecuteNonQueryAsync(cancellationToken);
         }
@@ -310,7 +307,7 @@ public class BulkMergeBuilder<T>
         Log("End creating temp table.");
 
         Log($"Begin executing SqlBulkCopy. TableName: {temptableName}");
-        await dataTable.SqlBulkCopyAsync(temptableName, null, _connection, _transaction, _options, cancellationToken);
+        await dataTable.SqlBulkCopyAsync(temptableName, null, _connectionContext.Connection, _connectionContext.Transaction, _options, cancellationToken);
         Log("End executing SqlBulkCopy.");
 
         var result = new BulkMergeResult();
@@ -321,7 +318,7 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
-            using var updateCommand = _connection.CreateTextCommand(_transaction, sqlUpdateStatement, _options);
+            using var updateCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlUpdateStatement, _options);
 
             result.UpdatedRows = await updateCommand.ExecuteNonQueryAsync(cancellationToken);
 
@@ -334,7 +331,7 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
-            using var insertCommand = _connection.CreateTextCommand(_transaction, sqlInsertStatement, _options);
+            using var insertCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlInsertStatement, _options);
 
             result.InsertedRows = await insertCommand.ExecuteNonQueryAsync(cancellationToken);
 
@@ -358,9 +355,9 @@ public class BulkMergeBuilder<T>
         if (_updateColumnNames.Any())
         {
             var whereCondition = string.Join(" AND ", _idColumns.Select(x =>
-            {
-                return CreateSetStatement(x);
-            }));
+               {
+                   return CreateSetStatement(x);
+               }));
 
             updateStatementBuilder.AppendLine($"UPDATE {_table.SchemaQualifiedTableName} SET");
             updateStatementBuilder.AppendLine(string.Join("," + Environment.NewLine, _updateColumnNames.Select(x => CreateSetStatement(x))));
@@ -370,16 +367,16 @@ public class BulkMergeBuilder<T>
         if (_insertColumnNames.Any())
         {
             var whereCondition = $"SELECT 1 FROM {_table.SchemaQualifiedTableName} WHERE " + string.Join(" AND ", _idColumns.Select(x =>
-            {
-                return CreateSetStatement(x);
-            }));
+                {
+                    return CreateSetStatement(x);
+                }));
 
             insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{GetDbColumnName(x)}`"))})");
             insertStatementBuilder.AppendLine($"SELECT {string.Join(", ", _insertColumnNames.Select(x => $"@{x}"))}");
             insertStatementBuilder.AppendLine($"WHERE NOT EXISTS ({whereCondition});");
         }
 
-        _connection.EnsureOpen();
+        _connectionContext.Connection.EnsureOpen();
 
         var result = new BulkMergeResult();
 
@@ -392,11 +389,11 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
-            using var updateCommand = _connection.CreateTextCommand(_transaction, sqlUpdateStatement, _options);
+            using var updateCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlUpdateStatement, _options);
             _table.CreateMySqlParameters(updateCommand, data, propertyNamesIncludeId).ForEach(x => updateCommand.Parameters.Add(x));
 
             result.UpdatedRows = updateCommand.ExecuteNonQuery();
-
+            
             Log("End updating.");
         }
 
@@ -409,7 +406,7 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
-            using var insertCommand = _connection.CreateTextCommand(_transaction, sqlInsertStatement, _options);
+            using var insertCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlInsertStatement, _options);
             _table.CreateMySqlParameters(insertCommand, data, propertyNamesIncludeId).ForEach(x => insertCommand.Parameters.Add(x));
 
             result.InsertedRows = insertCommand.ExecuteNonQuery();
@@ -434,9 +431,9 @@ public class BulkMergeBuilder<T>
         if (_updateColumnNames.Any())
         {
             var whereCondition = string.Join(" AND ", _idColumns.Select(x =>
-          {
-              return CreateSetStatement(x);
-          }));
+                 {
+                     return CreateSetStatement(x);
+                 }));
 
             updateStatementBuilder.AppendLine($"UPDATE {_table.SchemaQualifiedTableName} SET");
             updateStatementBuilder.AppendLine(string.Join("," + Environment.NewLine, _updateColumnNames.Select(x => CreateSetStatement(x))));
@@ -455,7 +452,7 @@ public class BulkMergeBuilder<T>
             insertStatementBuilder.AppendLine($"WHERE NOT EXISTS ({whereCondition});");
         }
 
-        await _connection.EnsureOpenAsync(cancellationToken: cancellationToken);
+        await _connectionContext.Connection.EnsureOpenAsync(cancellationToken: cancellationToken);
 
         var result = new BulkMergeResult();
 
@@ -468,7 +465,7 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
-            using var updateCommand = _connection.CreateTextCommand(_transaction, sqlUpdateStatement, _options);
+            using var updateCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlUpdateStatement, _options);
             _table.CreateMySqlParameters(updateCommand, data, propertyNamesIncludeId).ForEach(x => updateCommand.Parameters.Add(x));
 
             result.UpdatedRows = await updateCommand.ExecuteNonQueryAsync(cancellationToken);
@@ -485,7 +482,7 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
-            using var insertCommand = _connection.CreateTextCommand(_transaction, sqlInsertStatement, _options);
+            using var insertCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlInsertStatement, _options);
             _table.CreateMySqlParameters(insertCommand, data, propertyNamesIncludeId).ForEach(x => insertCommand.Parameters.Add(x));
 
             result.InsertedRows = await insertCommand.ExecuteNonQueryAsync(cancellationToken);

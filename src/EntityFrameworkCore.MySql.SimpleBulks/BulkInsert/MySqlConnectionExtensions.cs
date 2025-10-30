@@ -1,5 +1,4 @@
-﻿using MySqlConnector;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
@@ -11,7 +10,7 @@ public static class MySqlConnectionExtensions
     {
         var table = TableMapper.Resolve(typeof(T));
 
-        new BulkInsertBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
+        new BulkInsertBuilder<T>(connectionContext)
             .WithColumns(columnNamesSelector)
             .ToTable(table)
             .ConfigureBulkOptions(configureOptions)
@@ -22,7 +21,7 @@ public static class MySqlConnectionExtensions
     {
         var table = TableMapper.Resolve(typeof(T));
 
-        new BulkInsertBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
+        new BulkInsertBuilder<T>(connectionContext)
             .WithColumns(columnNames)
             .ToTable(table)
             .ConfigureBulkOptions(configureOptions)
@@ -31,7 +30,7 @@ public static class MySqlConnectionExtensions
 
     public static void BulkInsert<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, Expression<Func<T, object>> columnNamesSelector, Action<BulkInsertOptions> configureOptions = null)
     {
-        new BulkInsertBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
+        new BulkInsertBuilder<T>(connectionContext)
             .WithColumns(columnNamesSelector)
             .ToTable(table)
             .ConfigureBulkOptions(configureOptions)
@@ -40,7 +39,7 @@ public static class MySqlConnectionExtensions
 
     public static void BulkInsert<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, IEnumerable<string> columnNames, Action<BulkInsertOptions> configureOptions = null)
     {
-        new BulkInsertBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
+        new BulkInsertBuilder<T>(connectionContext)
             .WithColumns(columnNames)
             .ToTable(table)
             .ConfigureBulkOptions(configureOptions)

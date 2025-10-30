@@ -1,5 +1,4 @@
-﻿using MySqlConnector;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
@@ -11,59 +10,59 @@ public static class MySqlConnectionExtensions
     {
         var table = TableMapper.Resolve(typeof(T));
 
-        return new BulkDeleteBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
-              .WithId(idSelector)
-              .ToTable(table)
-              .ConfigureBulkOptions(configureOptions)
-              .Execute(data);
+        return new BulkDeleteBuilder<T>(connectionContext)
+                 .WithId(idSelector)
+           .ToTable(table)
+          .ConfigureBulkOptions(configureOptions)
+           .Execute(data);
     }
 
     public static BulkDeleteResult BulkDelete<T>(this ConnectionContext connectionContext, IEnumerable<T> data, string idColumn, Action<BulkDeleteOptions> configureOptions = null)
     {
         var table = TableMapper.Resolve(typeof(T));
 
-        return new BulkDeleteBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
-            .WithId(idColumn)
+        return new BulkDeleteBuilder<T>(connectionContext)
+     .WithId(idColumn)
             .ToTable(table)
             .ConfigureBulkOptions(configureOptions)
-            .Execute(data);
+ .Execute(data);
     }
 
     public static BulkDeleteResult BulkDelete<T>(this ConnectionContext connectionContext, IEnumerable<T> data, IEnumerable<string> idColumns, Action<BulkDeleteOptions> configureOptions = null)
     {
         var table = TableMapper.Resolve(typeof(T));
 
-        return new BulkDeleteBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
-            .WithId(idColumns)
-            .ToTable(table)
-            .ConfigureBulkOptions(configureOptions)
+        return new BulkDeleteBuilder<T>(connectionContext)
+   .WithId(idColumns)
+      .ToTable(table)
+    .ConfigureBulkOptions(configureOptions)
             .Execute(data);
     }
 
     public static BulkDeleteResult BulkDelete<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, Expression<Func<T, object>> idSelector, Action<BulkDeleteOptions> configureOptions = null)
     {
-        return new BulkDeleteBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
-            .WithId(idSelector)
-            .ToTable(table)
-            .ConfigureBulkOptions(configureOptions)
+        return new BulkDeleteBuilder<T>(connectionContext)
+   .WithId(idSelector)
+          .ToTable(table)
+    .ConfigureBulkOptions(configureOptions)
             .Execute(data);
     }
 
     public static BulkDeleteResult BulkDelete<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, string idColumn, Action<BulkDeleteOptions> configureOptions = null)
     {
-        return new BulkDeleteBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
-            .WithId(idColumn)
-            .ToTable(table)
-            .ConfigureBulkOptions(configureOptions)
-            .Execute(data);
+        return new BulkDeleteBuilder<T>(connectionContext)
+        .WithId(idColumn)
+                 .ToTable(table)
+                 .ConfigureBulkOptions(configureOptions)
+               .Execute(data);
     }
 
     public static BulkDeleteResult BulkDelete<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, IEnumerable<string> idColumns, Action<BulkDeleteOptions> configureOptions = null)
     {
-        return new BulkDeleteBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
-            .WithId(idColumns)
-            .ToTable(table)
-            .ConfigureBulkOptions(configureOptions)
-            .Execute(data);
+        return new BulkDeleteBuilder<T>(connectionContext)
+      .WithId(idColumns)
+   .ToTable(table)
+ .ConfigureBulkOptions(configureOptions)
+       .Execute(data);
     }
 }

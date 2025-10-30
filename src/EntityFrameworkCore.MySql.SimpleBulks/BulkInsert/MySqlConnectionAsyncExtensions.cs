@@ -1,5 +1,4 @@
-﻿using MySqlConnector;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
@@ -13,7 +12,7 @@ public static class MySqlConnectionAsyncExtensions
     {
         var table = TableMapper.Resolve(typeof(T));
 
-        return new BulkInsertBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
+        return new BulkInsertBuilder<T>(connectionContext)
              .WithColumns(columnNamesSelector)
              .ToTable(table)
              .ConfigureBulkOptions(configureOptions)
@@ -24,7 +23,7 @@ public static class MySqlConnectionAsyncExtensions
     {
         var table = TableMapper.Resolve(typeof(T));
 
-        return new BulkInsertBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
+        return new BulkInsertBuilder<T>(connectionContext)
             .WithColumns(columnNames)
             .ToTable(table)
             .ConfigureBulkOptions(configureOptions)
@@ -33,7 +32,7 @@ public static class MySqlConnectionAsyncExtensions
 
     public static Task BulkInsertAsync<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, Expression<Func<T, object>> columnNamesSelector, Action<BulkInsertOptions> configureOptions = null, CancellationToken cancellationToken = default)
     {
-        return new BulkInsertBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
+        return new BulkInsertBuilder<T>(connectionContext)
             .WithColumns(columnNamesSelector)
             .ToTable(table)
             .ConfigureBulkOptions(configureOptions)
@@ -42,7 +41,7 @@ public static class MySqlConnectionAsyncExtensions
 
     public static Task BulkInsertAsync<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, IEnumerable<string> columnNames, Action<BulkInsertOptions> configureOptions = null, CancellationToken cancellationToken = default)
     {
-        return new BulkInsertBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
+        return new BulkInsertBuilder<T>(connectionContext)
             .WithColumns(columnNames)
             .ToTable(table)
             .ConfigureBulkOptions(configureOptions)

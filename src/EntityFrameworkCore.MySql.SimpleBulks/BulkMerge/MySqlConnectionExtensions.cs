@@ -1,5 +1,4 @@
-﻿using MySqlConnector;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
@@ -11,7 +10,7 @@ public static class MySqlConnectionExtensions
     {
         var table = TableMapper.Resolve(typeof(T));
 
-        return new BulkMergeBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
+        return new BulkMergeBuilder<T>(connectionContext)
             .WithId(idSelector)
             .WithUpdateColumns(updateColumnNamesSelector)
             .WithInsertColumns(insertColumnNamesSelector)
@@ -24,7 +23,7 @@ public static class MySqlConnectionExtensions
     {
         var table = TableMapper.Resolve(typeof(T));
 
-        return new BulkMergeBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
+        return new BulkMergeBuilder<T>(connectionContext)
             .WithId(idColumn)
             .WithUpdateColumns(updateColumnNames)
             .WithInsertColumns(insertColumnNames)
@@ -37,7 +36,7 @@ public static class MySqlConnectionExtensions
     {
         var table = TableMapper.Resolve(typeof(T));
 
-        return new BulkMergeBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
+        return new BulkMergeBuilder<T>(connectionContext)
             .WithId(idColumns)
             .WithUpdateColumns(updateColumnNames)
             .WithInsertColumns(insertColumnNames)
@@ -48,7 +47,7 @@ public static class MySqlConnectionExtensions
 
     public static BulkMergeResult BulkMerge<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, Expression<Func<T, object>> idSelector, Expression<Func<T, object>> updateColumnNamesSelector, Expression<Func<T, object>> insertColumnNamesSelector, Action<BulkMergeOptions> configureOptions = null)
     {
-        return new BulkMergeBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
+        return new BulkMergeBuilder<T>(connectionContext)
             .WithId(idSelector)
             .WithUpdateColumns(updateColumnNamesSelector)
             .WithInsertColumns(insertColumnNamesSelector)
@@ -59,7 +58,7 @@ public static class MySqlConnectionExtensions
 
     public static BulkMergeResult BulkMerge<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, string idColumn, IEnumerable<string> updateColumnNames, IEnumerable<string> insertColumnNames, Action<BulkMergeOptions> configureOptions = null)
     {
-        return new BulkMergeBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
+        return new BulkMergeBuilder<T>(connectionContext)
             .WithId(idColumn)
             .WithUpdateColumns(updateColumnNames)
             .WithInsertColumns(insertColumnNames)
@@ -70,7 +69,7 @@ public static class MySqlConnectionExtensions
 
     public static BulkMergeResult BulkMerge<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, IEnumerable<string> idColumns, IEnumerable<string> updateColumnNames, IEnumerable<string> insertColumnNames, Action<BulkMergeOptions> configureOptions = null)
     {
-        return new BulkMergeBuilder<T>(connectionContext.Connection, connectionContext.Transaction)
+        return new BulkMergeBuilder<T>(connectionContext)
             .WithId(idColumns)
             .WithUpdateColumns(updateColumnNames)
             .WithInsertColumns(insertColumnNames)
