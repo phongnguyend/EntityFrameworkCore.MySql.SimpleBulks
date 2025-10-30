@@ -158,11 +158,11 @@ public class BulkMergeBuilder<T>
             insertStatementBuilder.AppendLine($"WHERE {whereCondition};");
         }
 
-        _connectionContext.Connection.EnsureOpen();
+        _connectionContext.EnsureOpen();
 
         Log($"Begin creating temp table:{Environment.NewLine}{sqlCreateTemptable}");
 
-        using (var createTemptableCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlCreateTemptable, _options))
+        using (var createTemptableCommand = _connectionContext.CreateTextCommand(sqlCreateTemptable, _options))
         {
             createTemptableCommand.ExecuteNonQuery();
         }
@@ -181,7 +181,7 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
-            using var updateCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlUpdateStatement, _options);
+            using var updateCommand = _connectionContext.CreateTextCommand(sqlUpdateStatement, _options);
 
             result.UpdatedRows = updateCommand.ExecuteNonQuery();
 
@@ -194,7 +194,7 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
-            using var insertCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlInsertStatement, _options);
+            using var insertCommand = _connectionContext.CreateTextCommand(sqlInsertStatement, _options);
 
             result.InsertedRows = insertCommand.ExecuteNonQuery();
 
@@ -295,11 +295,11 @@ public class BulkMergeBuilder<T>
             insertStatementBuilder.AppendLine($"WHERE {whereCondition};");
         }
 
-        await _connectionContext.Connection.EnsureOpenAsync(cancellationToken);
+        await _connectionContext.EnsureOpenAsync(cancellationToken);
 
         Log($"Begin creating temp table:{Environment.NewLine}{sqlCreateTemptable}");
 
-        using (var createTemptableCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlCreateTemptable, _options))
+        using (var createTemptableCommand = _connectionContext.CreateTextCommand(sqlCreateTemptable, _options))
         {
             await createTemptableCommand.ExecuteNonQueryAsync(cancellationToken);
         }
@@ -318,7 +318,7 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
-            using var updateCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlUpdateStatement, _options);
+            using var updateCommand = _connectionContext.CreateTextCommand(sqlUpdateStatement, _options);
 
             result.UpdatedRows = await updateCommand.ExecuteNonQueryAsync(cancellationToken);
 
@@ -331,7 +331,7 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
-            using var insertCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlInsertStatement, _options);
+            using var insertCommand = _connectionContext.CreateTextCommand(sqlInsertStatement, _options);
 
             result.InsertedRows = await insertCommand.ExecuteNonQueryAsync(cancellationToken);
 
@@ -376,7 +376,7 @@ public class BulkMergeBuilder<T>
             insertStatementBuilder.AppendLine($"WHERE NOT EXISTS ({whereCondition});");
         }
 
-        _connectionContext.Connection.EnsureOpen();
+        _connectionContext.EnsureOpen();
 
         var result = new BulkMergeResult();
 
@@ -389,11 +389,11 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
-            using var updateCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlUpdateStatement, _options);
+            using var updateCommand = _connectionContext.CreateTextCommand(sqlUpdateStatement, _options);
             _table.CreateMySqlParameters(updateCommand, data, propertyNamesIncludeId).ForEach(x => updateCommand.Parameters.Add(x));
 
             result.UpdatedRows = updateCommand.ExecuteNonQuery();
-            
+
             Log("End updating.");
         }
 
@@ -406,7 +406,7 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
-            using var insertCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlInsertStatement, _options);
+            using var insertCommand = _connectionContext.CreateTextCommand(sqlInsertStatement, _options);
             _table.CreateMySqlParameters(insertCommand, data, propertyNamesIncludeId).ForEach(x => insertCommand.Parameters.Add(x));
 
             result.InsertedRows = insertCommand.ExecuteNonQuery();
@@ -452,7 +452,7 @@ public class BulkMergeBuilder<T>
             insertStatementBuilder.AppendLine($"WHERE NOT EXISTS ({whereCondition});");
         }
 
-        await _connectionContext.Connection.EnsureOpenAsync(cancellationToken: cancellationToken);
+        await _connectionContext.EnsureOpenAsync(cancellationToken: cancellationToken);
 
         var result = new BulkMergeResult();
 
@@ -465,7 +465,7 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
-            using var updateCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlUpdateStatement, _options);
+            using var updateCommand = _connectionContext.CreateTextCommand(sqlUpdateStatement, _options);
             _table.CreateMySqlParameters(updateCommand, data, propertyNamesIncludeId).ForEach(x => updateCommand.Parameters.Add(x));
 
             result.UpdatedRows = await updateCommand.ExecuteNonQueryAsync(cancellationToken);
@@ -482,7 +482,7 @@ public class BulkMergeBuilder<T>
 
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
-            using var insertCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlInsertStatement, _options);
+            using var insertCommand = _connectionContext.CreateTextCommand(sqlInsertStatement, _options);
             _table.CreateMySqlParameters(insertCommand, data, propertyNamesIncludeId).ForEach(x => insertCommand.Parameters.Add(x));
 
             result.InsertedRows = await insertCommand.ExecuteNonQueryAsync(cancellationToken);

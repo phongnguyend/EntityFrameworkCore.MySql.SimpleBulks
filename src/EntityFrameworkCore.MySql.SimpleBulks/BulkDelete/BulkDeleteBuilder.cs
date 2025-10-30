@@ -88,9 +88,9 @@ public class BulkDeleteBuilder<T>
 
         Log($"Begin creating temp table:{Environment.NewLine}{sqlCreateTemptable}");
 
-        _connectionContext.Connection.EnsureOpen();
+        _connectionContext.EnsureOpen();
 
-        using (var createTemptableCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlCreateTemptable, _options))
+        using (var createTemptableCommand = _connectionContext.CreateTextCommand(sqlCreateTemptable, _options))
         {
             createTemptableCommand.ExecuteNonQuery();
         }
@@ -106,7 +106,7 @@ public class BulkDeleteBuilder<T>
 
         Log($"Begin deleting:{Environment.NewLine}{deleteStatement}");
 
-        using var deleteCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, deleteStatement, _options);
+        using var deleteCommand = _connectionContext.CreateTextCommand(deleteStatement, _options);
 
         var affectedRows = deleteCommand.ExecuteNonQuery();
 
@@ -129,11 +129,11 @@ public class BulkDeleteBuilder<T>
 
         Log($"Begin deleting:{Environment.NewLine}{deleteStatement}");
 
-        using var deleteCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, deleteStatement, _options);
+        using var deleteCommand = _connectionContext.CreateTextCommand(deleteStatement, _options);
 
         _table.CreateMySqlParameters(deleteCommand, dataToDelete, _idColumns).ForEach(x => deleteCommand.Parameters.Add(x));
 
-        _connectionContext.Connection.EnsureOpen();
+        _connectionContext.EnsureOpen();
 
         var affectedRows = deleteCommand.ExecuteNonQuery();
 
@@ -173,9 +173,9 @@ public class BulkDeleteBuilder<T>
 
         Log($"Begin creating temp table:{Environment.NewLine}{sqlCreateTemptable}");
 
-        await _connectionContext.Connection.EnsureOpenAsync(cancellationToken);
+        await _connectionContext.EnsureOpenAsync(cancellationToken);
 
-        using (var createTemptableCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, sqlCreateTemptable, _options))
+        using (var createTemptableCommand = _connectionContext.CreateTextCommand(sqlCreateTemptable, _options))
         {
             await createTemptableCommand.ExecuteNonQueryAsync(cancellationToken);
         }
@@ -191,7 +191,7 @@ public class BulkDeleteBuilder<T>
 
         Log($"Begin deleting:{Environment.NewLine}{deleteStatement}");
 
-        using var deleteCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, deleteStatement, _options);
+        using var deleteCommand = _connectionContext.CreateTextCommand(deleteStatement, _options);
 
         var affectedRows = await deleteCommand.ExecuteNonQueryAsync(cancellationToken);
 
@@ -214,11 +214,11 @@ public class BulkDeleteBuilder<T>
 
         Log($"Begin deleting:{Environment.NewLine}{deleteStatement}");
 
-        using var deleteCommand = _connectionContext.Connection.CreateTextCommand(_connectionContext.Transaction, deleteStatement, _options);
+        using var deleteCommand = _connectionContext.CreateTextCommand(deleteStatement, _options);
 
         _table.CreateMySqlParameters(deleteCommand, dataToDelete, _idColumns).ForEach(x => deleteCommand.Parameters.Add(x));
 
-        await _connectionContext.Connection.EnsureOpenAsync(cancellationToken);
+        await _connectionContext.EnsureOpenAsync(cancellationToken);
 
         var affectedRows = await deleteCommand.ExecuteNonQueryAsync(cancellationToken);
 
