@@ -1,20 +1,11 @@
-﻿using MySqlConnector;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 
 public static class DataTableExtensions
 {
-    private static readonly BulkOptions DefaultBulkOptions = new BulkOptions()
-    {
-        BatchSize = 0,
-        Timeout = 30,
-    };
-
     public static string GenerateTempTableDefinition(this DataTable table, string tableName, IReadOnlyDictionary<string, string> columnNameMappings, IReadOnlyDictionary<string, string> columnTypeMappings)
     {
         var sql = new StringBuilder();
@@ -36,48 +27,6 @@ public static class DataTableExtensions
         sql.Append("\n);");
 
         return sql.ToString();
-    }
-
-    public static void SqlBulkCopy(this ConnectionContext connectionContext, DataTable dataTable, string tableName, IReadOnlyDictionary<string, string> columnNameMappings, BulkOptions options = null)
-    {
-        options ??= DefaultBulkOptions;
-
-        var bulkCopy = new MySqlBulkCopy(connectionContext.Connection, connectionContext.Transaction)
-        {
-            BulkCopyTimeout = options.Timeout,
-            DestinationTableName = $"{tableName}"
-        };
-
-        int idx = 0;
-
-        foreach (DataColumn dtColum in dataTable.Columns)
-        {
-            bulkCopy.ColumnMappings.Add(new MySqlBulkCopyColumnMapping(idx, GetDbColumnName(dtColum.ColumnName, columnNameMappings)));
-            idx++;
-        }
-
-        bulkCopy.WriteToServer(dataTable);
-    }
-
-    public static async Task SqlBulkCopyAsync(this ConnectionContext connectionContext, DataTable dataTable, string tableName, IReadOnlyDictionary<string, string> columnNameMappings, BulkOptions options = null, CancellationToken cancellationToken = default)
-    {
-        options ??= DefaultBulkOptions;
-
-        var bulkCopy = new MySqlBulkCopy(connectionContext.Connection, connectionContext.Transaction)
-        {
-            BulkCopyTimeout = options.Timeout,
-            DestinationTableName = $"{tableName}"
-        };
-
-        int idx = 0;
-
-        foreach (DataColumn dtColum in dataTable.Columns)
-        {
-            bulkCopy.ColumnMappings.Add(new MySqlBulkCopyColumnMapping(idx, GetDbColumnName(dtColum.ColumnName, columnNameMappings)));
-            idx++;
-        }
-
-        await bulkCopy.WriteToServerAsync(dataTable, cancellationToken);
     }
 
     private static string GetDbColumnName(string columnName, IReadOnlyDictionary<string, string> columnNameMappings)
