@@ -10,7 +10,7 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.BulkMatch;
 
 public static class DbContextAsyncExtensions
 {
-    public static Task<List<T>> BulkMatchAsync<T>(this DbContext dbContext, IEnumerable<T> machedValues, Expression<Func<T, object>> matchedColumnsSelector, Action<BulkMatchOptions> configureOptions = null, CancellationToken cancellationToken = default)
+    public static Task<List<T>> BulkMatchAsync<T>(this DbContext dbContext, IEnumerable<T> machedValues, Expression<Func<T, object>> matchedColumnsSelector, BulkMatchOptions options = null, CancellationToken cancellationToken = default)
     {
         var connectionContext = dbContext.GetConnectionContext();
 
@@ -18,11 +18,11 @@ public static class DbContextAsyncExtensions
              .WithReturnedColumns(dbContext.GetAllPropertyNames(typeof(T)))
              .WithTable(dbContext.GetTableInfor(typeof(T)))
              .WithMatchedColumns(matchedColumnsSelector)
-             .ConfigureBulkOptions(configureOptions)
+             .WithBulkOptions(options)
              .ExecuteAsync(machedValues, cancellationToken);
     }
 
-    public static Task<List<T>> BulkMatchAsync<T>(this DbContext dbContext, IEnumerable<T> machedValues, Expression<Func<T, object>> matchedColumnsSelector, Expression<Func<T, object>> returnedColumnsSelector, Action<BulkMatchOptions> configureOptions = null, CancellationToken cancellationToken = default)
+    public static Task<List<T>> BulkMatchAsync<T>(this DbContext dbContext, IEnumerable<T> machedValues, Expression<Func<T, object>> matchedColumnsSelector, Expression<Func<T, object>> returnedColumnsSelector, BulkMatchOptions options = null, CancellationToken cancellationToken = default)
     {
         var connectionContext = dbContext.GetConnectionContext();
 
@@ -30,7 +30,7 @@ public static class DbContextAsyncExtensions
              .WithReturnedColumns(returnedColumnsSelector)
              .WithTable(dbContext.GetTableInfor(typeof(T)))
              .WithMatchedColumns(matchedColumnsSelector)
-             .ConfigureBulkOptions(configureOptions)
+             .WithBulkOptions(options)
              .ExecuteAsync(machedValues, cancellationToken);
     }
 }

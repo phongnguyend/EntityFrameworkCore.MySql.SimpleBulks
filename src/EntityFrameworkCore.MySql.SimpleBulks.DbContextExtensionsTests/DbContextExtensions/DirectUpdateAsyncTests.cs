@@ -1,7 +1,8 @@
 ﻿using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
+using EntityFrameworkCore.MySql.SimpleBulks.BulkUpdate;
+using EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.Database;
 using EntityFrameworkCore.MySql.SimpleBulks.DirectUpdate;
 using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
-using EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.Database;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
@@ -45,10 +46,10 @@ public class DirectUpdateAsyncTests : BaseTest
         }
 
         _context.BulkInsert(rows,
-                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString });
+            row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString });
 
         _context.BulkInsert(compositeKeyRows,
-                row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString });
+            row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString });
 
         tran.Commit();
     }
@@ -77,19 +78,18 @@ public class DirectUpdateAsyncTests : BaseTest
         compositeKeyRow.Season = Season.Autumn;
         compositeKeyRow.SeasonAsString = Season.Winter;
 
+        var updateOptions = new BulkUpdateOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         var updateResult1 = await _context.DirectUpdateAsync(row,
-                row => new { row.Column3, row.Column2, row.Season, row.SeasonAsString },
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+            row => new { row.Column3, row.Column2, row.Season, row.SeasonAsString },
+            updateOptions);
 
         var updateResult2 = await _context.DirectUpdateAsync(compositeKeyRow,
-                row => new { row.Column3, row.Column2, row.Season, row.SeasonAsString },
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+            row => new { row.Column3, row.Column2, row.Season, row.SeasonAsString },
+            updateOptions);
 
         tran.Commit();
 
@@ -143,19 +143,18 @@ public class DirectUpdateAsyncTests : BaseTest
         compositeKeyRow.Season = Season.Autumn;
         compositeKeyRow.SeasonAsString = Season.Winter;
 
+        var updateOptions = new BulkUpdateOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         var updateResult1 = await _context.DirectUpdateAsync(row,
-              ["Column3", "Column2", "Season", "SeasonAsString"],
-              options =>
-              {
-                  options.LogTo = _output.WriteLine;
-              });
+            ["Column3", "Column2", "Season", "SeasonAsString"],
+            updateOptions);
 
         var updateResult2 = await _context.DirectUpdateAsync(compositeKeyRow,
             ["Column3", "Column2", "Season", "SeasonAsString"],
-            options =>
-            {
-                options.LogTo = _output.WriteLine;
-            });
+            updateOptions);
 
         tran.Commit();
 

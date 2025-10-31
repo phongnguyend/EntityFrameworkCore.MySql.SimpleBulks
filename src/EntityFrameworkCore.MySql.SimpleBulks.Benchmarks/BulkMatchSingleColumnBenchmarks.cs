@@ -43,10 +43,12 @@ public class BulkMatchSingleColumnBenchmarks1
             _customers.Add(customer);
         }
 
-        _context.BulkInsert(_customers, opt =>
+        var insertOptions = new BulkInsertOptions
         {
-            opt.Timeout = 0;
-        });
+            Timeout = 0
+        };
+
+        _context.BulkInsert(_customers, insertOptions);
 
         _customerIds = _customers.Select(x => x.Id).ToList();
     }
@@ -87,12 +89,14 @@ public class BulkMatchSingleColumnBenchmarks1
     {
         var matchedCustomers = _customerIds.Select(x => new Customer { Id = x }).ToList();
 
+        var matchOptions = new BulkMatchOptions
+        {
+            Timeout = 0
+        };
+
         var customers = _context.BulkMatch(matchedCustomers,
             x => x.Id,
-            opt =>
-            {
-                opt.Timeout = 0;
-            });
+            matchOptions);
     }
 }
 
@@ -133,10 +137,12 @@ public class BulkMatchSingleColumnBenchmarks2
             _customers.Add(customer);
         }
 
-        _context.BulkInsert(_customers, opt =>
+        var insertOptions = new BulkInsertOptions
         {
-            opt.Timeout = 0;
-        });
+            Timeout = 0
+        };
+
+        _context.BulkInsert(_customers, insertOptions);
 
         _customerIds = _customers.Select(x => x.Id).ToList();
     }
@@ -166,11 +172,13 @@ public class BulkMatchSingleColumnBenchmarks2
     {
         var matchedCustomers = _customerIds.Select(x => new Customer { Id = x }).ToList();
 
+        var matchOptions = new BulkMatchOptions
+        {
+            Timeout = 0
+        };
+
         var customers = _context.BulkMatch(matchedCustomers,
             x => x.Id,
-            opt =>
-            {
-                opt.Timeout = 0;
-            });
+            matchOptions);
     }
 }

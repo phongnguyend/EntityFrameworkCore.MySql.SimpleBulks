@@ -1,6 +1,6 @@
 ﻿using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
-using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.Database;
+using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
@@ -50,9 +50,9 @@ public class BulkInsertTests : BaseTest
 
         _context.BulkInsert(rows,
                 row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString, row.BulkId, row.BulkIndex },
-                options =>
+                new BulkInsertOptions
                 {
-                    options.LogTo = _output.WriteLine;
+                    LogTo = _output.WriteLine
                 });
 
         var ids = _context.SingleKeyRows.Where(x => x.BulkId == bulkId).ToDictionary(x => x.BulkIndex!.Value, x => x.Id);
@@ -64,9 +64,9 @@ public class BulkInsertTests : BaseTest
 
         _context.BulkInsert(compositeKeyRows,
                 row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-                options =>
+                new BulkInsertOptions
                 {
-                    options.LogTo = _output.WriteLine;
+                    LogTo = _output.WriteLine
                 });
 
 
@@ -132,9 +132,9 @@ public class BulkInsertTests : BaseTest
 
         _context.BulkInsert(rows,
                 row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString, row.BulkId, row.BulkIndex },
-                options =>
+                new BulkInsertOptions
                 {
-                    options.LogTo = _output.WriteLine;
+                    LogTo = _output.WriteLine
                 });
 
         var ids = _context.SingleKeyRows.Where(x => x.BulkId == bulkId).ToDictionary(x => x.BulkIndex!.Value, x => x.Id);
@@ -146,9 +146,9 @@ public class BulkInsertTests : BaseTest
 
         _context.BulkInsert(compositeKeyRows,
                 row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-                options =>
+                new BulkInsertOptions
                 {
-                    options.LogTo = _output.WriteLine;
+                    LogTo = _output.WriteLine
                 });
 
         tran.Commit();
@@ -209,19 +209,18 @@ public class BulkInsertTests : BaseTest
             });
         }
 
+        var options = new BulkInsertOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         _context.BulkInsert(rows,
                 row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+                options);
 
         _context.BulkInsert(compositeKeyRows,
                 row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+                options);
 
         tran.Rollback();
 
@@ -252,11 +251,13 @@ public class BulkInsertTests : BaseTest
             });
         }
 
-        _context.BulkInsert(configurationEntries, options =>
+        var options = new BulkInsertOptions
         {
-            options.KeepIdentity = true;
-            options.LogTo = _output.WriteLine;
-        });
+            KeepIdentity = true,
+            LogTo = _output.WriteLine
+        };
+
+        _context.BulkInsert(configurationEntries, options);
 
         // Assert
         configurationEntries = configurationEntries.OrderBy(x => x.Id).ToList();
@@ -290,10 +291,12 @@ public class BulkInsertTests : BaseTest
             });
         }
 
-        _context.BulkInsert(configurationEntries, options =>
+        var options = new BulkInsertOptions
         {
-            options.LogTo = _output.WriteLine;
-        });
+            LogTo = _output.WriteLine
+        };
+
+        _context.BulkInsert(configurationEntries, options);
 
         // Assert
         configurationEntries = configurationEntries.OrderBy(x => x.Id).ToList();

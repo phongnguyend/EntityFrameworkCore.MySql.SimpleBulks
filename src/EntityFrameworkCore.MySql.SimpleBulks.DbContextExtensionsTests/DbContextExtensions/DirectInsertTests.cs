@@ -1,6 +1,7 @@
-﻿using EntityFrameworkCore.MySql.SimpleBulks.DirectInsert;
-using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
+﻿using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 using EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.Database;
+using EntityFrameworkCore.MySql.SimpleBulks.DirectInsert;
+using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
@@ -39,21 +40,20 @@ public class DirectInsertTests : BaseTest
             SeasonAsString = Season.Summer
         };
 
+        var options = new BulkInsertOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         _context.DirectInsert(row,
                 row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString, row.BulkId },
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+                options);
 
         row.Id = _context.SingleKeyRows.Where(x => x.BulkId == bulkId).Select(x => x.Id).FirstOrDefault();
 
         _context.DirectInsert(compositeKeyRow,
                 row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+                options);
 
 
         // Assert
@@ -107,21 +107,20 @@ public class DirectInsertTests : BaseTest
             SeasonAsString = Season.Summer
         };
 
+        var options = new BulkInsertOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         _context.DirectInsert(row,
                 row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString, row.BulkId },
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+                options);
 
         row.Id = _context.SingleKeyRows.Where(x => x.BulkId == bulkId).Select(x => x.Id).FirstOrDefault();
 
         _context.DirectInsert(compositeKeyRow,
                 row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+                options);
 
         tran.Commit();
 
@@ -173,19 +172,18 @@ public class DirectInsertTests : BaseTest
             SeasonAsString = Season.Summer
         };
 
+        var options = new BulkInsertOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         _context.DirectInsert(row,
                 row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+                options);
 
         _context.DirectInsert(compositeKeyRow,
                 row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+                options);
 
         tran.Rollback();
 
@@ -209,11 +207,13 @@ public class DirectInsertTests : BaseTest
             CreatedDateTime = DateTimeOffset.Now,
         };
 
-        _context.DirectInsert(configurationEntry, options =>
+        var options = new BulkInsertOptions
         {
-            options.KeepIdentity = true;
-            options.LogTo = _output.WriteLine;
-        });
+            KeepIdentity = true,
+            LogTo = _output.WriteLine
+        };
+
+        _context.DirectInsert(configurationEntry, options);
 
         // Assert
         var configurationEntriesInDb = _context.Set<ConfigurationEntry>().AsNoTracking().ToList();
@@ -236,10 +236,12 @@ public class DirectInsertTests : BaseTest
             CreatedDateTime = DateTimeOffset.Now,
         };
 
-        _context.DirectInsert(configurationEntry, options =>
+        var options = new BulkInsertOptions
         {
-            options.LogTo = _output.WriteLine;
-        });
+            LogTo = _output.WriteLine
+        };
+
+        _context.DirectInsert(configurationEntry, options);
 
         // Assert
         var configurationEntriesInDb = _context.Set<ConfigurationEntry>().AsNoTracking().ToList();

@@ -59,15 +59,15 @@ public class BulkDeleteTests : BaseTest
         var compositeKeyRows = _context.CompositeKeyRows.AsNoTracking().Take(length).ToList();
 
         var deleteResult1 = _context.BulkDelete(rows,
-                  options =>
+                  new()
                   {
-                      options.LogTo = _output.WriteLine;
+                      LogTo = _output.WriteLine
                   });
 
         var deleteResult2 = _context.BulkDelete(compositeKeyRows,
-                options =>
+                new()
                 {
-                    options.LogTo = _output.WriteLine;
+                    LogTo = _output.WriteLine
                 });
 
         tran.Commit();

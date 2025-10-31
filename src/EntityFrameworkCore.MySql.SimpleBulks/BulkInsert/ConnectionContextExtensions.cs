@@ -6,43 +6,43 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 
 public static class ConnectionContextExtensions
 {
-    public static void BulkInsert<T>(this ConnectionContext connectionContext, IEnumerable<T> data, Expression<Func<T, object>> columnNamesSelector, Action<BulkInsertOptions> configureOptions = null)
+    public static void BulkInsert<T>(this ConnectionContext connectionContext, IEnumerable<T> data, Expression<Func<T, object>> columnNamesSelector, BulkInsertOptions options = null)
     {
         var table = TableMapper.Resolve(typeof(T));
 
         new BulkInsertBuilder<T>(connectionContext)
    .WithColumns(columnNamesSelector)
             .ToTable(table)
-            .ConfigureBulkOptions(configureOptions)
+            .WithBulkOptions(options)
     .Execute(data);
     }
 
-    public static void BulkInsert<T>(this ConnectionContext connectionContext, IEnumerable<T> data, IEnumerable<string> columnNames, Action<BulkInsertOptions> configureOptions = null)
+    public static void BulkInsert<T>(this ConnectionContext connectionContext, IEnumerable<T> data, IEnumerable<string> columnNames, BulkInsertOptions options = null)
     {
         var table = TableMapper.Resolve(typeof(T));
 
         new BulkInsertBuilder<T>(connectionContext)
                 .WithColumns(columnNames)
          .ToTable(table)
-        .ConfigureBulkOptions(configureOptions)
+      .WithBulkOptions(options)
          .Execute(data);
     }
 
-    public static void BulkInsert<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, Expression<Func<T, object>> columnNamesSelector, Action<BulkInsertOptions> configureOptions = null)
+    public static void BulkInsert<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, Expression<Func<T, object>> columnNamesSelector, BulkInsertOptions options = null)
     {
         new BulkInsertBuilder<T>(connectionContext)
       .WithColumns(columnNamesSelector)
          .ToTable(table)
-       .ConfigureBulkOptions(configureOptions)
+       .WithBulkOptions(options)
      .Execute(data);
     }
 
-    public static void BulkInsert<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, IEnumerable<string> columnNames, Action<BulkInsertOptions> configureOptions = null)
+    public static void BulkInsert<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, IEnumerable<string> columnNames, BulkInsertOptions options = null)
     {
         new BulkInsertBuilder<T>(connectionContext)
-    .WithColumns(columnNames)
-            .ToTable(table)
-     .ConfigureBulkOptions(configureOptions)
-            .Execute(data);
+         .WithColumns(columnNames)
+                 .ToTable(table)
+          .WithBulkOptions(options)
+             .Execute(data);
     }
 }

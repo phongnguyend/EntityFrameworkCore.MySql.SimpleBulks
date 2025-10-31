@@ -1,6 +1,7 @@
-﻿using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
-using EntityFrameworkCore.MySql.SimpleBulks.DirectDelete;
+﻿using EntityFrameworkCore.MySql.SimpleBulks.BulkDelete;
+using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 using EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.Database;
+using EntityFrameworkCore.MySql.SimpleBulks.DirectDelete;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
@@ -58,17 +59,14 @@ public class DirectDeleteAsyncTests : BaseTest
         var row = _context.SingleKeyRows.AsNoTracking().Skip(index).First();
         var compositeKeyRow = _context.CompositeKeyRows.AsNoTracking().Skip(index).First();
 
-        var deleteResult1 = await _context.DirectDeleteAsync(row,
-                  options =>
-                  {
-                      options.LogTo = _output.WriteLine;
-                  });
+        var options = new BulkDeleteOptions
+        {
+            LogTo = _output.WriteLine
+        };
 
-        var deleteResult2 = await _context.DirectDeleteAsync(compositeKeyRow,
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+        var deleteResult1 = await _context.DirectDeleteAsync(row, options);
+
+        var deleteResult2 = await _context.DirectDeleteAsync(compositeKeyRow, options);
 
         tran.Commit();
 
@@ -94,17 +92,14 @@ public class DirectDeleteAsyncTests : BaseTest
         var row = _context.SingleKeyRows.AsNoTracking().Skip(index).First();
         var compositeKeyRow = _context.CompositeKeyRows.AsNoTracking().Skip(index).First();
 
-        var deleteResult1 = await _context.DirectDeleteAsync(row,
-                  options =>
-                  {
-                      options.LogTo = _output.WriteLine;
-                  });
+        var options = new BulkDeleteOptions
+        {
+            LogTo = _output.WriteLine
+        };
 
-        var deleteResult2 = await _context.DirectDeleteAsync(compositeKeyRow,
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+        var deleteResult1 = await _context.DirectDeleteAsync(row, options);
+
+        var deleteResult2 = await _context.DirectDeleteAsync(compositeKeyRow, options);
 
         tran.Rollback();
 

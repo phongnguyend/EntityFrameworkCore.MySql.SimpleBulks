@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
+using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.ConnectionExtensionsTests.Database;
 

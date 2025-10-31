@@ -1,6 +1,6 @@
-﻿using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
+﻿using EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.Database;
+using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using EntityFrameworkCore.MySql.SimpleBulks.TempTable;
-using EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.Database;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
@@ -69,17 +69,17 @@ public class TempTableAsyncTests : BaseTest
         var customers = new List<CustomerDto>();
 
         var tableName = await _context.CreateTempTableAsync(_customers,
-               x => new
-               {
-                   x.IdNumber,
-                   x.FirstName,
-                   x.LastName,
-                   x.CurrentCountryIsoCode
-               },
-               options =>
-               {
-                   options.LogTo = _output.WriteLine;
-               });
+   x => new
+   {
+       x.IdNumber,
+       x.FirstName,
+       x.LastName,
+       x.CurrentCountryIsoCode
+   },
+    new TempTableOptions
+    {
+        LogTo = _output.WriteLine
+    });
 
         var sql = $"select * from {tableName}";
 
@@ -110,38 +110,38 @@ public class TempTableAsyncTests : BaseTest
         var result = new List<dynamic>();
 
         var customerTableName = await _context.CreateTempTableAsync(_customers,
-            x => new
-            {
-                x.IdNumber,
-                x.FirstName,
-                x.LastName,
-                x.CurrentCountryIsoCode
-            },
-            options =>
-            {
-                options.LogTo = _output.WriteLine;
-            });
+   x => new
+   {
+       x.IdNumber,
+       x.FirstName,
+       x.LastName,
+       x.CurrentCountryIsoCode
+   },
+     new TempTableOptions
+     {
+         LogTo = _output.WriteLine
+     });
 
         var contactTableName = await _context.CreateTempTableAsync(_contacts,
-                        x => new
-                        {
-                            x.EmailAddress,
-                            x.PhoneNumber,
-                            x.CustomerIdNumber,
-                            x.CountryIsoCode
-                        },
-                        options =>
-                        {
-                            options.LogTo = _output.WriteLine;
-                        });
+           x => new
+           {
+               x.EmailAddress,
+               x.PhoneNumber,
+               x.CustomerIdNumber,
+               x.CountryIsoCode
+           },
+       new TempTableOptions
+       {
+           LogTo = _output.WriteLine
+       });
 
         var sql = $"select * from {contactTableName} contact join {customerTableName} customer on contact.CustomerIdNumber = customer.IdNumber";
 
         result = result.OrderBy(x => x.IdNumber)
-                .ThenBy(x => x.CurrentCountryIsoCode)
-                .ThenBy(x => x.EmailAddress)
-                .ThenBy(x => x.PhoneNumber)
-                .ToList();
+                 .ThenBy(x => x.CurrentCountryIsoCode)
+               .ThenBy(x => x.EmailAddress)
+        .ThenBy(x => x.PhoneNumber)
+                 .ToList();
 
         _context.ExecuteReader(sql, reader =>
         {
@@ -189,24 +189,24 @@ public class TempTableAsyncTests : BaseTest
 
         // Act
         var tableName = await _context.CreateTempTableAsync(_customers,
-               ["IdNumber", "FirstName", "LastName", "CurrentCountryIsoCode"],
-               options =>
-               {
-                   options.LogTo = _output.WriteLine;
-               });
+     ["IdNumber", "FirstName", "LastName", "CurrentCountryIsoCode"],
+       new TempTableOptions
+       {
+           LogTo = _output.WriteLine
+       });
 
         var sql = $"select * from {tableName}";
 
         _context.ExecuteReader(sql, reader =>
-        {
-            customers.Add(new CustomerDto
-            {
-                IdNumber = reader["IdNumber"] as string,
-                FirstName = reader["FirstName"] as string,
-                LastName = reader["LastName"] as string,
-                CurrentCountryIsoCode = reader["CurrentCountryIsoCode"] as string,
-            });
-        });
+       {
+           customers.Add(new CustomerDto
+           {
+               IdNumber = reader["IdNumber"] as string,
+               FirstName = reader["FirstName"] as string,
+               LastName = reader["LastName"] as string,
+               CurrentCountryIsoCode = reader["CurrentCountryIsoCode"] as string,
+           });
+       });
 
         // Assert
         for (var i = 0; i < _customers.Count; i++)
@@ -226,37 +226,37 @@ public class TempTableAsyncTests : BaseTest
 
         // Act
         var customerTableName = await _context.CreateTempTableAsync(_customers,
-               ["IdNumber", "FirstName", "LastName", "CurrentCountryIsoCode"],
-               options =>
-               {
-                   options.LogTo = _output.WriteLine;
-               });
+         ["IdNumber", "FirstName", "LastName", "CurrentCountryIsoCode"],
+ new TempTableOptions
+ {
+     LogTo = _output.WriteLine
+ });
 
         var contactTableName = await _context.CreateTempTableAsync(_contacts,
                ["EmailAddress", "PhoneNumber", "CustomerIdNumber", "CountryIsoCode"],
-               options =>
+               new TempTableOptions
                {
-                   options.LogTo = _output.WriteLine;
+                   LogTo = _output.WriteLine
                });
 
         var sql = $"select * from {contactTableName} contact join {customerTableName} customer on contact.CustomerIdNumber = customer.IdNumber";
 
         _context.ExecuteReader(sql, reader =>
-        {
-            result.Add(new
-            {
-                IdNumber = reader["IdNumber"] as string,
-                FirstName = reader["FirstName"] as string,
-                LastName = reader["LastName"] as string,
-                CurrentCountryIsoCode = reader["CurrentCountryIsoCode"] as string,
-                EmailAddress = reader["EmailAddress"] as string,
-                PhoneNumber = reader["PhoneNumber"] as string
-            });
-        });
+  {
+      result.Add(new
+      {
+          IdNumber = reader["IdNumber"] as string,
+          FirstName = reader["FirstName"] as string,
+          LastName = reader["LastName"] as string,
+          CurrentCountryIsoCode = reader["CurrentCountryIsoCode"] as string,
+          EmailAddress = reader["EmailAddress"] as string,
+          PhoneNumber = reader["PhoneNumber"] as string
+      });
+  });
 
         result = result.OrderBy(x => x.IdNumber)
             .ThenBy(x => x.CurrentCountryIsoCode)
-            .ThenBy(x => x.EmailAddress)
+     .ThenBy(x => x.EmailAddress)
             .ThenBy(x => x.PhoneNumber)
             .ToList();
 
@@ -321,18 +321,18 @@ public class TempTableAsyncTests : BaseTest
 
         // Act
         var customerTableName = await _context.CreateTempTableAsync(customers,
-               ["Id", "FirstName", "LastName", "Index"],
-               options =>
-               {
-                   options.LogTo = _output.WriteLine;
-               });
+       ["Id", "FirstName", "LastName", "Index"],
+       new TempTableOptions
+       {
+           LogTo = _output.WriteLine
+       });
 
         var contactTableName = await _context.CreateTempTableAsync(contacts,
-               ["CustomerId", "EmailAddress", "PhoneNumber", "Index"],
-               options =>
-               {
-                   options.LogTo = _output.WriteLine;
-               });
+    ["CustomerId", "EmailAddress", "PhoneNumber", "Index"],
+            new TempTableOptions
+            {
+                LogTo = _output.WriteLine
+            });
 
         var tempCustomers = _context.Customers.FromSqlRaw($"select * from {customerTableName}").Where(x => x.Index > 10 && x.Index < 20);
 
@@ -385,11 +385,11 @@ public class TempTableAsyncTests : BaseTest
 
         // Act
         var tableName = await _context.CreateTempTableAsync(configurationEntries,
-               ["Id", "Key", "Value"],
-               options =>
-               {
-                   options.LogTo = _output.WriteLine;
-               });
+      ["Id", "Key", "Value"],
+     new TempTableOptions
+     {
+         LogTo = _output.WriteLine
+     });
 
         var configurationEntriesDb = _context.Set<ConfigurationEntry>().FromSqlRaw($"select * from {tableName}").Select(x => new { x.Id, x.Key, x.Value }).ToList();
 

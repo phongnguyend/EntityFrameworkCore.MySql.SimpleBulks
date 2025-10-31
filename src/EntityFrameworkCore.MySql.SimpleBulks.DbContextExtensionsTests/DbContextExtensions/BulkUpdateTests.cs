@@ -1,7 +1,7 @@
 ﻿using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 using EntityFrameworkCore.MySql.SimpleBulks.BulkUpdate;
-using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.Database;
+using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
@@ -83,16 +83,16 @@ public class BulkUpdateTests : BaseTest
 
         var updateResult1 = _context.BulkUpdate(rows,
                 row => new { row.Column3, row.Column2, row.Season, row.SeasonAsString },
-                options =>
+                new BulkUpdateOptions
                 {
-                    options.LogTo = _output.WriteLine;
+                    LogTo = _output.WriteLine
                 });
 
         var updateResult2 = _context.BulkUpdate(compositeKeyRows,
                 row => new { row.Column3, row.Column2, row.Season, row.SeasonAsString },
-                options =>
+                new BulkUpdateOptions
                 {
-                    options.LogTo = _output.WriteLine;
+                    LogTo = _output.WriteLine
                 });
 
         tran.Commit();
@@ -153,16 +153,16 @@ public class BulkUpdateTests : BaseTest
 
         var updateResult1 = _context.BulkUpdate(rows,
               ["Column3", "Column2", "Season", "SeasonAsString"],
-              options =>
+              new BulkUpdateOptions
               {
-                  options.LogTo = _output.WriteLine;
+                  LogTo = _output.WriteLine
               });
 
         var updateResult2 = _context.BulkUpdate(compositeKeyRows,
             ["Column3", "Column2", "Season", "SeasonAsString"],
-            options =>
+            new BulkUpdateOptions
             {
-                options.LogTo = _output.WriteLine;
+                LogTo = _output.WriteLine
             });
 
         tran.Commit();

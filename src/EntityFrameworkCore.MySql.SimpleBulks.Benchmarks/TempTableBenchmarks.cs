@@ -45,6 +45,11 @@ public class TempTableBenchmarks
     [Benchmark]
     public void CreateTempTable()
     {
+        var tempTableOptions = new TempTableOptions
+        {
+            Timeout = 0
+        };
+
         _context.CreateTempTable(_customers,
             x => new
             {
@@ -54,9 +59,6 @@ public class TempTableBenchmarks
                 x.CurrentCountryIsoCode,
                 x.Index
             },
-            opt =>
-            {
-                opt.Timeout = 0;
-            });
+            tempTableOptions);
     }
 }

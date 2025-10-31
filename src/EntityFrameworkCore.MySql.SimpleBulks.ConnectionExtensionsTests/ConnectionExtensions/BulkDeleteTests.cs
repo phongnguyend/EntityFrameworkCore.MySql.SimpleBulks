@@ -54,62 +54,35 @@ public class BulkDeleteTests : BaseTest
         var rows = _context.SingleKeyRows.AsNoTracking().Take(99).ToList();
         var compositeKeyRows = _context.CompositeKeyRows.AsNoTracking().Take(99).ToList();
 
+        var options = new BulkDeleteOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         if (useLinq)
         {
             if (omitTableName)
             {
-                connectionContext.BulkDelete(rows, row => row.Id,
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
-                connectionContext.BulkDelete(compositeKeyRows, row => new { row.Id1, row.Id2 },
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+                connectionContext.BulkDelete(rows, row => row.Id, options);
+                connectionContext.BulkDelete(compositeKeyRows, row => new { row.Id1, row.Id2 }, options);
             }
             else
             {
-                connectionContext.BulkDelete(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")), row => row.Id,
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
-                connectionContext.BulkDelete(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")), row => new { row.Id1, row.Id2 },
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+                connectionContext.BulkDelete(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")), row => row.Id, options);
+                connectionContext.BulkDelete(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")), row => new { row.Id1, row.Id2 }, options);
             }
         }
         else
         {
             if (omitTableName)
             {
-                connectionContext.BulkDelete(rows, ["Id"],
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
-                connectionContext.BulkDelete(compositeKeyRows, ["Id1", "Id2"],
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+                connectionContext.BulkDelete(rows, ["Id"], options);
+                connectionContext.BulkDelete(compositeKeyRows, ["Id1", "Id2"], options);
             }
             else
             {
-                connectionContext.BulkDelete(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")), ["Id"],
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
-                connectionContext.BulkDelete(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")), ["Id1", "Id2"],
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+                connectionContext.BulkDelete(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")), ["Id"], options);
+                connectionContext.BulkDelete(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")), ["Id1", "Id2"], options);
             }
         }
 

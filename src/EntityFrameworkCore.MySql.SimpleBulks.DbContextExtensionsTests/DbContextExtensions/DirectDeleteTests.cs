@@ -1,6 +1,7 @@
-﻿using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
-using EntityFrameworkCore.MySql.SimpleBulks.DirectDelete;
+﻿using EntityFrameworkCore.MySql.SimpleBulks.BulkDelete;
+using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 using EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.Database;
+using EntityFrameworkCore.MySql.SimpleBulks.DirectDelete;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
@@ -40,10 +41,10 @@ public class DirectDeleteTests : BaseTest
         }
 
         _context.BulkInsert(rows,
-                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString });
+   row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString });
 
         _context.BulkInsert(compositeKeyRows,
-                row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString });
+   row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString });
 
         tran.Commit();
     }
@@ -58,17 +59,14 @@ public class DirectDeleteTests : BaseTest
         var row = _context.SingleKeyRows.AsNoTracking().Skip(index).First();
         var compositeKeyRow = _context.CompositeKeyRows.AsNoTracking().Skip(index).First();
 
-        var deleteResult1 = _context.DirectDelete(row,
-                  options =>
-                  {
-                      options.LogTo = _output.WriteLine;
-                  });
+        var options = new BulkDeleteOptions
+        {
+            LogTo = _output.WriteLine
+        };
 
-        var deleteResult2 = _context.DirectDelete(compositeKeyRow,
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+        var deleteResult1 = _context.DirectDelete(row, options);
+
+        var deleteResult2 = _context.DirectDelete(compositeKeyRow, options);
 
         tran.Commit();
 
@@ -94,17 +92,14 @@ public class DirectDeleteTests : BaseTest
         var row = _context.SingleKeyRows.AsNoTracking().Skip(index).First();
         var compositeKeyRow = _context.CompositeKeyRows.AsNoTracking().Skip(index).First();
 
-        var deleteResult1 = _context.DirectDelete(row,
-                  options =>
-                  {
-                      options.LogTo = _output.WriteLine;
-                  });
+        var options = new BulkDeleteOptions
+        {
+            LogTo = _output.WriteLine
+        };
 
-        var deleteResult2 = _context.DirectDelete(compositeKeyRow,
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+        var deleteResult1 = _context.DirectDelete(row, options);
+
+        var deleteResult2 = _context.DirectDelete(compositeKeyRow, options);
 
         tran.Rollback();
 

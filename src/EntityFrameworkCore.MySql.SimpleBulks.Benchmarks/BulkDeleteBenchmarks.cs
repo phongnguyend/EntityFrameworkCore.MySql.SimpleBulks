@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using EntityFrameworkCore.MySql.SimpleBulks.Benchmarks.Database;
-using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 using EntityFrameworkCore.MySql.SimpleBulks.BulkDelete;
+using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 using Microsoft.EntityFrameworkCore;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Benchmarks;
@@ -40,9 +40,9 @@ public class BulkDeleteBenchmarks1
             _customers.Add(customer);
         }
 
-        _context.BulkInsert(_customers, opt =>
+        _context.BulkInsert(_customers, new BulkInsertOptions
         {
-            opt.Timeout = 0;
+            Timeout = 0
         });
 
         _customerIds = _customers.Take(RowsCount).Select(x => x.Id).ToList();
@@ -67,11 +67,10 @@ public class BulkDeleteBenchmarks1
     [Benchmark]
     public void BulkDelete()
     {
-        _context.BulkDelete(_customersToDelete,
-            opt =>
-            {
-                opt.Timeout = 0;
-            });
+        _context.BulkDelete(_customersToDelete, new BulkDeleteOptions
+        {
+            Timeout = 0
+        });
     }
 }
 
@@ -109,9 +108,9 @@ public class BulkDeleteBenchmarks2
             _customers.Add(customer);
         }
 
-        _context.BulkInsert(_customers, opt =>
+        _context.BulkInsert(_customers, new BulkInsertOptions
         {
-            opt.Timeout = 0;
+            Timeout = 0
         });
 
         _customerIds = _customers.Take(RowsCount).Select(x => x.Id).ToList();
@@ -128,10 +127,9 @@ public class BulkDeleteBenchmarks2
     [Benchmark]
     public void BulkDelete()
     {
-        _context.BulkDelete(_customersToDelete,
-            opt =>
-            {
-                opt.Timeout = 0;
-            });
+        _context.BulkDelete(_customersToDelete, new BulkDeleteOptions
+        {
+            Timeout = 0
+        });
     }
 }

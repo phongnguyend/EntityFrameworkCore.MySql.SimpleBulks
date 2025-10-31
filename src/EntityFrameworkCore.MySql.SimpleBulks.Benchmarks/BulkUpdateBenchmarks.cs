@@ -39,10 +39,12 @@ public class BulkUpdateBenchmarks1
             _customers.Add(customer);
         }
 
-        _context.BulkInsert(_customers, opt =>
+        var insertOptions = new BulkInsertOptions
         {
-            opt.Timeout = 0;
-        });
+            Timeout = 0
+        };
+
+        _context.BulkInsert(_customers, insertOptions);
 
         _customerIds = _customers.Select(x => x.Id).ToList();
     }
@@ -84,12 +86,14 @@ public class BulkUpdateBenchmarks1
             customer.FirstName = "Updated" + random.Next();
         }
 
+        var updateOptions = new BulkUpdateOptions
+        {
+            Timeout = 0
+        };
+
         _context.BulkUpdate(_customers,
         x => new { x.FirstName },
-        opt =>
-        {
-            opt.Timeout = 0;
-        });
+        updateOptions);
     }
 }
 
@@ -126,10 +130,12 @@ public class BulkUpdateBenchmarks2
             _customers.Add(customer);
         }
 
-        _context.BulkInsert(_customers, opt =>
+        var insertOptions = new BulkInsertOptions
         {
-            opt.Timeout = 0;
-        });
+            Timeout = 0
+        };
+
+        _context.BulkInsert(_customers, insertOptions);
 
         _customerIds = _customers.Select(x => x.Id).ToList();
     }
@@ -150,11 +156,13 @@ public class BulkUpdateBenchmarks2
             customer.FirstName = "Updated" + random.Next();
         }
 
+        var updateOptions = new BulkUpdateOptions
+        {
+            Timeout = 0
+        };
+
         _context.BulkUpdate(_customers,
         x => new { x.FirstName },
-        opt =>
-        {
-            opt.Timeout = 0;
-        });
+        updateOptions);
     }
 }

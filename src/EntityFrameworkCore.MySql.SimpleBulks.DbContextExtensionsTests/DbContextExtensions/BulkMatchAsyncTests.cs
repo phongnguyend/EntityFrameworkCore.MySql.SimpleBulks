@@ -75,13 +75,15 @@ public class BulkMatchAsyncTests : BaseTest
         var customerIds = customers.Select(x => x.Id).ToList();
         var matchedCustommers = customerIds.Select(x => new Customer { Id = x });
 
+        var matchOptions = new BulkMatchOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         // Act
         var customersFromDb = await _context.BulkMatchAsync(matchedCustommers,
             x => x.Id,
-            options =>
-            {
-                options.LogTo = _output.WriteLine;
-            });
+            matchOptions);
 
         // Assert
         Assert.Equal(customers.Count, customersFromDb.Count);
@@ -104,14 +106,16 @@ public class BulkMatchAsyncTests : BaseTest
         var customerIds = customers.Select(x => x.Id).ToList();
         var matchedCustommers = customerIds.Select(x => new Customer { Id = x });
 
+        var matchOptions = new BulkMatchOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         // Act
         var customersFromDb = await _context.BulkMatchAsync(matchedCustommers,
             x => x.Id,
             x => new { x.Id, x.FirstName },
-            options =>
-            {
-                options.LogTo = _output.WriteLine;
-            });
+            matchOptions);
 
         // Assert
         Assert.Equal(customers.Count, customersFromDb.Count);
@@ -132,13 +136,15 @@ public class BulkMatchAsyncTests : BaseTest
         var customerIds = customers.Select(x => x.Id).ToList();
         var matchedContacts = customerIds.Select(x => new Contact { CustomerId = x });
 
+        var matchOptions = new BulkMatchOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         // Act
         var contactsFromDb = (await _context.BulkMatchAsync(matchedContacts,
             x => x.CustomerId,
-            options =>
-            {
-                options.LogTo = _output.WriteLine;
-            }))
+            matchOptions))
             .OrderBy(x => x.Id).ToList();
 
         var contactsInMemory = _contacts.Where(x => customerIds.Contains(x.CustomerId)).OrderBy(x => x.Id).ToList();
@@ -166,14 +172,16 @@ public class BulkMatchAsyncTests : BaseTest
         var customerIds = customers.Select(x => x.Id).ToList();
         var matchedContacts = customerIds.Select(x => new Contact { CustomerId = x });
 
+        var matchOptions = new BulkMatchOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         // Act
         var contactsFromDb = (await _context.BulkMatchAsync(matchedContacts,
             x => x.CustomerId,
             x => new { x.Id, x.PhoneNumber },
-            options =>
-            {
-                options.LogTo = _output.WriteLine;
-            }))
+            matchOptions))
             .OrderBy(x => x.Id).ToList();
 
         var contactsInMemory = _contacts.Where(x => customerIds.Contains(x.CustomerId)).OrderBy(x => x.Id).ToList();
@@ -197,13 +205,15 @@ public class BulkMatchAsyncTests : BaseTest
         var customers = _customers.Where(x => x.Index % 5 == 0).ToList();
         var matchedContacts = customers.Select(x => new Contact { CustomerId = x.Id, CountryIsoCode = x.CurrentCountryIsoCode });
 
+        var matchOptions = new BulkMatchOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         // Act
         var contactsFromDb = (await _context.BulkMatchAsync(matchedContacts,
             x => new { x.CustomerId, x.CountryIsoCode },
-            options =>
-            {
-                options.LogTo = _output.WriteLine;
-            }))
+            matchOptions))
             .OrderBy(x => x.Id).ToList();
 
         var contactsInMemory = _contacts.Where(x => customers.Any(y => y.Id == x.CustomerId && y.CurrentCountryIsoCode == x.CountryIsoCode)).OrderBy(x => x.Id).ToList();
@@ -230,14 +240,16 @@ public class BulkMatchAsyncTests : BaseTest
         var customers = _customers.Where(x => x.Index % 5 == 0).ToList();
         var matchedContacts = customers.Select(x => new Contact { CustomerId = x.Id, CountryIsoCode = x.CurrentCountryIsoCode });
 
+        var matchOptions = new BulkMatchOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         // Act
         var contactsFromDb = (await _context.BulkMatchAsync(matchedContacts,
             x => new { x.CustomerId, x.CountryIsoCode },
             x => new { x.Id, x.PhoneNumber },
-            options =>
-            {
-                options.LogTo = _output.WriteLine;
-            }))
+            matchOptions))
             .OrderBy(x => x.Id).ToList();
 
         var contactsInMemory = _contacts.Where(x => customers.Any(y => y.Id == x.CustomerId && y.CurrentCountryIsoCode == x.CountryIsoCode)).OrderBy(x => x.Id).ToList();

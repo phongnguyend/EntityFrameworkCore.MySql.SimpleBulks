@@ -42,10 +42,12 @@ public class BulkMergeBenchmarks
             _customers.Add(customer);
         }
 
-        _context.BulkInsert(_customers, opt =>
+        var insertOptions = new BulkInsertOptions
         {
-            opt.Timeout = 0;
-        });
+            Timeout = 0
+        };
+
+        _context.BulkInsert(_customers, insertOptions);
         _customerIds = _customers.Select(x => x.Id).ToList();
 
         for (int i = RowsCount; i < RowsCount * 2; i++)
@@ -109,13 +111,15 @@ public class BulkMergeBenchmarks
         customers.AddRange(_customers);
         customers.AddRange(_newCustomers);
 
+        var mergeOptions = new BulkMergeOptions
+        {
+            Timeout = 0
+        };
+
         _context.BulkMerge(customers,
             x => x.Id,
             x => new { x.FirstName },
             x => new { x.Id, x.FirstName, x.LastName, x.Index },
-            opt =>
-            {
-                opt.Timeout = 0;
-            });
+            mergeOptions);
     }
 }

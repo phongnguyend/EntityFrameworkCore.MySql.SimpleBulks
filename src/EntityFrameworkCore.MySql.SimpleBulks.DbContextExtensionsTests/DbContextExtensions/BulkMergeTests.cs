@@ -1,7 +1,7 @@
 ﻿using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 using EntityFrameworkCore.MySql.SimpleBulks.BulkMerge;
-using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using EntityFrameworkCore.MySql.SimpleBulks.DbContextExtensionsTests.Database;
+using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
@@ -45,10 +45,10 @@ public class BulkMergeTests : BaseTest
         }
 
         _context.BulkInsert(rows,
-                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString });
+ row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString });
 
         _context.BulkInsert(compositeKeyRows,
-                row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString });
+        row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString });
 
         tran.Commit();
     }
@@ -109,23 +109,22 @@ public class BulkMergeTests : BaseTest
             });
         }
 
+        var mergeOptions = new BulkMergeOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         var result1 = _context.BulkMerge(rows,
-                row => row.Id,
-                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString, row.BulkId },
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+      row => row.Id,
+       row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
+      row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString, row.BulkId },
+   mergeOptions);
 
         var result2 = _context.BulkMerge(compositeKeyRows,
-                row => new { row.Id1, row.Id2 },
-                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-                row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-                options =>
-                {
-                    options.LogTo = _output.WriteLine;
-                });
+          row => new { row.Id1, row.Id2 },
+        row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
+       row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
+         mergeOptions);
 
         tran.Commit();
 
@@ -134,8 +133,8 @@ public class BulkMergeTests : BaseTest
         var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
 
         rows.Where(x => x.BulkId == bulkId)
-            .ToList()
-            .ForEach(x => x.Id = dbRows.First(y => y.BulkId == bulkId && y.Column1 == x.Column1).Id);
+       .ToList()
+           .ForEach(x => x.Id = dbRows.First(y => y.BulkId == bulkId && y.Column1 == x.Column1).Id);
 
         Assert.Equal(length + insertLength, result1.AffectedRows);
         Assert.Equal(insertLength, result1.InsertedRows);
@@ -220,23 +219,22 @@ public class BulkMergeTests : BaseTest
             });
         }
 
+        var mergeOptions = new BulkMergeOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         var result1 = _context.BulkMerge(rows,
             ["Id"],
-            ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
-            ["Column1", "Column2", "Column3", "Season", "SeasonAsString", "BulkId"],
-            options =>
-            {
-                options.LogTo = _output.WriteLine;
-            });
+           ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
+                 ["Column1", "Column2", "Column3", "Season", "SeasonAsString", "BulkId"],
+          mergeOptions);
 
         var result2 = _context.BulkMerge(compositeKeyRows,
-            ["Id1", "Id2"],
-            ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
-            ["Id1", "Id2", "Column1", "Column2", "Column3", "Season", "SeasonAsString"],
-            options =>
-            {
-                options.LogTo = _output.WriteLine;
-            });
+        ["Id1", "Id2"],
+        ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
+      ["Id1", "Id2", "Column1", "Column2", "Column3", "Season", "SeasonAsString"],
+           mergeOptions);
 
         tran.Commit();
 
@@ -245,8 +243,8 @@ public class BulkMergeTests : BaseTest
         var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
 
         rows.Where(x => x.BulkId == bulkId)
-            .ToList()
-            .ForEach(x => x.Id = dbRows.First(y => y.BulkId == bulkId && y.Column1 == x.Column1).Id);
+         .ToList()
+           .ForEach(x => x.Id = dbRows.First(y => y.BulkId == bulkId && y.Column1 == x.Column1).Id);
 
         Assert.Equal(length + insertLength, result1.AffectedRows);
         Assert.Equal(insertLength, result1.InsertedRows);
@@ -294,10 +292,12 @@ public class BulkMergeTests : BaseTest
             });
         }
 
-        _context.BulkInsert(configurationEntries, options =>
+        var insertOptions = new BulkInsertOptions
         {
-            options.LogTo = _output.WriteLine;
-        });
+            LogTo = _output.WriteLine
+        };
+
+        _context.BulkInsert(configurationEntries, insertOptions);
 
         foreach (var entry in configurationEntries)
         {
@@ -316,14 +316,16 @@ public class BulkMergeTests : BaseTest
             });
         }
 
+        var mergeOptions = new BulkMergeOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         var result = _context.BulkMerge(configurationEntries,
-             x => x.Id,
-             x => new { x.Key, x.Value, x.Description, x.UpdatedDateTime },
-             x => new { },
-             options =>
-             {
-                 options.LogTo = _output.WriteLine;
-             });
+                  x => x.Id,
+            x => new { x.Key, x.Value, x.Description, x.UpdatedDateTime },
+                  x => new { },
+            mergeOptions);
 
         // Assert
         var configurationEntriesInDb = _context.Set<ConfigurationEntry>().AsNoTracking().ToList();
@@ -363,10 +365,12 @@ public class BulkMergeTests : BaseTest
             });
         }
 
-        _context.BulkInsert(configurationEntries, options =>
+        var insertOptions = new BulkInsertOptions
         {
-            options.LogTo = _output.WriteLine;
-        });
+            LogTo = _output.WriteLine
+        };
+
+        _context.BulkInsert(configurationEntries, insertOptions);
 
         foreach (var entry in configurationEntries)
         {
@@ -386,14 +390,16 @@ public class BulkMergeTests : BaseTest
             });
         }
 
+        var mergeOptions = new BulkMergeOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         var result = _context.BulkMerge(configurationEntries,
-             x => x.Id,
-             x => new { },
-             x => new { x.Id, x.Key, x.Value, x.Description, x.IsSensitive, x.CreatedDateTime },
-             options =>
-             {
-                 options.LogTo = _output.WriteLine;
-             });
+x => x.Id,
+     x => new { },
+    x => new { x.Id, x.Key, x.Value, x.Description, x.IsSensitive, x.CreatedDateTime },
+           mergeOptions);
 
         // Assert
         var configurationEntriesInDb = _context.Set<ConfigurationEntry>().AsNoTracking().ToList();
@@ -443,10 +449,12 @@ public class BulkMergeTests : BaseTest
             });
         }
 
-        _context.BulkInsert(configurationEntries, options =>
+        var insertOptions = new BulkInsertOptions
         {
-            options.LogTo = _output.WriteLine;
-        });
+            LogTo = _output.WriteLine
+        };
+
+        _context.BulkInsert(configurationEntries, insertOptions);
 
         foreach (var entry in configurationEntries)
         {
@@ -465,14 +473,16 @@ public class BulkMergeTests : BaseTest
             });
         }
 
+        var mergeOptions = new BulkMergeOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         var result = _context.BulkMerge(configurationEntries,
              x => x.Id,
              x => new { },
-             x => new { },
-             options =>
-             {
-                 options.LogTo = _output.WriteLine;
-             });
+       x => new { },
+             mergeOptions);
 
         // Assert
         var configurationEntriesInDb = _context.Set<ConfigurationEntry>().AsNoTracking().ToList();
