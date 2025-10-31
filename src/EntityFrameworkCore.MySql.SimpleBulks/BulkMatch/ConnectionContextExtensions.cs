@@ -4,15 +4,15 @@ using System.Linq.Expressions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.BulkMatch;
 
-public static class MySqlConnectionExtensions
+public static class ConnectionContextExtensions
 {
     public static List<T> BulkMatch<T>(this ConnectionContext connectionContext, IEnumerable<T> machedValues, Expression<Func<T, object>> matchedColumnsSelector, Expression<Func<T, object>> returnedColumnsSelector, Action<BulkMatchOptions> configureOptions = null)
     {
         var table = TableMapper.Resolve(typeof(T));
 
         return new BulkMatchBuilder<T>(connectionContext)
-        .WithReturnedColumns(returnedColumnsSelector)
-          .WithTable(table)
+  .WithReturnedColumns(returnedColumnsSelector)
+  .WithTable(table)
        .WithMatchedColumns(matchedColumnsSelector)
      .ConfigureBulkOptions(configureOptions)
          .Execute(machedValues);
@@ -24,10 +24,10 @@ public static class MySqlConnectionExtensions
 
         return new BulkMatchBuilder<T>(connectionContext)
               .WithReturnedColumns(returnedColumns)
-          .WithTable(table)
-      .WithMatchedColumn(matchedColumn)
-     .ConfigureBulkOptions(configureOptions)
-      .Execute(machedValues);
+             .WithTable(table)
+         .WithMatchedColumn(matchedColumn)
+        .ConfigureBulkOptions(configureOptions)
+         .Execute(machedValues);
     }
 
     public static List<T> BulkMatch<T>(this ConnectionContext connectionContext, IEnumerable<T> machedValues, IEnumerable<string> matchedColumns, IEnumerable<string> returnedColumns, Action<BulkMatchOptions> configureOptions = null)
@@ -35,11 +35,11 @@ public static class MySqlConnectionExtensions
         var table = TableMapper.Resolve(typeof(T));
 
         return new BulkMatchBuilder<T>(connectionContext)
-                   .WithReturnedColumns(returnedColumns)
-            .WithTable(table)
-          .WithMatchedColumns(matchedColumns)
+       .WithReturnedColumns(returnedColumns)
+      .WithTable(table)
+      .WithMatchedColumns(matchedColumns)
          .ConfigureBulkOptions(configureOptions)
-                   .Execute(machedValues);
+          .Execute(machedValues);
     }
 
     public static List<T> BulkMatch<T>(this ConnectionContext connectionContext, IEnumerable<T> machedValues, TableInfor table, Expression<Func<T, object>> matchedColumnsSelector, Expression<Func<T, object>> returnedColumnsSelector, Action<BulkMatchOptions> configureOptions = null)
@@ -67,8 +67,8 @@ public static class MySqlConnectionExtensions
         return new BulkMatchBuilder<T>(connectionContext)
   .WithReturnedColumns(returnedColumns)
     .WithTable(table)
-         .WithMatchedColumns(matchedColumns)
-      .ConfigureBulkOptions(configureOptions)
+  .WithMatchedColumns(matchedColumns)
+   .ConfigureBulkOptions(configureOptions)
       .Execute(machedValues);
     }
 }

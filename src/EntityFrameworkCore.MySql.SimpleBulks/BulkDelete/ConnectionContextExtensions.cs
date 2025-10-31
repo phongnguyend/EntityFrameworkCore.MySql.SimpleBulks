@@ -4,17 +4,17 @@ using System.Linq.Expressions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.BulkDelete;
 
-public static class MySqlConnectionExtensions
+public static class ConnectionContextExtensions
 {
     public static BulkDeleteResult BulkDelete<T>(this ConnectionContext connectionContext, IEnumerable<T> data, Expression<Func<T, object>> idSelector, Action<BulkDeleteOptions> configureOptions = null)
     {
         var table = TableMapper.Resolve(typeof(T));
 
         return new BulkDeleteBuilder<T>(connectionContext)
-                 .WithId(idSelector)
+       .WithId(idSelector)
            .ToTable(table)
           .ConfigureBulkOptions(configureOptions)
-           .Execute(data);
+      .Execute(data);
     }
 
     public static BulkDeleteResult BulkDelete<T>(this ConnectionContext connectionContext, IEnumerable<T> data, IEnumerable<string> idColumns, Action<BulkDeleteOptions> configureOptions = null)
@@ -34,7 +34,7 @@ public static class MySqlConnectionExtensions
    .WithId(idSelector)
           .ToTable(table)
     .ConfigureBulkOptions(configureOptions)
-            .Execute(data);
+    .Execute(data);
     }
 
     public static BulkDeleteResult BulkDelete<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, IEnumerable<string> idColumns, Action<BulkDeleteOptions> configureOptions = null)
