@@ -13,8 +13,8 @@ public class BulkUpdateTests : BaseTest
 {
     public BulkUpdateTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkUpdate")
     {
-        TableMapper.Register(typeof(SingleKeyRow<int>), GetTableName("SingleKeyRows"));
-        TableMapper.Register(typeof(CompositeKeyRow<int, int>), GetTableName("CompositeKeyRows"));
+        TableMapper.Register(typeof(SingleKeyRow<int>), new MySqlTableInfor(GetTableName("SingleKeyRows")));
+        TableMapper.Register(typeof(CompositeKeyRow<int, int>), new MySqlTableInfor(GetTableName("CompositeKeyRows")));
 
         var tran = _context.Database.BeginTransaction();
 

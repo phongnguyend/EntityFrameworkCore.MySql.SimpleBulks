@@ -108,8 +108,8 @@ using EntityFrameworkCore.MySql.SimpleBulks.BulkMerge;
 using EntityFrameworkCore.MySql.SimpleBulks.BulkUpdate;
 
 // Register Type - Table Name globaly
-TableMapper.Register(typeof(Row), "Rows");
-TableMapper.Register(typeof(CompositeKeyRow), "CompositeKeyRows");
+TableMapper.Register(typeof(Row), new MySqlTableInfor("Rows"));
+TableMapper.Register(typeof(CompositeKeyRow), new MySqlTableInfor("CompositeKeyRows"));
 
 await connection.BulkInsertAsync(rows,
            row => new { row.Column1, row.Column2, row.Column3 });
