@@ -10,26 +10,22 @@ public static class ConnectionContextAsyncExtensions
 {
     public static Task<BulkMergeResult> BulkMergeAsync<T>(this ConnectionContext connectionContext, IEnumerable<T> data, Expression<Func<T, object>> idSelector, Expression<Func<T, object>> updateColumnNamesSelector, Expression<Func<T, object>> insertColumnNamesSelector, BulkMergeOptions options = null, CancellationToken cancellationToken = default)
     {
-        var table = TableMapper.Resolve(typeof(T));
-
         return new BulkMergeBuilder<T>(connectionContext)
           .WithId(idSelector)
            .WithUpdateColumns(updateColumnNamesSelector)
     .WithInsertColumns(insertColumnNamesSelector)
-       .ToTable(table)
+       .ToTable(TableMapper.Resolve(typeof(T)))
       .WithBulkOptions(options)
          .ExecuteAsync(data, cancellationToken);
     }
 
     public static Task<BulkMergeResult> BulkMergeAsync<T>(this ConnectionContext connectionContext, IEnumerable<T> data, IEnumerable<string> idColumns, IEnumerable<string> updateColumnNames, IEnumerable<string> insertColumnNames, BulkMergeOptions options = null, CancellationToken cancellationToken = default)
     {
-        var table = TableMapper.Resolve(typeof(T));
-
         return new BulkMergeBuilder<T>(connectionContext)
                 .WithId(idColumns)
                .WithUpdateColumns(updateColumnNames)
              .WithInsertColumns(insertColumnNames)
-            .ToTable(table)
+            .ToTable(TableMapper.Resolve(typeof(T)))
              .WithBulkOptions(options)
                   .ExecuteAsync(data, cancellationToken);
     }
