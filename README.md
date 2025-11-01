@@ -110,6 +110,8 @@ using EntityFrameworkCore.MySql.SimpleBulks.BulkUpdate;
 TableMapper.Register(typeof(Row), new MySqlTableInfor("Rows"));
 TableMapper.Register(typeof(CompositeKeyRow), new MySqlTableInfor("CompositeKeyRows"));
 
+var connection = new ConnectionContext(new MySqlConnection(connectionString), null);
+
 await connection.BulkInsertAsync(rows,
            row => new { row.Column1, row.Column2, row.Column3 });
 await connection.BulkInsertAsync(compositeKeyRows,
@@ -140,6 +142,8 @@ using EntityFrameworkCore.MySql.SimpleBulks.BulkDelete;
 using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 using EntityFrameworkCore.MySql.SimpleBulks.BulkMerge;
 using EntityFrameworkCore.MySql.SimpleBulks.BulkUpdate;
+
+var connection = new ConnectionContext(new MySqlConnection(connectionString), null);
 
 await connection.BulkInsertAsync(rows,
            [ "Column1", "Column2", "Column3" ]);
