@@ -13,7 +13,7 @@ public static class DbContextExtensions
     {
         var outputIdColumn = dbContext.GetOutputId(typeof(T))?.PropertyName;
 
-        return new BulkMergeBuilder<T>(dbContext.GetConnectionContext())
+        return dbContext.CreateBulkMergeBuilder<T>()
     .WithId(idSelector)
        .WithUpdateColumns(updateColumnNamesSelector)
    .WithInsertColumns(insertColumnNamesSelector)
@@ -27,13 +27,13 @@ public static class DbContextExtensions
     {
         var outputIdColumn = dbContext.GetOutputId(typeof(T))?.PropertyName;
 
-        return new BulkMergeBuilder<T>(dbContext.GetConnectionContext())
-     .WithId(idColumns)
-              .WithUpdateColumns(updateColumnNames)
-      .WithInsertColumns(insertColumnNames)
-          .WithOutputId(outputIdColumn)
-           .ToTable(dbContext.GetTableInfor(typeof(T)))
+        return dbContext.CreateBulkMergeBuilder<T>()
+       .WithId(idColumns)
+       .WithUpdateColumns(updateColumnNames)
+  .WithInsertColumns(insertColumnNames)
+         .WithOutputId(outputIdColumn)
+             .ToTable(dbContext.GetTableInfor(typeof(T)))
           .WithBulkOptions(options)
-           .SingleMerge(data);
+             .SingleMerge(data);
     }
 }

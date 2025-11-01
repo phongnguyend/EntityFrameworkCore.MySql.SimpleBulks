@@ -12,27 +12,27 @@ public static class DbContextExtensions
     {
         var outputIdColumn = dbContext.GetOutputId(typeof(T))?.PropertyName;
 
-        return new BulkMergeBuilder<T>(dbContext.GetConnectionContext())
-             .WithId(idSelector)
-        .WithUpdateColumns(updateColumnNamesSelector)
-      .WithInsertColumns(insertColumnNamesSelector)
-        .WithOutputId(outputIdColumn)
-      .ToTable(dbContext.GetTableInfor(typeof(T)))
-         .WithBulkOptions(options)
-             .Execute(data);
+        return dbContext.CreateBulkMergeBuilder<T>()
+      .WithId(idSelector)
+            .WithUpdateColumns(updateColumnNamesSelector)
+       .WithInsertColumns(insertColumnNamesSelector)
+            .WithOutputId(outputIdColumn)
+    .ToTable(dbContext.GetTableInfor(typeof(T)))
+        .WithBulkOptions(options)
+       .Execute(data);
     }
 
     public static BulkMergeResult BulkMerge<T>(this DbContext dbContext, IEnumerable<T> data, IEnumerable<string> idColumns, IEnumerable<string> updateColumnNames, IEnumerable<string> insertColumnNames, BulkMergeOptions options = null)
     {
         var outputIdColumn = dbContext.GetOutputId(typeof(T))?.PropertyName;
 
-        return new BulkMergeBuilder<T>(dbContext.GetConnectionContext())
-         .WithId(idColumns)
-       .WithUpdateColumns(updateColumnNames)
-     .WithInsertColumns(insertColumnNames)
+        return dbContext.CreateBulkMergeBuilder<T>()
+   .WithId(idColumns)
+      .WithUpdateColumns(updateColumnNames)
+ .WithInsertColumns(insertColumnNames)
       .WithOutputId(outputIdColumn)
       .ToTable(dbContext.GetTableInfor(typeof(T)))
-         .WithBulkOptions(options)
-      .Execute(data);
+  .WithBulkOptions(options)
+     .Execute(data);
     }
 }
