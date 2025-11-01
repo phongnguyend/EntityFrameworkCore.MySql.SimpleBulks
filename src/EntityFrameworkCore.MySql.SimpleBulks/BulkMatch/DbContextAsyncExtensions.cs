@@ -12,25 +12,21 @@ public static class DbContextAsyncExtensions
 {
     public static Task<List<T>> BulkMatchAsync<T>(this DbContext dbContext, IEnumerable<T> machedValues, Expression<Func<T, object>> matchedColumnsSelector, BulkMatchOptions options = null, CancellationToken cancellationToken = default)
     {
-        var connectionContext = dbContext.GetConnectionContext();
-
-        return new BulkMatchBuilder<T>(connectionContext)
-             .WithReturnedColumns(dbContext.GetAllPropertyNames(typeof(T)))
-             .WithTable(dbContext.GetTableInfor(typeof(T)))
-             .WithMatchedColumns(matchedColumnsSelector)
-             .WithBulkOptions(options)
-             .ExecuteAsync(machedValues, cancellationToken);
+        return new BulkMatchBuilder<T>(dbContext.GetConnectionContext())
+         .WithReturnedColumns(dbContext.GetAllPropertyNames(typeof(T)))
+        .WithTable(dbContext.GetTableInfor(typeof(T)))
+       .WithMatchedColumns(matchedColumnsSelector)
+        .WithBulkOptions(options)
+    .ExecuteAsync(machedValues, cancellationToken);
     }
 
     public static Task<List<T>> BulkMatchAsync<T>(this DbContext dbContext, IEnumerable<T> machedValues, Expression<Func<T, object>> matchedColumnsSelector, Expression<Func<T, object>> returnedColumnsSelector, BulkMatchOptions options = null, CancellationToken cancellationToken = default)
     {
-        var connectionContext = dbContext.GetConnectionContext();
-
-        return new BulkMatchBuilder<T>(connectionContext)
-             .WithReturnedColumns(returnedColumnsSelector)
-             .WithTable(dbContext.GetTableInfor(typeof(T)))
-             .WithMatchedColumns(matchedColumnsSelector)
-             .WithBulkOptions(options)
-             .ExecuteAsync(machedValues, cancellationToken);
+        return new BulkMatchBuilder<T>(dbContext.GetConnectionContext())
+        .WithReturnedColumns(returnedColumnsSelector)
+    .WithTable(dbContext.GetTableInfor(typeof(T)))
+       .WithMatchedColumns(matchedColumnsSelector)
+           .WithBulkOptions(options)
+        .ExecuteAsync(machedValues, cancellationToken);
     }
 }

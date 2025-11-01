@@ -1,4 +1,10 @@
-﻿using MySqlConnector;
+﻿using EntityFrameworkCore.MySql.SimpleBulks.BulkDelete;
+using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
+using EntityFrameworkCore.MySql.SimpleBulks.BulkMatch;
+using EntityFrameworkCore.MySql.SimpleBulks.BulkMerge;
+using EntityFrameworkCore.MySql.SimpleBulks.BulkUpdate;
+using EntityFrameworkCore.MySql.SimpleBulks.TempTable;
+using MySqlConnector;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading;
@@ -105,5 +111,35 @@ public static class ConnectionContextExtensions
         }
 
         return columnNameMappings.TryGetValue(columnName, out string value) ? value : columnName;
+    }
+
+    public static BulkInsertBuilder<T> CreateBulkInsertBuilder<T>(this ConnectionContext connectionContext)
+    {
+        return new BulkInsertBuilder<T>(connectionContext);
+    }
+
+    public static BulkUpdateBuilder<T> CreateBulkUpdateBuilder<T>(this ConnectionContext connectionContext)
+    {
+        return new BulkUpdateBuilder<T>(connectionContext);
+    }
+
+    public static BulkDeleteBuilder<T> CreateBulkDeleteBuilder<T>(this ConnectionContext connectionContext)
+    {
+        return new BulkDeleteBuilder<T>(connectionContext);
+    }
+
+    public static BulkMergeBuilder<T> CreateBulkMergeBuilder<T>(this ConnectionContext connectionContext)
+    {
+        return new BulkMergeBuilder<T>(connectionContext);
+    }
+
+    public static BulkMatchBuilder<T> CreateBulkMatchBuilder<T>(this ConnectionContext connectionContext)
+    {
+        return new BulkMatchBuilder<T>(connectionContext);
+    }
+
+    public static TempTableBuilder<T> CreateTempTableBuilder<T>(this ConnectionContext connectionContext)
+    {
+        return new TempTableBuilder<T>(connectionContext);
     }
 }

@@ -1,4 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EntityFrameworkCore.MySql.SimpleBulks.BulkDelete;
+using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
+using EntityFrameworkCore.MySql.SimpleBulks.BulkMatch;
+using EntityFrameworkCore.MySql.SimpleBulks.BulkMerge;
+using EntityFrameworkCore.MySql.SimpleBulks.BulkUpdate;
+using EntityFrameworkCore.MySql.SimpleBulks.TempTable;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -221,5 +227,35 @@ public static class DbContextExtensions
             && property.ValueGenerated == ValueGenerated.OnAddOrUpdate
             && property.ClrType == typeof(byte[])
             && string.Equals(property.GetColumnType(), "timestamp(6)", StringComparison.OrdinalIgnoreCase);
+    }
+
+    public static BulkInsertBuilder<T> CreateBulkInsertBuilder<T>(this DbContext dbContext)
+    {
+        return new BulkInsertBuilder<T>(dbContext.GetConnectionContext());
+    }
+
+    public static BulkUpdateBuilder<T> CreateBulkUpdateBuilder<T>(this DbContext dbContext)
+    {
+        return new BulkUpdateBuilder<T>(dbContext.GetConnectionContext());
+    }
+
+    public static BulkDeleteBuilder<T> CreateBulkDeleteBuilder<T>(this DbContext dbContext)
+    {
+        return new BulkDeleteBuilder<T>(dbContext.GetConnectionContext());
+    }
+
+    public static BulkMergeBuilder<T> CreateBulkMergeBuilder<T>(this DbContext dbContext)
+    {
+        return new BulkMergeBuilder<T>(dbContext.GetConnectionContext());
+    }
+
+    public static BulkMatchBuilder<T> CreateBulkMatchBuilder<T>(this DbContext dbContext)
+    {
+        return new BulkMatchBuilder<T>(dbContext.GetConnectionContext());
+    }
+
+    public static TempTableBuilder<T> CreateTempTableBuilder<T>(this DbContext dbContext)
+    {
+        return new TempTableBuilder<T>(dbContext.GetConnectionContext());
     }
 }
