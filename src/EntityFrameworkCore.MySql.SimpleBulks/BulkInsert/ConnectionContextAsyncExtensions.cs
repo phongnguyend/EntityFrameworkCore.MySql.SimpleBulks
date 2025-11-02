@@ -9,39 +9,21 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 
 public static class ConnectionContextAsyncExtensions
 {
-    public static Task BulkInsertAsync<T>(this ConnectionContext connectionContext, IEnumerable<T> data, Expression<Func<T, object>> columnNamesSelector, BulkInsertOptions options = null, CancellationToken cancellationToken = default)
+    public static Task BulkInsertAsync<T>(this ConnectionContext connectionContext, IEnumerable<T> data, Expression<Func<T, object>> columnNamesSelector, MySqlTableInfor table = null, BulkInsertOptions options = null, CancellationToken cancellationToken = default)
     {
         return connectionContext.CreateBulkInsertBuilder<T>()
    .WithColumns(columnNamesSelector)
-    .ToTable(TableMapper.Resolve<T>())
+    .ToTable(table ?? TableMapper.Resolve<T>())
      .WithBulkOptions(options)
 .ExecuteAsync(data, cancellationToken);
     }
 
-    public static Task BulkInsertAsync<T>(this ConnectionContext connectionContext, IEnumerable<T> data, IEnumerable<string> columnNames, BulkInsertOptions options = null, CancellationToken cancellationToken = default)
+    public static Task BulkInsertAsync<T>(this ConnectionContext connectionContext, IEnumerable<T> data, IEnumerable<string> columnNames, MySqlTableInfor table = null, BulkInsertOptions options = null, CancellationToken cancellationToken = default)
     {
         return connectionContext.CreateBulkInsertBuilder<T>()
         .WithColumns(columnNames)
-       .ToTable(TableMapper.Resolve<T>())
+       .ToTable(table ?? TableMapper.Resolve<T>())
            .WithBulkOptions(options)
          .ExecuteAsync(data, cancellationToken);
-    }
-
-    public static Task BulkInsertAsync<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, Expression<Func<T, object>> columnNamesSelector, BulkInsertOptions options = null, CancellationToken cancellationToken = default)
-    {
-        return connectionContext.CreateBulkInsertBuilder<T>()
-             .WithColumns(columnNamesSelector)
-          .ToTable(table)
-        .WithBulkOptions(options)
-           .ExecuteAsync(data, cancellationToken);
-    }
-
-    public static Task BulkInsertAsync<T>(this ConnectionContext connectionContext, IEnumerable<T> data, TableInfor table, IEnumerable<string> columnNames, BulkInsertOptions options = null, CancellationToken cancellationToken = default)
-    {
-        return connectionContext.CreateBulkInsertBuilder<T>()
-      .WithColumns(columnNames)
-    .ToTable(table)
-       .WithBulkOptions(options)
-    .ExecuteAsync(data, cancellationToken);
     }
 }

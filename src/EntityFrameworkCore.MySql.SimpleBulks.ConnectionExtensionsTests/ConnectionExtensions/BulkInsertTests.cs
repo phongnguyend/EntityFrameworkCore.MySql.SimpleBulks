@@ -61,21 +61,23 @@ public class BulkInsertTests : BaseTest
             {
                 connectionContext.BulkInsert(rows,
                     row => new { row.Column1, row.Column2, row.Column3, row.BulkId, row.BulkIndex },
-                    options);
+                    options: options);
 
                 connectionContext.BulkInsert(compositeKeyRows,
                     row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 },
-                    options);
+                    options: options);
             }
             else
             {
-                connectionContext.BulkInsert(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                connectionContext.BulkInsert(rows, 
                     row => new { row.Column1, row.Column2, row.Column3, row.BulkId, row.BulkIndex },
-                    options);
+                    new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                    options: options);
 
-                connectionContext.BulkInsert(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                connectionContext.BulkInsert(compositeKeyRows, 
                     row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 },
-                    options);
+                    new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                    options: options);
             }
 
         }
@@ -85,21 +87,23 @@ public class BulkInsertTests : BaseTest
             {
                 connectionContext.BulkInsert(rows,
                     ["Column1", "Column2", "Column3", "BulkId", "BulkIndex"],
-                    options);
+                    options: options);
 
                 connectionContext.BulkInsert(compositeKeyRows,
                     ["Id1", "Id2", "Column1", "Column2", "Column3"],
-                    options);
+                    options: options);
             }
             else
             {
-                connectionContext.BulkInsert(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                connectionContext.BulkInsert(rows,
                     ["Column1", "Column2", "Column3", "BulkId", "BulkIndex"],
-                    options);
+                    new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                    options: options);
 
-                connectionContext.BulkInsert(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                connectionContext.BulkInsert(compositeKeyRows, 
                     ["Id1", "Id2", "Column1", "Column2", "Column3"],
-                    options);
+                    new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                    options: options);
             }
 
         }

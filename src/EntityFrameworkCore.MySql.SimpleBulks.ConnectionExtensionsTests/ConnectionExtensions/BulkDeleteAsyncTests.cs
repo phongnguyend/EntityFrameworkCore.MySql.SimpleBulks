@@ -63,26 +63,26 @@ public class BulkDeleteAsyncTests : BaseTest
         {
             if (omitTableName)
             {
-                await connectionContext.BulkDeleteAsync(rows, row => row.Id, options);
-                await connectionContext.BulkDeleteAsync(compositeKeyRows, row => new { row.Id1, row.Id2 }, options);
+                await connectionContext.BulkDeleteAsync(rows, row => row.Id, options: options);
+                await connectionContext.BulkDeleteAsync(compositeKeyRows, row => new { row.Id1, row.Id2 }, options: options);
             }
             else
             {
-                await connectionContext.BulkDeleteAsync(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")), row => row.Id, options);
-                await connectionContext.BulkDeleteAsync(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")), row => new { row.Id1, row.Id2 }, options);
+                await connectionContext.BulkDeleteAsync(rows, row => row.Id, new MySqlTableInfor(GetTableName("SingleKeyRows")), options: options);
+                await connectionContext.BulkDeleteAsync(compositeKeyRows, row => new { row.Id1, row.Id2 }, new MySqlTableInfor(GetTableName("CompositeKeyRows")), options: options);
             }
         }
         else
         {
             if (omitTableName)
             {
-                await connectionContext.BulkDeleteAsync(rows, ["Id"], options);
-                await connectionContext.BulkDeleteAsync(compositeKeyRows, ["Id1", "Id2"], options);
+                await connectionContext.BulkDeleteAsync(rows, ["Id"], options: options);
+                await connectionContext.BulkDeleteAsync(compositeKeyRows, ["Id1", "Id2"], options: options);
             }
             else
             {
-                await connectionContext.BulkDeleteAsync(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")), ["Id"], options);
-                await connectionContext.BulkDeleteAsync(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")), ["Id1", "Id2"], options);
+                await connectionContext.BulkDeleteAsync(rows, ["Id"], new MySqlTableInfor(GetTableName("SingleKeyRows")), options: options);
+                await connectionContext.BulkDeleteAsync(compositeKeyRows, ["Id1", "Id2"], new MySqlTableInfor(GetTableName("CompositeKeyRows")), options: options);
             }
         }
 

@@ -90,24 +90,26 @@ public class BulkUpdateAsyncTests : BaseTest
                 await connectionContext.BulkUpdateAsync(rows,
                     row => row.Id,
                     row => new { row.Column3, row.Column2 },
-                    updateOptions);
+                    options: updateOptions);
 
                 await connectionContext.BulkUpdateAsync(compositeKeyRows,
                     row => new { row.Id1, row.Id2 },
                     row => new { row.Column3, row.Column2 },
-                    updateOptions);
+                    options: updateOptions);
             }
             else
             {
-                await connectionContext.BulkUpdateAsync(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                await connectionContext.BulkUpdateAsync(rows,
                     row => row.Id,
                     row => new { row.Column3, row.Column2 },
-                    updateOptions);
+                    new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                    options: updateOptions);
 
-                await connectionContext.BulkUpdateAsync(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                await connectionContext.BulkUpdateAsync(compositeKeyRows,
                     row => new { row.Id1, row.Id2 },
                     row => new { row.Column3, row.Column2 },
-                    updateOptions);
+                    new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                    options: updateOptions);
             }
 
             var newIndex = rows.Max(x => x.Id) + 1;
@@ -140,27 +142,29 @@ public class BulkUpdateAsyncTests : BaseTest
                     row => row.Id,
                     row => new { row.Column1, row.Column2 },
                     row => new { row.Column1, row.Column2, row.Column3, row.BulkId },
-                    mergeOptions);
+                    options: mergeOptions);
 
                 await connectionContext.BulkMergeAsync(compositeKeyRows,
                     row => new { row.Id1, row.Id2 },
                     row => new { row.Column1, row.Column2, row.Column3 },
                     row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 },
-                    mergeOptions);
+                    options: mergeOptions);
             }
             else
             {
-                await connectionContext.BulkMergeAsync(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                await connectionContext.BulkMergeAsync(rows,
                     row => row.Id,
                     row => new { row.Column1, row.Column2 },
                     row => new { row.Column1, row.Column2, row.Column3, row.BulkId },
-                    mergeOptions);
+                    new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                    options: mergeOptions);
 
-                await connectionContext.BulkMergeAsync(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                await connectionContext.BulkMergeAsync(compositeKeyRows,
                     row => new { row.Id1, row.Id2 },
                     row => new { row.Column1, row.Column2, row.Column3 },
                     row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 },
-                    mergeOptions);
+                    new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                    options: mergeOptions);
             }
 
             rows.First(x => x.BulkId == bulkId).Id = _context.SingleKeyRows.Where(x => x.BulkId == bulkId).Select(x => x.Id).FirstOrDefault();
@@ -173,24 +177,26 @@ public class BulkUpdateAsyncTests : BaseTest
                 await connectionContext.BulkUpdateAsync(rows,
                     ["Id"],
                     ["Column3", "Column2"],
-                    updateOptions);
+                    options: updateOptions);
 
                 await connectionContext.BulkUpdateAsync(compositeKeyRows,
                     ["Id1", "Id2"],
                     ["Column3", "Column2"],
-                    updateOptions);
+                    options: updateOptions);
             }
             else
             {
-                await connectionContext.BulkUpdateAsync(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                await connectionContext.BulkUpdateAsync(rows,
                     ["Id"],
                     ["Column3", "Column2"],
-                    updateOptions);
+                    new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                    options: updateOptions);
 
-                await connectionContext.BulkUpdateAsync(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                await connectionContext.BulkUpdateAsync(compositeKeyRows,
                     ["Id1", "Id2"],
                     ["Column3", "Column2"],
-                    updateOptions);
+                    new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                    options: updateOptions);
             }
 
             var newIndex = rows.Max(x => x.Id) + 1;
@@ -223,27 +229,29 @@ public class BulkUpdateAsyncTests : BaseTest
                     ["Id"],
                     ["Column1", "Column2"],
                     ["Column1", "Column2", "Column3", "BulkId"],
-                    mergeOptions);
+                    options: mergeOptions);
 
                 await connectionContext.BulkMergeAsync(compositeKeyRows,
                     ["Id1", "Id2"],
                     ["Column1", "Column2", "Column3"],
                     ["Id1", "Id2", "Column1", "Column2", "Column3"],
-                    mergeOptions);
+                    options: mergeOptions);
             }
             else
             {
-                await connectionContext.BulkMergeAsync(rows, new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                await connectionContext.BulkMergeAsync(rows,
                     ["Id"],
                     ["Column1", "Column2"],
                     ["Column1", "Column2", "Column3", "BulkId"],
-                    mergeOptions);
+                    new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                    options: mergeOptions);
 
-                await connectionContext.BulkMergeAsync(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                await connectionContext.BulkMergeAsync(compositeKeyRows,
                     ["Id1", "Id2"],
                     ["Column1", "Column2", "Column3"],
                     ["Id1", "Id2", "Column1", "Column2", "Column3"],
-                    mergeOptions);
+                    new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                    options: mergeOptions);
             }
 
             rows.First(x => x.BulkId == bulkId).Id = _context.SingleKeyRows.Where(x => x.BulkId == bulkId).Select(x => x.Id).FirstOrDefault();
