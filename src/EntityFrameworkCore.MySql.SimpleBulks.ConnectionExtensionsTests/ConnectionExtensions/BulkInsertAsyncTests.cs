@@ -11,8 +11,8 @@ public class BulkInsertAsyncTests : BaseTest
 {
     public BulkInsertAsyncTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkInsert")
     {
-        TableMapper.Register(typeof(SingleKeyRow<int>), new MySqlTableInfor(GetTableName("SingleKeyRows")));
-        TableMapper.Register(typeof(CompositeKeyRow<int, int>), new MySqlTableInfor(GetTableName("CompositeKeyRows")));
+        TableMapper.Register<SingleKeyRow<int>>(new MySqlTableInfor(GetTableName("SingleKeyRows")));
+        TableMapper.Register<CompositeKeyRow<int, int>>(new MySqlTableInfor(GetTableName("CompositeKeyRows")));
     }
 
     [Theory]
