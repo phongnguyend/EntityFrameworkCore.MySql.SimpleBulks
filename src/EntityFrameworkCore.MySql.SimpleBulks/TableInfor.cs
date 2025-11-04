@@ -35,6 +35,17 @@ public abstract class TableInfor
     public TableInfor(string tableName) : this(null, tableName, null)
     {
     }
+
+    public string GetDbColumnName(string propertyName)
+    {
+        if (ColumnNameMappings == null)
+        {
+            return propertyName;
+        }
+
+        return ColumnNameMappings.TryGetValue(propertyName, out string value) ? value : propertyName;
+    }
+
     public abstract List<MySqlParameter> CreateMySqlParameters<T>(MySqlCommand command, T data, IEnumerable<string> propertyNames);
 }
 

@@ -85,16 +85,6 @@ public class BulkMergeBuilder<T>
         return this;
     }
 
-    private string GetDbColumnName(string columnName)
-    {
-        if (_table.ColumnNameMappings == null)
-        {
-            return columnName;
-        }
-
-        return _table.ColumnNameMappings.TryGetValue(columnName, out string value) ? value : columnName;
-    }
-
     public BulkMergeResult Execute(IEnumerable<T> data)
     {
         if (data.Count() == 1)
@@ -122,12 +112,12 @@ public class BulkMergeBuilder<T>
               {
                   string collation = !string.IsNullOrEmpty(_options.Collation) && dataTable.Columns[x].DataType == typeof(string) ?
                  $" collate {_options.Collation}" : string.Empty;
-                  return $"s.`{x}`{collation} = t.`{GetDbColumnName(x)}`{collation}";
+                  return $"s.`{x}`{collation} = t.`{_table.GetDbColumnName(x)}`{collation}";
               }));
 
         var whereCondition = string.Join(" and ", _idColumns.Select(x =>
         {
-            return $"t.`{GetDbColumnName(x)}` IS NULL";
+            return $"t.`{_table.GetDbColumnName(x)}` IS NULL";
         }));
 
         var insertStatementBuilder = new StringBuilder();
@@ -141,7 +131,7 @@ public class BulkMergeBuilder<T>
 
         if (_insertColumnNames.Any())
         {
-            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{GetDbColumnName(x)}`"))})");
+            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{_table.GetDbColumnName(x)}`"))})");
             insertStatementBuilder.AppendLine($"SELECT {string.Join(", ", _insertColumnNames.Select(x => $"s.`{x}`"))}");
             insertStatementBuilder.AppendLine($"FROM {temptableName} s");
             insertStatementBuilder.AppendLine($"LEFT JOIN {_table.SchemaQualifiedTableName} t ON {joinCondition}");
@@ -205,7 +195,7 @@ public class BulkMergeBuilder<T>
             sqlOperator = "+=";
         }
 
-        return $"{leftTable}.`{GetDbColumnName(sqlProp)}` {sqlOperator} {rightTable}.`{sqlProp}`";
+        return $"{leftTable}.`{_table.GetDbColumnName(sqlProp)}` {sqlOperator} {rightTable}.`{sqlProp}`";
     }
 
     private string CreateSetStatement(string prop)
@@ -218,7 +208,7 @@ public class BulkMergeBuilder<T>
             sqlOperator = "+=";
         }
 
-        return $"`{GetDbColumnName(sqlProp)}` {sqlOperator} @{sqlProp}";
+        return $"`{_table.GetDbColumnName(sqlProp)}` {sqlOperator} @{sqlProp}";
     }
 
     private static string RemoveOperator(string prop)
@@ -259,12 +249,12 @@ public class BulkMergeBuilder<T>
         {
             string collation = !string.IsNullOrEmpty(_options.Collation) && dataTable.Columns[x].DataType == typeof(string) ?
            $" collate {_options.Collation}" : string.Empty;
-            return $"s.`{x}`{collation} = t.`{GetDbColumnName(x)}`{collation}";
+            return $"s.`{x}`{collation} = t.`{_table.GetDbColumnName(x)}`{collation}";
         }));
 
         var whereCondition = string.Join(" and ", _idColumns.Select(x =>
         {
-            return $"t.`{GetDbColumnName(x)}` IS NULL";
+            return $"t.`{_table.GetDbColumnName(x)}` IS NULL";
         }));
 
         var insertStatementBuilder = new StringBuilder();
@@ -278,7 +268,7 @@ public class BulkMergeBuilder<T>
 
         if (_insertColumnNames.Any())
         {
-            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{GetDbColumnName(x)}`"))})");
+            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{_table.GetDbColumnName(x)}`"))})");
             insertStatementBuilder.AppendLine($"SELECT {string.Join(", ", _insertColumnNames.Select(x => $"s.`{x}`"))}");
             insertStatementBuilder.AppendLine($"FROM {temptableName} s");
             insertStatementBuilder.AppendLine($"LEFT JOIN {_table.SchemaQualifiedTableName} t ON {joinCondition}");
@@ -361,7 +351,7 @@ public class BulkMergeBuilder<T>
                     return CreateSetStatement(x);
                 }));
 
-            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{GetDbColumnName(x)}`"))})");
+            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{_table.GetDbColumnName(x)}`"))})");
             insertStatementBuilder.AppendLine($"SELECT {string.Join(", ", _insertColumnNames.Select(x => $"@{x}"))}");
             insertStatementBuilder.AppendLine($"WHERE NOT EXISTS ({whereCondition});");
         }
@@ -437,7 +427,7 @@ public class BulkMergeBuilder<T>
                 return CreateSetStatement(x);
             }));
 
-            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{GetDbColumnName(x)}`"))})");
+            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{_table.GetDbColumnName(x)}`"))})");
             insertStatementBuilder.AppendLine($"SELECT {string.Join(", ", _insertColumnNames.Select(x => $"@{x}"))}");
             insertStatementBuilder.AppendLine($"WHERE NOT EXISTS ({whereCondition});");
         }
