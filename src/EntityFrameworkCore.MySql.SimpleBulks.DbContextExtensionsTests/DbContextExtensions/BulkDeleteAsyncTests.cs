@@ -58,17 +58,14 @@ public class BulkDeleteAsyncTests : BaseTest
         var rows = _context.SingleKeyRows.AsNoTracking().Take(length).ToList();
         var compositeKeyRows = _context.CompositeKeyRows.AsNoTracking().Take(length).ToList();
 
-        var deleteResult1 = await _context.BulkDeleteAsync(rows,
-                    new BulkDeleteOptions
-                    {
-                        LogTo = _output.WriteLine
-                    });
+        var options = new BulkDeleteOptions
+        {
+            LogTo = _output.WriteLine
+        };
 
-        var deleteResult2 = await _context.BulkDeleteAsync(compositeKeyRows,
-   new BulkDeleteOptions
-   {
-       LogTo = _output.WriteLine
-   });
+        var deleteResult1 = await _context.BulkDeleteAsync(rows, options);
+
+        var deleteResult2 = await _context.BulkDeleteAsync(compositeKeyRows, options);
 
         tran.Commit();
 

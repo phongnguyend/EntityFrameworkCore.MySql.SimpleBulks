@@ -48,12 +48,14 @@ public class BulkInsertTests : BaseTest
             });
         }
 
+        var options = new BulkInsertOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         _context.BulkInsert(rows,
                 row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString, row.BulkId, row.BulkIndex },
-                new BulkInsertOptions
-                {
-                    LogTo = _output.WriteLine
-                });
+                options);
 
         var ids = _context.SingleKeyRows.Where(x => x.BulkId == bulkId).ToDictionary(x => x.BulkIndex!.Value, x => x.Id);
 
@@ -64,10 +66,7 @@ public class BulkInsertTests : BaseTest
 
         _context.BulkInsert(compositeKeyRows,
                 row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-                new BulkInsertOptions
-                {
-                    LogTo = _output.WriteLine
-                });
+                options);
 
 
         // Assert
@@ -130,12 +129,14 @@ public class BulkInsertTests : BaseTest
             });
         }
 
+        var options = new BulkInsertOptions
+        {
+            LogTo = _output.WriteLine
+        };
+
         _context.BulkInsert(rows,
                 row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString, row.BulkId, row.BulkIndex },
-                new BulkInsertOptions
-                {
-                    LogTo = _output.WriteLine
-                });
+                options);
 
         var ids = _context.SingleKeyRows.Where(x => x.BulkId == bulkId).ToDictionary(x => x.BulkIndex!.Value, x => x.Id);
 
@@ -146,10 +147,7 @@ public class BulkInsertTests : BaseTest
 
         _context.BulkInsert(compositeKeyRows,
                 row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
-                new BulkInsertOptions
-                {
-                    LogTo = _output.WriteLine
-                });
+                options);
 
         tran.Commit();
 
