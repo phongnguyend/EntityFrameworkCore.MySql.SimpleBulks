@@ -22,6 +22,7 @@ or you can use **ConnectionContextExtensions.cs** to work directly with a **MySq
 - Direct Insert
 - Direct Update
 - Direct Delete
+- Upsert
 
 ## Examples
 [EntityFrameworkCore.MySql.SimpleBulks.Demo](/src/EntityFrameworkCore.MySql.SimpleBulks.Demo/Program.cs)
