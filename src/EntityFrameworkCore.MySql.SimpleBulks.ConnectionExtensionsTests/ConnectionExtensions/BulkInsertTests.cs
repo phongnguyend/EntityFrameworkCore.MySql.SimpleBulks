@@ -16,24 +16,29 @@ public class BulkInsertTests : BaseTest
     }
 
     [Theory]
-    [InlineData(true, true)]
-    [InlineData(true, false)]
-    [InlineData(false, true)]
-    [InlineData(false, false)]
-    public void Bulk_Insert_Without_Transaction(bool useLinq, bool omitTableName)
+    [InlineData(1, true, true)]
+    [InlineData(1, true, false)]
+    [InlineData(1, false, true)]
+    [InlineData(1, false, false)]
+    [InlineData(100, true, true)]
+    [InlineData(100, true, false)]
+    [InlineData(100, false, true)]
+    [InlineData(100, false, false)]
+    public void Bulk_Insert_Without_Transaction(int length, bool useLinq, bool omitTableName)
     {
         var rows = new List<SingleKeyRow<int>>();
         var compositeKeyRows = new List<CompositeKeyRow<int, int>>();
 
         var bulkId = SequentialGuidGenerator.Next();
 
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < length; i++)
         {
             rows.Add(new SingleKeyRow<int>
             {
                 Column1 = i,
                 Column2 = "" + i,
                 Column3 = DateTime.Now,
+                Season = Season.Autumn,
                 BulkId = bulkId,
                 BulkIndex = i
             });
@@ -44,7 +49,8 @@ public class BulkInsertTests : BaseTest
                 Id2 = i,
                 Column1 = i,
                 Column2 = "" + i,
-                Column3 = DateTime.Now
+                Column3 = DateTime.Now,
+                Season = Season.Autumn,
             });
         }
 
@@ -60,7 +66,26 @@ public class BulkInsertTests : BaseTest
             if (omitTableName)
             {
                 connectionContext.BulkInsert(rows,
-                    row => new { row.Column1, row.Column2, row.Column3, row.BulkId, row.BulkIndex },
+                    row => new
+                    {
+                        row.Column1,
+                        row.Column2,
+                        row.Column3,
+                        row.Season,
+                        row.NullableBool,
+                        row.NullableDateTime,
+                        row.NullableDateTimeOffset,
+                        row.NullableDecimal,
+                        row.NullableDouble,
+                        row.NullableGuid,
+                        row.NullableShort,
+                        row.NullableInt,
+                        row.NullableLong,
+                        row.NullableFloat,
+                        row.NullableString,
+                        row.BulkId,
+                        row.BulkIndex
+                    },
                     options: options);
 
                 connectionContext.BulkInsert(compositeKeyRows,
@@ -69,12 +94,31 @@ public class BulkInsertTests : BaseTest
             }
             else
             {
-                connectionContext.BulkInsert(rows, 
-                    row => new { row.Column1, row.Column2, row.Column3, row.BulkId, row.BulkIndex },
+                connectionContext.BulkInsert(rows,
+                    row => new
+                    {
+                        row.Column1,
+                        row.Column2,
+                        row.Column3,
+                        row.Season,
+                        row.NullableBool,
+                        row.NullableDateTime,
+                        row.NullableDateTimeOffset,
+                        row.NullableDecimal,
+                        row.NullableDouble,
+                        row.NullableGuid,
+                        row.NullableShort,
+                        row.NullableInt,
+                        row.NullableLong,
+                        row.NullableFloat,
+                        row.NullableString,
+                        row.BulkId,
+                        row.BulkIndex
+                    },
                     new MySqlTableInfor(GetTableName("SingleKeyRows")),
                     options: options);
 
-                connectionContext.BulkInsert(compositeKeyRows, 
+                connectionContext.BulkInsert(compositeKeyRows,
                     row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 },
                     new MySqlTableInfor(GetTableName("CompositeKeyRows")),
                     options: options);
@@ -100,7 +144,7 @@ public class BulkInsertTests : BaseTest
                     new MySqlTableInfor(GetTableName("SingleKeyRows")),
                     options: options);
 
-                connectionContext.BulkInsert(compositeKeyRows, 
+                connectionContext.BulkInsert(compositeKeyRows,
                     ["Id1", "Id2", "Column1", "Column2", "Column3"],
                     new MySqlTableInfor(GetTableName("CompositeKeyRows")),
                     options: options);
@@ -120,7 +164,7 @@ public class BulkInsertTests : BaseTest
         var dbRows = _context.SingleKeyRows.AsNoTracking().ToList();
         var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
 
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < length; i++)
         {
             Assert.Equal(rows[i].Id, dbRows[i].Id);
             Assert.Equal(rows[i].Column1, dbRows[i].Column1);

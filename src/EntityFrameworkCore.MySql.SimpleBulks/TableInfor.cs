@@ -5,8 +5,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks;
 
@@ -88,23 +88,19 @@ public class DbContextTableInfor : TableInfor
 
     public override List<MySqlParameter> CreateMySqlParameters<T>(MySqlCommand command, T data, IEnumerable<string> propertyNames)
     {
-        var properties = TypeDescriptor.GetProperties(typeof(T));
-
-        var updatablePros = new List<PropertyDescriptor>();
-        foreach (PropertyDescriptor prop in properties)
-        {
-            if (propertyNames.Contains(prop.Name))
-            {
-                updatablePros.Add(prop);
-            }
-        }
+        var properties = typeof(T).GetProperties();
 
         var parameters = new List<MySqlParameter>();
 
         var mappingSource = _dbContext.GetService<IRelationalTypeMappingSource>();
 
-        foreach (PropertyDescriptor prop in updatablePros)
+        foreach (var prop in properties)
         {
+            if (!propertyNames.Contains(prop.Name))
+            {
+                continue;
+            }
+
             if (ColumnTypeMappings != null && ColumnTypeMappings.TryGetValue(prop.Name, out var columnType))
             {
                 var mapping = mappingSource.FindMapping(columnType);
@@ -117,7 +113,7 @@ public class DbContextTableInfor : TableInfor
 
     }
 
-    private object GetProviderValue<T>(PropertyDescriptor property, T item)
+    private object GetProviderValue<T>(PropertyInfo property, T item)
     {
         if (ValueConverters != null && ValueConverters.TryGetValue(property.Name, out var converter))
         {
@@ -136,21 +132,17 @@ public class MySqlTableInfor : TableInfor
 
     public override List<MySqlParameter> CreateMySqlParameters<T>(MySqlCommand command, T data, IEnumerable<string> propertyNames)
     {
-        var properties = TypeDescriptor.GetProperties(typeof(T));
-
-        var updatablePros = new List<PropertyDescriptor>();
-        foreach (PropertyDescriptor prop in properties)
-        {
-            if (propertyNames.Contains(prop.Name))
-            {
-                updatablePros.Add(prop);
-            }
-        }
+        var properties = typeof(T).GetProperties();
 
         var parameters = new List<MySqlParameter>();
 
-        foreach (PropertyDescriptor prop in updatablePros)
+        foreach (var prop in properties)
         {
+            if (!propertyNames.Contains(prop.Name))
+            {
+                continue;
+            }
+
             var type = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
 
             var para = new MySqlParameter($"@{prop.Name}", prop.GetValue(data) ?? DBNull.Value);
