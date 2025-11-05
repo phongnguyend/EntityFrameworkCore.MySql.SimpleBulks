@@ -1,4 +1,4 @@
-﻿namespace EntityFrameworkCore.MySql.SimpleBulks.Demo.Entities;
+﻿namespace DbContextExtensionsExamples.Entities;
 
 public enum Season
 {

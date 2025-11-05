@@ -3,7 +3,8 @@
     <Project Path="EntityFrameworkCore.MySql.SimpleBulks.Benchmarks/EntityFrameworkCore.MySql.SimpleBulks.Benchmarks.csproj" />
   </Folder>
   <Folder Name="/examples/">
-    <Project Path="EntityFrameworkCore.MySql.SimpleBulks.Demo/EntityFrameworkCore.MySql.SimpleBulks.Demo.csproj" />
+    <Project Path="ConnectionExtensionsExamples/ConnectionExtensionsExamples.csproj" Id="d6d046c8-8b1e-416c-aef5-3a1b8d6bca0f" />
+    <Project Path="DbContextExtensionsExamples/DbContextExtensionsExamples.csproj" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="EntityFrameworkCore.MySql.SimpleBulks/EntityFrameworkCore.MySql.SimpleBulks.csproj" />

@@ -25,10 +25,17 @@ or you can use **ConnectionContextExtensions.cs** to work directly with a **MySq
 - Upsert
 
 ## Examples
-[EntityFrameworkCore.MySql.SimpleBulks.Demo](/src/EntityFrameworkCore.MySql.SimpleBulks.Demo/Program.cs)
+[DbContextExtensionsExamples](/src/DbContextExtensionsExamples/Program.cs)
 - Update the connection string:
   ```c#
-  private const string _connectionString = "server=localhost;database=SimpleBulks;user=root;password=mysql;AllowLoadLocalInfile=true";
+  const string connectionString = "server=localhost;database=DbContextExtensionsExamples;user=root;password=mysql;AllowLoadLocalInfile=true";
+  ```
+- Build and run.
+
+[ConnectionExtensionsExamples](/src/ConnectionExtensionsExamples/Program.cs)
+- Update the connection string:
+  ```c#
+  const string connectionString = "server=localhost;database=ConnectionExtensionsExamples;user=root;password=mysql;AllowLoadLocalInfile=true";
   ```
 - Build and run.
 

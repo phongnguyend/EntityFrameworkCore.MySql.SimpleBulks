@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EntityFrameworkCore.MySql.SimpleBulks.Demo.Entities;
+namespace ConnectionExtensionsExamples.Entities;
 
 public class Row
 {
