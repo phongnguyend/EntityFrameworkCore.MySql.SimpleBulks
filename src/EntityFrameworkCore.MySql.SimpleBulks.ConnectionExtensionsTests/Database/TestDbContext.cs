@@ -50,6 +50,8 @@ public class TestDbContext : DbContext
 
         modelBuilder.Entity<CompositeKeyRow<int, int>>().HasKey(x => new { x.Id1, x.Id2 });
 
+        modelBuilder.Entity<ConfigurationEntry>();
+
         base.OnModelCreating(modelBuilder);
     }
 }
