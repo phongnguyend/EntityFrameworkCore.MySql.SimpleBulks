@@ -14,8 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-const string connectionString = "server=localhost;database=ConnectionExtensionsExamples;user=root;password=mysql;AllowLoadLocalInfile=true";
-
 TableMapper.Register<ConfigurationEntry>(new MySqlTableInfor("ConfigurationEntries"));
 
 var existingConfigurationEntries = new List<ConfigurationEntry>();
@@ -29,7 +27,7 @@ using (var dbct = new DemoDbContext())
     existingConfigurationEntries = dbct.Set<ConfigurationEntry>().AsNoTracking().ToList();
 }
 
-var connection = new ConnectionContext(new MySqlConnection(connectionString), null);
+var connection = new ConnectionContext(new MySqlConnection(ConnectionStrings.MySqlConnectionString), null);
 
 var deleteResult = await connection.BulkDeleteAsync(existingConfigurationEntries,
     x => x.Id,

@@ -7,7 +7,7 @@ namespace ConnectionExtensionsExamples;
 
 public class DemoDbContext : DbContext
 {
-    private const string _connectionString = "server=localhost;database=ConnectionExtensionsExamples;user=root;password=mysql;AllowLoadLocalInfile=true";
+    private string _connectionString = ConnectionStrings.MySqlConnectionString;
 
     public DbSet<Row> Rows { get; set; }
 

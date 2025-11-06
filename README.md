@@ -26,17 +26,11 @@ or you can use **ConnectionContextExtensions.cs** to work directly with a **MySq
 
 ## Examples
 [DbContextExtensionsExamples](/src/DbContextExtensionsExamples/Program.cs)
-- Update the connection string:
-  ```c#
-  const string connectionString = "server=localhost;database=DbContextExtensionsExamples;user=root;password=mysql;AllowLoadLocalInfile=true";
-  ```
+- Update the connection string ConnectionStrings.MySqlConnectionString.
 - Build and run.
 
 [ConnectionExtensionsExamples](/src/ConnectionExtensionsExamples/Program.cs)
-- Update the connection string:
-  ```c#
-  const string connectionString = "server=localhost;database=ConnectionExtensionsExamples;user=root;password=mysql;AllowLoadLocalInfile=true";
-  ```
+- Update the connection string ConnectionStrings.MySqlConnectionString.
 - Build and run.
 
 ## DbContextExtensions
