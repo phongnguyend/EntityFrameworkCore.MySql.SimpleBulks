@@ -51,12 +51,19 @@ public static class DbContextExtensions
 
             _schemaNameTranslators.TryGetValue(dbContext.GetType(), out var schemaNameTranslator);
 
+            var outputIdColumn = dbContext.GetOutputId(key.EntityType);
+
             var tableInfo = new DbContextTableInfor(schema, tableName, schemaNameTranslator, dbContext)
             {
                 PropertyTypes = dbContext.GetPropertyTypes(key.EntityType),
                 ColumnNameMappings = dbContext.GetColumnNames(key.EntityType),
                 ColumnTypeMappings = dbContext.GetColumnTypes(key.EntityType),
-                ValueConverters = dbContext.GetValueConverters(key.EntityType)
+                ValueConverters = dbContext.GetValueConverters(key.EntityType),
+                OutputId = outputIdColumn == null ? null : new OutputId
+                {
+                    Name = outputIdColumn.PropertyName,
+                    Mode = outputIdColumn.PropertyType == typeof(Guid) && string.IsNullOrEmpty(outputIdColumn.DefaultValueSql) ? OutputIdMode.ClientGenerated : OutputIdMode.ServerGenerated
+                }
             };
 
             return tableInfo;
