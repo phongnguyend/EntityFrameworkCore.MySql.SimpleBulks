@@ -25,11 +25,11 @@ or you can use **ConnectionContextExtensions.cs** to work directly with a **MySq
 - Upsert
 
 ## Examples
-[DbContextExtensionsExamples](/src/DbContextExtensionsExamples/Program.cs)
+[DbContextExtensionsExamples](/src/DbContextExtensionsExamples/)
 - Update the connection string ConnectionStrings.MySqlConnectionString.
 - Build and run.
 
-[ConnectionExtensionsExamples](/src/ConnectionExtensionsExamples/Program.cs)
+[ConnectionExtensionsExamples](/src/ConnectionExtensionsExamples/)
 - Update the connection string ConnectionStrings.MySqlConnectionString.
 - Build and run.
 
@@ -107,8 +107,8 @@ using EntityFrameworkCore.MySql.SimpleBulks.BulkMerge;
 using EntityFrameworkCore.MySql.SimpleBulks.BulkUpdate;
 
 // Register Type - Table Name globaly
-TableMapper.Register(typeof(Row), new MySqlTableInfor("Rows"));
-TableMapper.Register(typeof(CompositeKeyRow), new MySqlTableInfor("CompositeKeyRows"));
+TableMapper.Register<Row>(new MySqlTableInfor("Rows"));
+TableMapper.Register<CompositeKeyRow>(new MySqlTableInfor("CompositeKeyRows"));
 
 var connection = new ConnectionContext(new MySqlConnection(connectionString), null);
 
@@ -277,6 +277,18 @@ await _context.DirectUpdateAsync(row,
 ```c#
 await _context.DirectDeleteAsync(row,
     new BulkDeleteOptions
+    {
+        Timeout = 30,
+        LogTo = Console.WriteLine
+    });
+```
+### Upsert
+```c#
+await _context.UpsertAsync(row,
+    row => row.Id,
+    row => new { row.Column1, row.Column2 },
+    row => new { row.Column1, row.Column2, row.Column3 },
+    new BulkMergeOptions
     {
         Timeout = 30,
         LogTo = Console.WriteLine
