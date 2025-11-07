@@ -3,35 +3,35 @@ using System;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
-namespace EntityFrameworkCore.MySql.SimpleBulks.Extensions;
+namespace EntityFrameworkCore.MySql.SimpleBulks;
 
-public static class TypeExtensions
+public static class TypeMapper
 {
     private static readonly ConcurrentDictionary<Type, string> _mappings = new ConcurrentDictionary<Type, string>();
 
     private static readonly ConcurrentDictionary<string, MySqlDbType> _sqlTypeCache = new();
 
-    static TypeExtensions()
+    static TypeMapper()
     {
-        ConfigureMySqlTypeMapping<bool>("tinyint(1)");
-        ConfigureMySqlTypeMapping<DateTime>("datetime(6)");
-        ConfigureMySqlTypeMapping<DateTimeOffset>("datetime(6)");
-        ConfigureMySqlTypeMapping<decimal>("decimal(65,30)");
-        ConfigureMySqlTypeMapping<double>("double");
-        ConfigureMySqlTypeMapping<Guid>("char(36)");
-        ConfigureMySqlTypeMapping<short>("smallint");
-        ConfigureMySqlTypeMapping<int>("int");
-        ConfigureMySqlTypeMapping<long>("bigint");
-        ConfigureMySqlTypeMapping<float>("float");
-        ConfigureMySqlTypeMapping<string>("longtext");
+        ConfigureMySqlType<bool>("tinyint(1)");
+        ConfigureMySqlType<DateTime>("datetime(6)");
+        ConfigureMySqlType<DateTimeOffset>("datetime(6)");
+        ConfigureMySqlType<decimal>("decimal(65,30)");
+        ConfigureMySqlType<double>("double");
+        ConfigureMySqlType<Guid>("char(36)");
+        ConfigureMySqlType<short>("smallint");
+        ConfigureMySqlType<int>("int");
+        ConfigureMySqlType<long>("bigint");
+        ConfigureMySqlType<float>("float");
+        ConfigureMySqlType<string>("longtext");
     }
 
-    public static void ConfigureMySqlTypeMapping<T>(string mySqlType)
+    public static void ConfigureMySqlType<T>(string mySqlType)
     {
-        ConfigureMySqlTypeMapping(typeof(T), mySqlType);
+        ConfigureMySqlType(typeof(T), mySqlType);
     }
 
-    public static void ConfigureMySqlTypeMapping(Type type, string mySqlType)
+    public static void ConfigureMySqlType(Type type, string mySqlType)
     {
         _mappings[type] = mySqlType;
     }
@@ -43,7 +43,7 @@ public static class TypeExtensions
             return "int";
         }
 
-        var sqlType = _mappings.TryGetValue(type, out string value) ? value : "longtext";
+        var sqlType = _mappings.TryGetValue(type, out var value) ? value : "longtext";
         return sqlType;
     }
 
