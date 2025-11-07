@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -149,9 +150,13 @@ public class MySqlTableInfor : TableInfor
 
             var para = new MySqlParameter($"@{prop.Name}", prop.GetValue(data) ?? DBNull.Value);
 
-            if (type == typeof(DateTime))
+            if (ColumnTypeMappings != null && ColumnTypeMappings.TryGetValue(prop.Name, out var columnType))
             {
-                para.DbType = System.Data.DbType.DateTime2;
+                para.MySqlDbType = columnType.ToMySqlDbType();
+            }
+            else
+            {
+                para.MySqlDbType = type.ToMySqlDbType().ToMySqlDbType();
             }
 
             parameters.Add(para);
