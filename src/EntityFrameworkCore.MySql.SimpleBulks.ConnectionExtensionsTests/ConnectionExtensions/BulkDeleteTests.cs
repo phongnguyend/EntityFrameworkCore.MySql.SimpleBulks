@@ -11,9 +11,6 @@ public class BulkDeleteTests : BaseTest
 {
     public BulkDeleteTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkDelete")
     {
-        TableMapper.Register<SingleKeyRow<int>>(new MySqlTableInfor(GetTableName("SingleKeyRows")));
-        TableMapper.Register<CompositeKeyRow<int, int>>(new MySqlTableInfor(GetTableName("CompositeKeyRows")));
-
         var rows = new List<SingleKeyRow<int>>();
         var compositeKeyRows = new List<CompositeKeyRow<int, int>>();
 

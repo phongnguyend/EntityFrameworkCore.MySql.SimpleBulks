@@ -13,9 +13,6 @@ public class BulkUpdateAsyncTests : BaseTest
 {
     public BulkUpdateAsyncTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkUpdate")
     {
-        TableMapper.Register<SingleKeyRow<int>>(new MySqlTableInfor(GetTableName("SingleKeyRows")));
-        TableMapper.Register<CompositeKeyRow<int, int>>(new MySqlTableInfor(GetTableName("CompositeKeyRows")));
-
         var tran = _context.Database.BeginTransaction();
 
         var rows = new List<SingleKeyRow<int>>();

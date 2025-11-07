@@ -13,9 +13,6 @@ public class UpsertAsyncTests : BaseTest
 {
     public UpsertAsyncTests(ITestOutputHelper output, MySqlFixture fixture) : base(output, fixture, "SimpleBulks.BulkMerge")
     {
-        TableMapper.Register<SingleKeyRow<int>>(new MySqlTableInfor(GetTableName("SingleKeyRows")));
-        TableMapper.Register<CompositeKeyRow<int, int>>(new MySqlTableInfor(GetTableName("CompositeKeyRows")));
-        TableMapper.Register<ConfigurationEntry>(new MySqlTableInfor(GetTableName("ConfigurationEntry")));
     }
 
     private void SeedData(int length)

@@ -24,6 +24,17 @@ public abstract class BaseTest : IDisposable
         _context.Database.ExecuteSqlRaw("SET GLOBAL local_infile = 1;");
         _connection = new MySqlConnection(connectionString);
         _schema = schema;
+
+        TableMapper.Register<SingleKeyRow<int>>(new MySqlTableInfor(GetTableName("SingleKeyRows")));
+        TableMapper.Register<CompositeKeyRow<int, int>>(new MySqlTableInfor(GetTableName("CompositeKeyRows")));
+        TableMapper.Register<ConfigurationEntry>(new MySqlTableInfor(GetTableName("ConfigurationEntry"))
+        {
+            OutputId = new OutputId
+            {
+                Name = "Id",
+                Mode = OutputIdMode.ClientGenerated,
+            }
+        });
     }
 
     public void Dispose()
