@@ -1,29 +1,40 @@
 ﻿using MySqlConnector;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 
 public static class TypeExtensions
 {
-    private static Dictionary<Type, string> _mappings = new Dictionary<Type, string>
-    {
-        {typeof(bool), "tinyint(1)"},
-        {typeof(DateTime), "datetime(6)"},
-        {typeof(DateTimeOffset), "datetime(6)"},
-        {typeof(decimal), "decimal(65,30)"},
-        {typeof(double), "double"},
-        {typeof(Guid), "char(36)"},
-        {typeof(short), "smallint"},
-        {typeof(int), "int"},
-        {typeof(long), "bigint"},
-        {typeof(float), "float"},
-        {typeof(string), "longtext"},
-    };
+    private static readonly ConcurrentDictionary<Type, string> _mappings = new ConcurrentDictionary<Type, string>();
 
     private static readonly ConcurrentDictionary<string, MySqlDbType> _sqlTypeCache = new();
+
+    static TypeExtensions()
+    {
+        ConfigureMySqlTypeMapping<bool>("tinyint(1)");
+        ConfigureMySqlTypeMapping<DateTime>("datetime(6)");
+        ConfigureMySqlTypeMapping<DateTimeOffset>("datetime(6)");
+        ConfigureMySqlTypeMapping<decimal>("decimal(65,30)");
+        ConfigureMySqlTypeMapping<double>("double");
+        ConfigureMySqlTypeMapping<Guid>("char(36)");
+        ConfigureMySqlTypeMapping<short>("smallint");
+        ConfigureMySqlTypeMapping<int>("int");
+        ConfigureMySqlTypeMapping<long>("bigint");
+        ConfigureMySqlTypeMapping<float>("float");
+        ConfigureMySqlTypeMapping<string>("longtext");
+    }
+
+    public static void ConfigureMySqlTypeMapping<T>(string mySqlType)
+    {
+        ConfigureMySqlTypeMapping(typeof(T), mySqlType);
+    }
+
+    public static void ConfigureMySqlTypeMapping(Type type, string mySqlType)
+    {
+        _mappings[type] = mySqlType;
+    }
 
     public static string ToMySqlDbType(this Type type)
     {
