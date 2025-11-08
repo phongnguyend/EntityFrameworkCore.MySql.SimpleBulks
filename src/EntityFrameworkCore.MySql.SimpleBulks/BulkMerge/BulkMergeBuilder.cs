@@ -357,6 +357,7 @@ public class BulkMergeBuilder<T>
 
             var propertyNamesIncludeId = _updateColumnNames.Select(RemoveOperator).ToList();
             propertyNamesIncludeId.AddRange(_idColumns);
+            propertyNamesIncludeId = propertyNamesIncludeId.Distinct().ToList();
 
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
@@ -374,6 +375,7 @@ public class BulkMergeBuilder<T>
 
             var propertyNamesIncludeId = _insertColumnNames.ToList();
             propertyNamesIncludeId.AddRange(_idColumns);
+            propertyNamesIncludeId = propertyNamesIncludeId.Distinct().ToList();
 
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
@@ -433,6 +435,7 @@ public class BulkMergeBuilder<T>
 
             var propertyNamesIncludeId = _updateColumnNames.Select(RemoveOperator).ToList();
             propertyNamesIncludeId.AddRange(_idColumns);
+            propertyNamesIncludeId = propertyNamesIncludeId.Distinct().ToList();
 
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
@@ -450,6 +453,7 @@ public class BulkMergeBuilder<T>
 
             var propertyNamesIncludeId = _insertColumnNames.ToList();
             propertyNamesIncludeId.AddRange(_idColumns);
+            propertyNamesIncludeId = propertyNamesIncludeId.Distinct().ToList();
 
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
