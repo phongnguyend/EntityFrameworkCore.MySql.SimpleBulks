@@ -9,6 +9,18 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.BulkMatch;
 
 public static class ConnectionContextAsyncExtensions
 {
+    public static Task<List<T>> BulkMatchAsync<T>(this ConnectionContext connectionContext, IEnumerable<T> machedValues, Expression<Func<T, object>> matchedColumnsSelector, MySqlTableInfor table = null, BulkMatchOptions options = null, CancellationToken cancellationToken = default)
+    {
+        var temp = table ?? TableMapper.Resolve<T>();
+
+        return connectionContext.CreateBulkMatchBuilder<T>()
+            .WithReturnedColumns(temp.PropertyNames)
+            .WithTable(temp)
+            .WithMatchedColumns(matchedColumnsSelector)
+            .WithBulkOptions(options)
+            .ExecuteAsync(machedValues, cancellationToken);
+    }
+
     public static Task<List<T>> BulkMatchAsync<T>(this ConnectionContext connectionContext, IEnumerable<T> machedValues, Expression<Func<T, object>> matchedColumnsSelector, Expression<Func<T, object>> returnedColumnsSelector, MySqlTableInfor table = null, BulkMatchOptions options = null, CancellationToken cancellationToken = default)
     {
         return connectionContext.CreateBulkMatchBuilder<T>()

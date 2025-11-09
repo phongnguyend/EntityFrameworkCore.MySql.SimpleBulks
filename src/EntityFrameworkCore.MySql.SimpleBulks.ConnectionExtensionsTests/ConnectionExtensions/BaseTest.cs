@@ -26,7 +26,9 @@ public abstract class BaseTest : IDisposable
         _schema = schema;
 
         TableMapper.Register<SingleKeyRow<int>>(new MySqlTableInfor(GetTableName("SingleKeyRows")));
+
         TableMapper.Register<CompositeKeyRow<int, int>>(new MySqlTableInfor(GetTableName("CompositeKeyRows")));
+
         TableMapper.Register<ConfigurationEntry>(new MySqlTableInfor(GetTableName("ConfigurationEntry"))
         {
             OutputId = new OutputId
@@ -34,6 +36,16 @@ public abstract class BaseTest : IDisposable
                 Name = "Id",
                 Mode = OutputIdMode.ClientGenerated,
             }
+        });
+
+        TableMapper.Register<Customer>(new MySqlTableInfor(GetTableName("Customers"))
+        {
+            PropertyNames = ["Id", "FirstName", "LastName", "CurrentCountryIsoCode", "Index", "Season", "SeasonAsString"]
+        });
+
+        TableMapper.Register<Contact>(new MySqlTableInfor(GetTableName("Contacts"))
+        {
+            PropertyNames = ["Id", "EmailAddress", "PhoneNumber", "CountryIsoCode", "Index", "Season", "SeasonAsString", "CustomerId"]
         });
     }
 
