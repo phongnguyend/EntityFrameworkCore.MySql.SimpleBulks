@@ -60,26 +60,38 @@ public class BulkDeleteTests : BaseTest
         {
             if (omitTableName)
             {
-                connectionContext.BulkDelete(rows, row => row.Id, options: options);
-                connectionContext.BulkDelete(compositeKeyRows, row => new { row.Id1, row.Id2 }, options: options);
+                connectionContext.BulkDelete(rows, options: options);
+                connectionContext.BulkDelete(compositeKeyRows, options: options);
             }
             else
             {
-                connectionContext.BulkDelete(rows, row => row.Id, new MySqlTableInfor(GetTableName("SingleKeyRows")), options: options);
-                connectionContext.BulkDelete(compositeKeyRows, row => new { row.Id1, row.Id2 }, new MySqlTableInfor(GetTableName("CompositeKeyRows")), options: options);
+                connectionContext.BulkDelete(rows, new MySqlTableInfor(GetTableName("SingleKeyRows"))
+                {
+                    PrimaryKeys = ["Id"],
+                }, options: options);
+                connectionContext.BulkDelete(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows"))
+                {
+                    PrimaryKeys = ["Id1", "Id2"],
+                }, options: options);
             }
         }
         else
         {
             if (omitTableName)
             {
-                connectionContext.BulkDelete(rows, ["Id"], options: options);
-                connectionContext.BulkDelete(compositeKeyRows, ["Id1", "Id2"], options: options);
+                connectionContext.BulkDelete(rows, options: options);
+                connectionContext.BulkDelete(compositeKeyRows, options: options);
             }
             else
             {
-                connectionContext.BulkDelete(rows, ["Id"], new MySqlTableInfor(GetTableName("SingleKeyRows")), options: options);
-                connectionContext.BulkDelete(compositeKeyRows, ["Id1", "Id2"], new MySqlTableInfor(GetTableName("CompositeKeyRows")), options: options);
+                connectionContext.BulkDelete(rows, new MySqlTableInfor(GetTableName("SingleKeyRows"))
+                {
+                    PrimaryKeys = ["Id"],
+                }, options: options);
+                connectionContext.BulkDelete(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows"))
+                {
+                    PrimaryKeys = ["Id1", "Id2"],
+                }, options: options);
             }
         }
 

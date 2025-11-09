@@ -7,23 +7,27 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.BulkUpdate;
 
 public static class ConnectionContextExtensions
 {
-    public static BulkUpdateResult BulkUpdate<T>(this ConnectionContext connectionContext, IEnumerable<T> data, Expression<Func<T, object>> idSelector, Expression<Func<T, object>> columnNamesSelector, MySqlTableInfor table = null, BulkUpdateOptions options = null)
+    public static BulkUpdateResult BulkUpdate<T>(this ConnectionContext connectionContext, IEnumerable<T> data, Expression<Func<T, object>> columnNamesSelector, MySqlTableInfor table = null, BulkUpdateOptions options = null)
     {
+        var temp = table ?? TableMapper.Resolve<T>();
+
         return connectionContext.CreateBulkUpdateBuilder<T>()
-       .WithId(idSelector)
-         .WithColumns(columnNamesSelector)
-               .ToTable(table ?? TableMapper.Resolve<T>())
-              .WithBulkOptions(options)
-        .Execute(data);
+  .WithId(temp.PrimaryKeys)
+   .WithColumns(columnNamesSelector)
+      .ToTable(temp)
+  .WithBulkOptions(options)
+  .Execute(data);
     }
 
-    public static BulkUpdateResult BulkUpdate<T>(this ConnectionContext connectionContext, IEnumerable<T> data, IEnumerable<string> idColumns, IEnumerable<string> columnNames, MySqlTableInfor table = null, BulkUpdateOptions options = null)
+    public static BulkUpdateResult BulkUpdate<T>(this ConnectionContext connectionContext, IEnumerable<T> data, IEnumerable<string> columnNames, MySqlTableInfor table = null, BulkUpdateOptions options = null)
     {
+        var temp = table ?? TableMapper.Resolve<T>();
+
         return connectionContext.CreateBulkUpdateBuilder<T>()
-    .WithId(idColumns)
- .WithColumns(columnNames)
-  .ToTable(table ?? TableMapper.Resolve<T>())
-      .WithBulkOptions(options)
-  .Execute(data);
+       .WithId(temp.PrimaryKeys)
+            .WithColumns(columnNames)
+       .ToTable(temp)
+           .WithBulkOptions(options)
+          .Execute(data);
     }
 }

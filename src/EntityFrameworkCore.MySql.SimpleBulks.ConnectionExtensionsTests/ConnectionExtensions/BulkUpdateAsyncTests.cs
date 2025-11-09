@@ -85,27 +85,29 @@ public class BulkUpdateAsyncTests : BaseTest
             if (omitTableName)
             {
                 await connectionContext.BulkUpdateAsync(rows,
-                    row => row.Id,
                     row => new { row.Column3, row.Column2 },
                     options: updateOptions);
 
                 await connectionContext.BulkUpdateAsync(compositeKeyRows,
-                    row => new { row.Id1, row.Id2 },
                     row => new { row.Column3, row.Column2 },
                     options: updateOptions);
             }
             else
             {
                 await connectionContext.BulkUpdateAsync(rows,
-                    row => row.Id,
                     row => new { row.Column3, row.Column2 },
-                    new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                    new MySqlTableInfor(GetTableName("SingleKeyRows"))
+                    {
+                        PrimaryKeys = ["Id"],
+                    },
                     options: updateOptions);
 
                 await connectionContext.BulkUpdateAsync(compositeKeyRows,
-                    row => new { row.Id1, row.Id2 },
                     row => new { row.Column3, row.Column2 },
-                    new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                    new MySqlTableInfor(GetTableName("CompositeKeyRows"))
+                    {
+                        PrimaryKeys = ["Id1", "Id2"],
+                    },
                     options: updateOptions);
             }
 
@@ -172,27 +174,29 @@ public class BulkUpdateAsyncTests : BaseTest
             if (omitTableName)
             {
                 await connectionContext.BulkUpdateAsync(rows,
-                    ["Id"],
                     ["Column3", "Column2"],
                     options: updateOptions);
 
                 await connectionContext.BulkUpdateAsync(compositeKeyRows,
-                    ["Id1", "Id2"],
                     ["Column3", "Column2"],
                     options: updateOptions);
             }
             else
             {
                 await connectionContext.BulkUpdateAsync(rows,
-                    ["Id"],
                     ["Column3", "Column2"],
-                    new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                    new MySqlTableInfor(GetTableName("SingleKeyRows"))
+                    {
+                        PrimaryKeys = ["Id"],
+                    },
                     options: updateOptions);
 
                 await connectionContext.BulkUpdateAsync(compositeKeyRows,
-                    ["Id1", "Id2"],
                     ["Column3", "Column2"],
-                    new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                    new MySqlTableInfor(GetTableName("CompositeKeyRows"))
+                    {
+                        PrimaryKeys = ["Id1", "Id2"],
+                    },
                     options: updateOptions);
             }
 
