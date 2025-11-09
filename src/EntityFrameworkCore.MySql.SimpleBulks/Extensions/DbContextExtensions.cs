@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MySqlConnector;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -128,7 +129,7 @@ public static class DbContextExtensions
         return _propertyTypesCache.GetOrAdd(cacheKey, (key) =>
         {
             var properties = dbContext.GetProperties(key.EntityType);
-            return properties.ToDictionary(x => x.PropertyName, x => x.PropertyType);
+            return properties.ToFrozenDictionary(x => x.PropertyName, x => x.PropertyType);
         });
     }
 
@@ -138,7 +139,7 @@ public static class DbContextExtensions
         return _columnNamesCache.GetOrAdd(cacheKey, (key) =>
         {
             var properties = dbContext.GetProperties(key.EntityType);
-            return properties.ToDictionary(x => x.PropertyName, x => x.ColumnName);
+            return properties.ToFrozenDictionary(x => x.PropertyName, x => x.ColumnName);
         });
     }
 
@@ -148,7 +149,7 @@ public static class DbContextExtensions
         return _columnTypesCache.GetOrAdd(cacheKey, (key) =>
         {
             var properties = dbContext.GetProperties(key.EntityType);
-            return properties.ToDictionary(x => x.PropertyName, x => x.ColumnType);
+            return properties.ToFrozenDictionary(x => x.PropertyName, x => x.ColumnType);
         });
     }
 
@@ -208,7 +209,7 @@ public static class DbContextExtensions
         return _valueConvertersCache.GetOrAdd(cacheKey, (key) =>
         {
             var properties = dbContext.GetProperties(key.EntityType);
-            return properties.Where(x => x.ValueConverter != null).ToDictionary(x => x.PropertyName, x => x.ValueConverter);
+            return properties.Where(x => x.ValueConverter != null).ToFrozenDictionary(x => x.PropertyName, x => x.ValueConverter);
         });
     }
 
