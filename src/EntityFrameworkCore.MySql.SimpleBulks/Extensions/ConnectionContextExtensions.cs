@@ -5,6 +5,7 @@ using EntityFrameworkCore.MySql.SimpleBulks.BulkMerge;
 using EntityFrameworkCore.MySql.SimpleBulks.BulkUpdate;
 using EntityFrameworkCore.MySql.SimpleBulks.TempTable;
 using MySqlConnector;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading;
@@ -111,6 +112,17 @@ public static class ConnectionContextExtensions
         }
 
         return columnNameMappings.TryGetValue(columnName, out string value) ? value : columnName;
+    }
+
+    public static void ExecuteReader(this ConnectionContext connectionContext, string commandText, Action<IDataReader> action, BulkOptions options = null)
+    {
+        using var command = connectionContext.CreateTextCommand(commandText, options);
+        using var reader = command.ExecuteReader();
+
+        while (reader.Read())
+        {
+            action(reader);
+        }
     }
 
     public static BulkInsertBuilder<T> CreateBulkInsertBuilder<T>(this ConnectionContext connectionContext)
