@@ -83,11 +83,11 @@ public class DirectUpdateAsyncTests : BaseTest
             LogTo = _output.WriteLine
         };
 
-        var updateResult1 = await connectionContext.DirectUpdateAsync(row, row => row.Id,
+        var updateResult1 = await connectionContext.DirectUpdateAsync(row,
             row => new { row.Column3, row.Column2, row.Season },
             options: updateOptions);
 
-        var updateResult2 = await connectionContext.DirectUpdateAsync(compositeKeyRow, x => new { x.Id1, x.Id2 },
+        var updateResult2 = await connectionContext.DirectUpdateAsync(compositeKeyRow,
             row => new { row.Column3, row.Column2, row.Season },
             options: updateOptions);
 
@@ -149,12 +149,10 @@ public class DirectUpdateAsyncTests : BaseTest
         };
 
         var updateResult1 = await connectionContext.DirectUpdateAsync(row,
-            ["Id"],
             ["Column3", "Column2", "Season"],
             options: updateOptions);
 
         var updateResult2 = await connectionContext.DirectUpdateAsync(compositeKeyRow,
-            ["Id1", "Id2"],
             ["Column3", "Column2", "Season"],
             options: updateOptions);
 

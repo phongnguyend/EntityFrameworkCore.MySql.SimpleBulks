@@ -25,12 +25,19 @@ public abstract class BaseTest : IDisposable
         _connection = new MySqlConnection(connectionString);
         _schema = schema;
 
-        TableMapper.Register<SingleKeyRow<int>>(new MySqlTableInfor(GetTableName("SingleKeyRows")));
+        TableMapper.Register<SingleKeyRow<int>>(new MySqlTableInfor(GetTableName("SingleKeyRows"))
+        {
+            PrimaryKeys = ["Id"],
+        });
 
-        TableMapper.Register<CompositeKeyRow<int, int>>(new MySqlTableInfor(GetTableName("CompositeKeyRows")));
+        TableMapper.Register<CompositeKeyRow<int, int>>(new MySqlTableInfor(GetTableName("CompositeKeyRows"))
+        {
+            PrimaryKeys = ["Id1", "Id2"],
+        });
 
         TableMapper.Register<ConfigurationEntry>(new MySqlTableInfor(GetTableName("ConfigurationEntry"))
         {
+            PrimaryKeys = ["Id"],
             OutputId = new OutputId
             {
                 Name = "Id",

@@ -78,14 +78,14 @@ public class DirectUpdateTests : BaseTest
         compositeKeyRow.Column3 = DateTime.Now;
         compositeKeyRow.Season = Season.Autumn;
 
-        var updateResult1 = connectionContext.DirectUpdate(row, row => row.Id,
+        var updateResult1 = connectionContext.DirectUpdate(row,
             row => new { row.Column3, row.Column2, row.Season },
             options: new BulkUpdateOptions
             {
                 LogTo = _output.WriteLine
             });
 
-        var updateResult2 = connectionContext.DirectUpdate(compositeKeyRow, x => new { x.Id1, x.Id2 },
+        var updateResult2 = connectionContext.DirectUpdate(compositeKeyRow, 
                 row => new { row.Column3, row.Column2, row.Season },
                 options: new BulkUpdateOptions
                 {
@@ -145,7 +145,6 @@ public class DirectUpdateTests : BaseTest
         compositeKeyRow.Season = Season.Autumn;
 
         var updateResult1 = connectionContext.DirectUpdate(row,
-            ["Id"],
             ["Column3", "Column2", "Season"],
             options: new BulkUpdateOptions
             {
@@ -153,7 +152,6 @@ public class DirectUpdateTests : BaseTest
             });
 
         var updateResult2 = connectionContext.DirectUpdate(compositeKeyRow,
-            ["Id1", "Id2"],
             ["Column3", "Column2", "Season"],
             options: new BulkUpdateOptions
             {

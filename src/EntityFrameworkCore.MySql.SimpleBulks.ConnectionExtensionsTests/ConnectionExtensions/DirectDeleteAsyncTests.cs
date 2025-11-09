@@ -66,9 +66,9 @@ public class DirectDeleteAsyncTests : BaseTest
             LogTo = _output.WriteLine
         };
 
-        var deleteResult1 = await connectionContext.DirectDeleteAsync(row, row => row.Id, options: options);
+        var deleteResult1 = await connectionContext.DirectDeleteAsync(row, options: options);
 
-        var deleteResult2 = await connectionContext.DirectDeleteAsync(compositeKeyRow, row => new { row.Id1, row.Id2 }, options: options);
+        var deleteResult2 = await connectionContext.DirectDeleteAsync(compositeKeyRow, options: options);
 
         tran.Commit();
 
@@ -103,9 +103,9 @@ public class DirectDeleteAsyncTests : BaseTest
             LogTo = _output.WriteLine
         };
 
-        var deleteResult1 = await connectionContext.DirectDeleteAsync(row, row => row.Id, options: options);
+        var deleteResult1 = await connectionContext.DirectDeleteAsync(row, options: options);
 
-        var deleteResult2 = await connectionContext.DirectDeleteAsync(compositeKeyRow, row => new { row.Id1, row.Id2 }, options: options);
+        var deleteResult2 = await connectionContext.DirectDeleteAsync(compositeKeyRow, options: options);
 
         tran.Rollback();
 

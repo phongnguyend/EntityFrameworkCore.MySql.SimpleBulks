@@ -66,9 +66,9 @@ public class DirectDeleteTests : BaseTest
             LogTo = _output.WriteLine
         };
 
-        var deleteResult1 = connectionContext.DirectDelete(row, row => row.Id, options: options);
+        var deleteResult1 = connectionContext.DirectDelete(row, options: options);
 
-        var deleteResult2 = connectionContext.DirectDelete(compositeKeyRow, row => new { row.Id1, row.Id2 }, options: options);
+        var deleteResult2 = connectionContext.DirectDelete(compositeKeyRow, options: options);
 
         tran.Commit();
 
@@ -103,9 +103,9 @@ public class DirectDeleteTests : BaseTest
             LogTo = _output.WriteLine
         };
 
-        var deleteResult1 = connectionContext.DirectDelete(row, row => row.Id, options: options);
+        var deleteResult1 = connectionContext.DirectDelete(row, options: options);
 
-        var deleteResult2 = connectionContext.DirectDelete(compositeKeyRow, row => new { row.Id1, row.Id2 }, options: options);
+        var deleteResult2 = connectionContext.DirectDelete(compositeKeyRow, options: options);
 
         tran.Rollback();
 
