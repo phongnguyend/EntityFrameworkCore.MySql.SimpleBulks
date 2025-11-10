@@ -167,10 +167,10 @@ public class BulkInsertBuilder<T>
 
         var insertStatement = insertStatementBuilder.ToString();
 
-        using var insertCommand = _connectionContext.CreateTextCommand(insertStatement, _options);
-        _table.CreateMySqlParameters(insertCommand, dataToInsert, columnsToInsert).ForEach(x => insertCommand.Parameters.Add(x));
-
         Log($"Begin inserting: {Environment.NewLine}{insertStatement}");
+
+        using var insertCommand = _connectionContext.CreateTextCommand(insertStatement, _options);
+        LogParameters(_table.CreateMySqlParameters(insertCommand, dataToInsert, columnsToInsert, autoAdd: true));
 
         _connectionContext.EnsureOpen();
 
@@ -182,6 +182,19 @@ public class BulkInsertBuilder<T>
     private void Log(string message)
     {
         _options?.LogTo?.Invoke($"{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss.fff zzz} [BulkInsert]: {message}");
+    }
+
+    private void LogParameters(List<ParameterInfo> parameters)
+    {
+        if (_options?.LogTo == null)
+        {
+            return;
+        }
+
+        foreach (var parameter in parameters)
+        {
+            _options.LogTo?.Invoke($"{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss.fff zzz} [BulkInsert][Parameter]: Name={parameter.Name}, Type={parameter.Type}");
+        }
     }
 
     public async Task ExecuteAsync(IEnumerable<T> data, CancellationToken cancellationToken = default)
@@ -290,10 +303,10 @@ public class BulkInsertBuilder<T>
 
         var insertStatement = insertStatementBuilder.ToString();
 
-        using var insertCommand = _connectionContext.CreateTextCommand(insertStatement, _options);
-        _table.CreateMySqlParameters(insertCommand, dataToInsert, columnsToInsert).ForEach(x => insertCommand.Parameters.Add(x));
-
         Log($"Begin inserting: {Environment.NewLine}{insertStatement}");
+
+        using var insertCommand = _connectionContext.CreateTextCommand(insertStatement, _options);
+        LogParameters(_table.CreateMySqlParameters(insertCommand, dataToInsert, columnsToInsert, autoAdd: true));
 
         await _connectionContext.EnsureOpenAsync(cancellationToken);
 

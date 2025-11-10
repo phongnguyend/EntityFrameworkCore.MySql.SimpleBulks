@@ -213,6 +213,19 @@ public class BulkMergeBuilder<T>
         _options?.LogTo?.Invoke($"{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss.fff zzz} [BulkMerge]: {message}");
     }
 
+    private void LogParameters(List<ParameterInfo> parameters)
+    {
+        if (_options?.LogTo == null)
+        {
+            return;
+        }
+
+        foreach (var parameter in parameters)
+        {
+            _options.LogTo?.Invoke($"{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss.fff zzz} [BulkMerge][Parameter]: Name={parameter.Name}, Type={parameter.Type}");
+        }
+    }
+
     public async Task<BulkMergeResult> ExecuteAsync(IEnumerable<T> data, CancellationToken cancellationToken = default)
     {
         if (data.Count() == 1)
@@ -362,7 +375,7 @@ public class BulkMergeBuilder<T>
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
             using var updateCommand = _connectionContext.CreateTextCommand(sqlUpdateStatement, _options);
-            _table.CreateMySqlParameters(updateCommand, data, propertyNamesIncludeId).ForEach(x => updateCommand.Parameters.Add(x));
+            LogParameters(_table.CreateMySqlParameters(updateCommand, data, propertyNamesIncludeId, autoAdd: true));
 
             result.UpdatedRows = updateCommand.ExecuteNonQuery();
 
@@ -380,7 +393,7 @@ public class BulkMergeBuilder<T>
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
             using var insertCommand = _connectionContext.CreateTextCommand(sqlInsertStatement, _options);
-            _table.CreateMySqlParameters(insertCommand, data, propertyNamesIncludeId).ForEach(x => insertCommand.Parameters.Add(x));
+            LogParameters(_table.CreateMySqlParameters(insertCommand, data, propertyNamesIncludeId, autoAdd: true));
 
             result.InsertedRows = insertCommand.ExecuteNonQuery();
 
@@ -440,7 +453,7 @@ public class BulkMergeBuilder<T>
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
             using var updateCommand = _connectionContext.CreateTextCommand(sqlUpdateStatement, _options);
-            _table.CreateMySqlParameters(updateCommand, data, propertyNamesIncludeId).ForEach(x => updateCommand.Parameters.Add(x));
+            LogParameters(_table.CreateMySqlParameters(updateCommand, data, propertyNamesIncludeId, autoAdd: true));
 
             result.UpdatedRows = await updateCommand.ExecuteNonQueryAsync(cancellationToken);
 
@@ -458,7 +471,7 @@ public class BulkMergeBuilder<T>
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
             using var insertCommand = _connectionContext.CreateTextCommand(sqlInsertStatement, _options);
-            _table.CreateMySqlParameters(insertCommand, data, propertyNamesIncludeId).ForEach(x => insertCommand.Parameters.Add(x));
+            LogParameters(_table.CreateMySqlParameters(insertCommand, data, propertyNamesIncludeId, autoAdd: true));
 
             result.InsertedRows = await insertCommand.ExecuteNonQueryAsync(cancellationToken);
 

@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks;
@@ -77,7 +76,7 @@ public abstract class TableInfor
         throw new ArgumentException($"Property '{propertyName}' not found.");
     }
 
-    public abstract List<MySqlParameter> CreateMySqlParameters<T>(MySqlCommand command, T data, IEnumerable<string> propertyNames);
+    public abstract List<ParameterInfo> CreateMySqlParameters<T>(MySqlCommand command, T data, IEnumerable<string> propertyNames, bool autoAdd);
 }
 
 public class DbContextTableInfor : TableInfor
@@ -94,9 +93,9 @@ public class DbContextTableInfor : TableInfor
         _dbContext = dbContext;
     }
 
-    public override List<MySqlParameter> CreateMySqlParameters<T>(MySqlCommand command, T data, IEnumerable<string> propertyNames)
+    public override List<ParameterInfo> CreateMySqlParameters<T>(MySqlCommand command, T data, IEnumerable<string> propertyNames, bool autoAdd)
     {
-        var parameters = new List<MySqlParameter>();
+        var parameters = new List<ParameterInfo>();
 
         var mappingSource = _dbContext.GetService<IRelationalTypeMappingSource>();
 
@@ -111,8 +110,19 @@ public class DbContextTableInfor : TableInfor
             if (ColumnTypeMappings != null && ColumnTypeMappings.TryGetValue(prop.Name, out var columnType))
             {
                 var mapping = mappingSource.FindMapping(columnType);
-                var para = (MySqlParameter)mapping.CreateParameter(command, prop.Name, GetProviderValue(prop, data) ?? DBNull.Value);
-                parameters.Add(para);
+                var para = (MySqlParameter)mapping.CreateParameter(command, $"@{prop.Name}", GetProviderValue(prop, data) ?? DBNull.Value);
+                
+                parameters.Add(new ParameterInfo
+                {
+                    Name = para.ParameterName,
+                    Type = columnType,
+                    Parameter = para
+                });
+
+                if (autoAdd)
+                {
+                    command.Parameters.Add(para);
+                }
             }
         }
 
@@ -137,9 +147,9 @@ public class MySqlTableInfor : TableInfor
     {
     }
 
-    public override List<MySqlParameter> CreateMySqlParameters<T>(MySqlCommand command, T data, IEnumerable<string> propertyNames)
+    public override List<ParameterInfo> CreateMySqlParameters<T>(MySqlCommand command, T data, IEnumerable<string> propertyNames, bool autoAdd)
     {
-        var parameters = new List<MySqlParameter>();
+        var parameters = new List<ParameterInfo>();
 
         foreach (var propName in propertyNames)
         {
@@ -153,16 +163,29 @@ public class MySqlTableInfor : TableInfor
 
             var para = new MySqlParameter($"@{prop.Name}", prop.GetValue(data) ?? DBNull.Value);
 
+            var paraInfo = new ParameterInfo
+            {
+                Name = para.ParameterName,
+                Parameter = para
+            };
+
             if (ColumnTypeMappings != null && ColumnTypeMappings.TryGetValue(prop.Name, out var columnType))
             {
-                para.MySqlDbType = columnType.ToMySqlDbType();
+                paraInfo.Type = columnType;
             }
             else
             {
-                para.MySqlDbType = type.ToMySqlDbType().ToMySqlDbType();
+                paraInfo.Type = type.ToMySqlDbType();
             }
 
-            parameters.Add(para);
+            para.MySqlDbType = paraInfo.Type.ToMySqlDbType();
+
+            parameters.Add(paraInfo);
+
+            if (autoAdd)
+            {
+                command.Parameters.Add(para);
+            }
         }
 
         return parameters;
