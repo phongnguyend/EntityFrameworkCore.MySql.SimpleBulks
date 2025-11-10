@@ -40,9 +40,9 @@ public static class DbContextExtensions
         _schemaNameTranslators[dbContext.GetType()] = translator;
     }
 
-    public static TableInfor GetTableInfor(this DbContext dbContext, Type type)
+    public static TableInfor GetTableInfor<T>(this DbContext dbContext)
     {
-        var cacheKey = new CacheKey(dbContext.GetType(), type);
+        var cacheKey = new CacheKey(dbContext.GetType(), typeof(T));
         return _tableInfoCache.GetOrAdd(cacheKey, (key) =>
         {
             var entityType = dbContext.Model.FindEntityType(key.EntityType);
