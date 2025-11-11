@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+﻿using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks;
 
@@ -39,10 +41,24 @@ public class MySqlTableInforBuilder<T>
         return this;
     }
 
+    public MySqlTableInforBuilder<T> PrimaryKeys(Expression<Func<T, object>> primaryKeysSelector)
+    {
+        var primaryKey = primaryKeysSelector.Body.GetMemberName();
+        var primaryKeys = string.IsNullOrEmpty(primaryKey) ? primaryKeysSelector.Body.GetMemberNames() : [primaryKey];
+        return PrimaryKeys(primaryKeys);
+    }
+
     public MySqlTableInforBuilder<T> PropertyNames(IReadOnlyList<string> propertyNames)
     {
         _propertyNames = propertyNames;
         return this;
+    }
+
+    public MySqlTableInforBuilder<T> PropertyNames(Expression<Func<T, object>> propertyNamesSelector)
+    {
+        var propertyName = propertyNamesSelector.Body.GetMemberName();
+        var propertyNames = string.IsNullOrEmpty(propertyName) ? propertyNamesSelector.Body.GetMemberNames() : [propertyName];
+        return PropertyNames(propertyNames);
     }
 
     public MySqlTableInforBuilder<T> InsertablePropertyNames(IReadOnlyList<string> insertablePropertyNames)
@@ -83,6 +99,12 @@ public class MySqlTableInforBuilder<T>
             Mode = outputIdMode
         };
         return this;
+    }
+
+    public MySqlTableInforBuilder<T> OutputId(Expression<Func<T, object>> nameSelector, OutputIdMode outputIdMode)
+    {
+        var propertyName = nameSelector.Body.GetMemberName();
+        return OutputId(propertyName, outputIdMode);
     }
 
     public MySqlTableInforBuilder<T> ParameterConverter(Func<T, string, MySqlParameter> converter)
