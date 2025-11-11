@@ -10,7 +10,7 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.DirectInsert;
 
 public static class ConnectionContextAsyncExtensions
 {
-    public static Task DirectInsertAsync<T>(this ConnectionContext connectionContext, T data, Expression<Func<T, object>> columnNamesSelector, MySqlTableInfor table = null, BulkInsertOptions options = null, CancellationToken cancellationToken = default)
+    public static Task DirectInsertAsync<T>(this ConnectionContext connectionContext, T data, Expression<Func<T, object>> columnNamesSelector, MySqlTableInfor<T> table = null, BulkInsertOptions options = null, CancellationToken cancellationToken = default)
     {
         return connectionContext.CreateBulkInsertBuilder<T>()
    .WithColumns(columnNamesSelector)
@@ -19,7 +19,7 @@ public static class ConnectionContextAsyncExtensions
 .SingleInsertAsync(data, cancellationToken);
     }
 
-    public static Task DirectInsertAsync<T>(this ConnectionContext connectionContext, T data, IEnumerable<string> columnNames, MySqlTableInfor table = null, BulkInsertOptions options = null, CancellationToken cancellationToken = default)
+    public static Task DirectInsertAsync<T>(this ConnectionContext connectionContext, T data, IEnumerable<string> columnNames, MySqlTableInfor<T> table = null, BulkInsertOptions options = null, CancellationToken cancellationToken = default)
     {
         return connectionContext.CreateBulkInsertBuilder<T>()
         .WithColumns(columnNames)

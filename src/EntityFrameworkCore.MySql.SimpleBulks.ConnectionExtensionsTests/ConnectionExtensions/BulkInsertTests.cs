@@ -113,12 +113,12 @@ public class BulkInsertTests : BaseTest
                         row.BulkId,
                         row.BulkIndex
                     },
-                    new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                    new MySqlTableInfor<SingleKeyRow<int>>(GetTableName("SingleKeyRows")),
                     options: options);
 
                 connectionContext.BulkInsert(compositeKeyRows,
                     row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 },
-                    new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                    new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows")),
                     options: options);
             }
 
@@ -139,12 +139,12 @@ public class BulkInsertTests : BaseTest
             {
                 connectionContext.BulkInsert(rows,
                     ["Column1", "Column2", "Column3", "BulkId", "BulkIndex"],
-                    new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                    new MySqlTableInfor<SingleKeyRow<int>>(GetTableName("SingleKeyRows")),
                     options: options);
 
                 connectionContext.BulkInsert(compositeKeyRows,
                     ["Id1", "Id2", "Column1", "Column2", "Column3"],
-                    new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                    new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows")),
                     options: options);
             }
 

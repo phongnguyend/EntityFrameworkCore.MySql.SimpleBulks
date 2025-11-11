@@ -11,7 +11,7 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.BulkMerge;
 
 public class BulkMergeBuilder<T>
 {
-    private TableInfor _table;
+    private TableInfor<T> _table;
     private IEnumerable<string> _idColumns;
     private IEnumerable<string> _updateColumnNames;
     private IEnumerable<string> _insertColumnNames;
@@ -24,7 +24,7 @@ public class BulkMergeBuilder<T>
         _connectionContext = connectionContext;
     }
 
-    public BulkMergeBuilder<T> ToTable(TableInfor table)
+    public BulkMergeBuilder<T> ToTable(TableInfor<T> table)
     {
         _table = table;
 

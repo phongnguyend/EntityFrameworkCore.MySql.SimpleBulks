@@ -10,7 +10,7 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.DirectUpdate;
 
 public static class ConnectionContextAsyncExtensions
 {
-    public static Task<BulkUpdateResult> DirectUpdateAsync<T>(this ConnectionContext connectionContext, T data, Expression<Func<T, object>> columnNamesSelector, MySqlTableInfor table = null, BulkUpdateOptions options = null, CancellationToken cancellationToken = default)
+    public static Task<BulkUpdateResult> DirectUpdateAsync<T>(this ConnectionContext connectionContext, T data, Expression<Func<T, object>> columnNamesSelector, MySqlTableInfor<T> table = null, BulkUpdateOptions options = null, CancellationToken cancellationToken = default)
     {
         var temp = table ?? TableMapper.Resolve<T>();
 
@@ -22,7 +22,7 @@ public static class ConnectionContextAsyncExtensions
    .SingleUpdateAsync(data, cancellationToken);
     }
 
-    public static Task<BulkUpdateResult> DirectUpdateAsync<T>(this ConnectionContext connectionContext, T data, IEnumerable<string> columnNames, MySqlTableInfor table = null, BulkUpdateOptions options = null, CancellationToken cancellationToken = default)
+    public static Task<BulkUpdateResult> DirectUpdateAsync<T>(this ConnectionContext connectionContext, T data, IEnumerable<string> columnNames, MySqlTableInfor<T> table = null, BulkUpdateOptions options = null, CancellationToken cancellationToken = default)
     {
         var temp = table ?? TableMapper.Resolve<T>();
 

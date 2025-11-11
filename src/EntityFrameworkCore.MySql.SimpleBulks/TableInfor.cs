@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks;
 
-public abstract class TableInfor
+public abstract class TableInfor<T>
 {
     public string Schema { get; private set; }
 
@@ -55,7 +55,7 @@ public abstract class TableInfor
         return ColumnNameMappings.TryGetValue(propertyName, out string value) ? value : propertyName;
     }
 
-    public Type GetProviderClrType<T>(string propertyName)
+    public Type GetProviderClrType(string propertyName)
     {
         if (ValueConverters != null && ValueConverters.TryGetValue(propertyName, out var converter))
         {
@@ -76,10 +76,10 @@ public abstract class TableInfor
         throw new ArgumentException($"Property '{propertyName}' not found.");
     }
 
-    public abstract List<ParameterInfo> CreateMySqlParameters<T>(MySqlCommand command, T data, IEnumerable<string> propertyNames, bool autoAdd);
+    public abstract List<ParameterInfo> CreateMySqlParameters(MySqlCommand command, T data, IEnumerable<string> propertyNames, bool autoAdd);
 }
 
-public class DbContextTableInfor : TableInfor
+public class DbContextTableInfor<T> : TableInfor<T>
 {
     private readonly DbContext _dbContext;
 
@@ -93,7 +93,7 @@ public class DbContextTableInfor : TableInfor
         _dbContext = dbContext;
     }
 
-    public override List<ParameterInfo> CreateMySqlParameters<T>(MySqlCommand command, T data, IEnumerable<string> propertyNames, bool autoAdd)
+    public override List<ParameterInfo> CreateMySqlParameters(MySqlCommand command, T data, IEnumerable<string> propertyNames, bool autoAdd)
     {
         var parameters = new List<ParameterInfo>();
 
@@ -130,7 +130,7 @@ public class DbContextTableInfor : TableInfor
 
     }
 
-    private object GetProviderValue<T>(PropertyInfo property, T item)
+    private object GetProviderValue(PropertyInfo property, T item)
     {
         if (ValueConverters != null && ValueConverters.TryGetValue(property.Name, out var converter))
         {
@@ -141,13 +141,13 @@ public class DbContextTableInfor : TableInfor
     }
 }
 
-public class MySqlTableInfor : TableInfor
+public class MySqlTableInfor<T> : TableInfor<T>
 {
     public MySqlTableInfor(string tableName) : base(tableName)
     {
     }
 
-    public override List<ParameterInfo> CreateMySqlParameters<T>(MySqlCommand command, T data, IEnumerable<string> propertyNames, bool autoAdd)
+    public override List<ParameterInfo> CreateMySqlParameters(MySqlCommand command, T data, IEnumerable<string> propertyNames, bool autoAdd)
     {
         var parameters = new List<ParameterInfo>();
 

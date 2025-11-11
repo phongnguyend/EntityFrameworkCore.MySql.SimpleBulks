@@ -96,7 +96,7 @@ public class BulkUpdateTests : BaseTest
             {
                 connectionContext.BulkUpdate(rows,
                     row => new { row.Column3, row.Column2 },
-                    new MySqlTableInfor(GetTableName("SingleKeyRows"))
+                    new MySqlTableInfor<SingleKeyRow<int>>(GetTableName("SingleKeyRows"))
                     {
                         PrimaryKeys = ["Id"],
                     },
@@ -104,7 +104,7 @@ public class BulkUpdateTests : BaseTest
 
                 connectionContext.BulkUpdate(compositeKeyRows,
                     row => new { row.Column3, row.Column2 },
-                    new MySqlTableInfor(GetTableName("CompositeKeyRows"))
+                    new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows"))
                     {
                         PrimaryKeys = ["Id1", "Id2"],
                     },
@@ -155,14 +155,14 @@ public class BulkUpdateTests : BaseTest
                     row => row.Id,
                     row => new { row.Column1, row.Column2 },
                     row => new { row.Column1, row.Column2, row.Column3, row.BulkId },
-                    new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                    new MySqlTableInfor<SingleKeyRow<int>>(GetTableName("SingleKeyRows")),
                     options: mergeOptions);
 
                 connectionContext.BulkMerge(compositeKeyRows,
                     row => new { row.Id1, row.Id2 },
                     row => new { row.Column1, row.Column2, row.Column3 },
                     row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 },
-                    new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                    new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows")),
                     options: mergeOptions);
             }
 
@@ -185,7 +185,7 @@ public class BulkUpdateTests : BaseTest
             {
                 connectionContext.BulkUpdate(rows,
                     ["Column3", "Column2"],
-                    new MySqlTableInfor(GetTableName("SingleKeyRows"))
+                    new MySqlTableInfor<SingleKeyRow<int>>(GetTableName("SingleKeyRows"))
                     {
                         PrimaryKeys = ["Id"],
                     },
@@ -193,7 +193,7 @@ public class BulkUpdateTests : BaseTest
 
                 connectionContext.BulkUpdate(compositeKeyRows,
                     ["Column3", "Column2"],
-                    new MySqlTableInfor(GetTableName("CompositeKeyRows"))
+                    new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows"))
                     {
                         PrimaryKeys = ["Id1", "Id2"],
                     },
@@ -244,14 +244,14 @@ public class BulkUpdateTests : BaseTest
                     ["Id"],
                     ["Column1", "Column2"],
                     ["Column1", "Column2", "Column3", "BulkId"],
-                    new MySqlTableInfor(GetTableName("SingleKeyRows")),
+                    new MySqlTableInfor<SingleKeyRow<int>>(GetTableName("SingleKeyRows")),
                     options: mergeOptions);
 
                 connectionContext.BulkMerge(compositeKeyRows,
                     ["Id1", "Id2"],
                     ["Column1", "Column2", "Column3"],
                     ["Id1", "Id2", "Column1", "Column2", "Column3"],
-                    new MySqlTableInfor(GetTableName("CompositeKeyRows")),
+                    new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows")),
                     options: mergeOptions);
             }
 

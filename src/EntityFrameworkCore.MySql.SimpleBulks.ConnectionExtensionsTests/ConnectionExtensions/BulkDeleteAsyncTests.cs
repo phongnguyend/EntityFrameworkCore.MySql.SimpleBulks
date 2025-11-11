@@ -65,11 +65,11 @@ public class BulkDeleteAsyncTests : BaseTest
             }
             else
             {
-                await connectionContext.BulkDeleteAsync(rows, new MySqlTableInfor(GetTableName("SingleKeyRows"))
+                await connectionContext.BulkDeleteAsync(rows, new MySqlTableInfor<SingleKeyRow<int>>(GetTableName("SingleKeyRows"))
                 {
                     PrimaryKeys = ["Id"],
                 }, options: options);
-                await connectionContext.BulkDeleteAsync(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows"))
+                await connectionContext.BulkDeleteAsync(compositeKeyRows, new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows"))
                 {
                     PrimaryKeys = ["Id1", "Id2"],
                 }, options: options);
@@ -84,11 +84,11 @@ public class BulkDeleteAsyncTests : BaseTest
             }
             else
             {
-                await connectionContext.BulkDeleteAsync(rows, new MySqlTableInfor(GetTableName("SingleKeyRows"))
+                await connectionContext.BulkDeleteAsync(rows, new MySqlTableInfor<SingleKeyRow<int>>(GetTableName("SingleKeyRows"))
                 {
                     PrimaryKeys = ["Id"],
                 }, options: options);
-                await connectionContext.BulkDeleteAsync(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows"))
+                await connectionContext.BulkDeleteAsync(compositeKeyRows, new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows"))
                 {
                     PrimaryKeys = ["Id1", "Id2"],
                 }, options: options);

@@ -10,7 +10,7 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.Upsert;
 
 public static class ConnectionContextAsyncExtensions
 {
-    public static Task<BulkMergeResult> UpsertAsync<T>(this ConnectionContext connectionContext, T data, Expression<Func<T, object>> idSelector, Expression<Func<T, object>> updateColumnNamesSelector, Expression<Func<T, object>> insertColumnNamesSelector, MySqlTableInfor table = null, BulkMergeOptions options = null, CancellationToken cancellationToken = default)
+    public static Task<BulkMergeResult> UpsertAsync<T>(this ConnectionContext connectionContext, T data, Expression<Func<T, object>> idSelector, Expression<Func<T, object>> updateColumnNamesSelector, Expression<Func<T, object>> insertColumnNamesSelector, MySqlTableInfor<T> table = null, BulkMergeOptions options = null, CancellationToken cancellationToken = default)
     {
         return connectionContext.CreateBulkMergeBuilder<T>()
         .WithId(idSelector)
@@ -21,7 +21,7 @@ public static class ConnectionContextAsyncExtensions
         .SingleMergeAsync(data, cancellationToken);
     }
 
-    public static Task<BulkMergeResult> UpsertAsync<T>(this ConnectionContext connectionContext, T data, IEnumerable<string> idColumns, IEnumerable<string> updateColumnNames, IEnumerable<string> insertColumnNames, MySqlTableInfor table = null, BulkMergeOptions options = null, CancellationToken cancellationToken = default)
+    public static Task<BulkMergeResult> UpsertAsync<T>(this ConnectionContext connectionContext, T data, IEnumerable<string> idColumns, IEnumerable<string> updateColumnNames, IEnumerable<string> insertColumnNames, MySqlTableInfor<T> table = null, BulkMergeOptions options = null, CancellationToken cancellationToken = default)
     {
         return connectionContext.CreateBulkMergeBuilder<T>()
        .WithId(idColumns)

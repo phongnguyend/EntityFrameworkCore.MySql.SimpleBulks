@@ -65,11 +65,11 @@ public class BulkDeleteTests : BaseTest
             }
             else
             {
-                connectionContext.BulkDelete(rows, new MySqlTableInfor(GetTableName("SingleKeyRows"))
+                connectionContext.BulkDelete(rows, new MySqlTableInfor<SingleKeyRow<int>>(GetTableName("SingleKeyRows"))
                 {
                     PrimaryKeys = ["Id"],
                 }, options: options);
-                connectionContext.BulkDelete(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows"))
+                connectionContext.BulkDelete(compositeKeyRows, new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows"))
                 {
                     PrimaryKeys = ["Id1", "Id2"],
                 }, options: options);
@@ -84,11 +84,11 @@ public class BulkDeleteTests : BaseTest
             }
             else
             {
-                connectionContext.BulkDelete(rows, new MySqlTableInfor(GetTableName("SingleKeyRows"))
+                connectionContext.BulkDelete(rows, new MySqlTableInfor<SingleKeyRow<int>>(GetTableName("SingleKeyRows"))
                 {
                     PrimaryKeys = ["Id"],
                 }, options: options);
-                connectionContext.BulkDelete(compositeKeyRows, new MySqlTableInfor(GetTableName("CompositeKeyRows"))
+                connectionContext.BulkDelete(compositeKeyRows, new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows"))
                 {
                     PrimaryKeys = ["Id1", "Id2"],
                 }, options: options);

@@ -8,7 +8,7 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.DirectInsert;
 
 public static class ConnectionContextExtensions
 {
-    public static void DirectInsert<T>(this ConnectionContext connectionContext, T data, Expression<Func<T, object>> columnNamesSelector, MySqlTableInfor table = null, BulkInsertOptions options = null)
+    public static void DirectInsert<T>(this ConnectionContext connectionContext, T data, Expression<Func<T, object>> columnNamesSelector, MySqlTableInfor<T> table = null, BulkInsertOptions options = null)
     {
         connectionContext.CreateBulkInsertBuilder<T>()
    .WithColumns(columnNamesSelector)
@@ -17,7 +17,7 @@ public static class ConnectionContextExtensions
     .SingleInsert(data);
     }
 
-    public static void DirectInsert<T>(this ConnectionContext connectionContext, T data, IEnumerable<string> columnNames, MySqlTableInfor table = null, BulkInsertOptions options = null)
+    public static void DirectInsert<T>(this ConnectionContext connectionContext, T data, IEnumerable<string> columnNames, MySqlTableInfor<T> table = null, BulkInsertOptions options = null)
     {
         connectionContext.CreateBulkInsertBuilder<T>()
        .WithColumns(columnNames)

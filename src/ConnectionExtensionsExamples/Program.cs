@@ -14,7 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-TableMapper.Register<ConfigurationEntry>(new MySqlTableInfor("ConfigurationEntries")
+TableMapper.Register(new MySqlTableInfor<ConfigurationEntry>("ConfigurationEntries")
 {
     PrimaryKeys = ["Id"],
 });

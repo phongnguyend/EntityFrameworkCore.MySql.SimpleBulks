@@ -25,17 +25,17 @@ public abstract class BaseTest : IDisposable
         _connection = new MySqlConnection(connectionString);
         _schema = schema;
 
-        TableMapper.Register<SingleKeyRow<int>>(new MySqlTableInfor(GetTableName("SingleKeyRows"))
+        TableMapper.Register(new MySqlTableInfor<SingleKeyRow<int>>(GetTableName("SingleKeyRows"))
         {
             PrimaryKeys = ["Id"],
         });
 
-        TableMapper.Register<CompositeKeyRow<int, int>>(new MySqlTableInfor(GetTableName("CompositeKeyRows"))
+        TableMapper.Register(new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows"))
         {
             PrimaryKeys = ["Id1", "Id2"],
         });
 
-        TableMapper.Register<ConfigurationEntry>(new MySqlTableInfor(GetTableName("ConfigurationEntry"))
+        TableMapper.Register(new MySqlTableInfor<ConfigurationEntry>(GetTableName("ConfigurationEntry"))
         {
             PrimaryKeys = ["Id"],
             OutputId = new OutputId
@@ -45,12 +45,12 @@ public abstract class BaseTest : IDisposable
             }
         });
 
-        TableMapper.Register<Customer>(new MySqlTableInfor(GetTableName("Customers"))
+        TableMapper.Register(new MySqlTableInfor<Customer>(GetTableName("Customers"))
         {
             PropertyNames = ["Id", "FirstName", "LastName", "CurrentCountryIsoCode", "Index", "Season", "SeasonAsString"]
         });
 
-        TableMapper.Register<Contact>(new MySqlTableInfor(GetTableName("Contacts"))
+        TableMapper.Register(new MySqlTableInfor<Contact>(GetTableName("Contacts"))
         {
             PropertyNames = ["Id", "EmailAddress", "PhoneNumber", "CountryIsoCode", "Index", "Season", "SeasonAsString", "CustomerId"]
         });
