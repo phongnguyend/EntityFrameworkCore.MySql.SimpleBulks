@@ -111,7 +111,7 @@ public class DbContextTableInfor<T> : TableInfor<T>
             {
                 var mapping = mappingSource.FindMapping(columnType);
                 var para = (MySqlParameter)mapping.CreateParameter(command, $"@{prop.Name}", GetProviderValue(prop, data) ?? DBNull.Value);
-                
+
                 parameters.Add(new ParameterInfo
                 {
                     Name = para.ParameterName,
@@ -143,6 +143,8 @@ public class DbContextTableInfor<T> : TableInfor<T>
 
 public class MySqlTableInfor<T> : TableInfor<T>
 {
+    public Func<T, string, MySqlParameter> ParameterConverter { get; init; }
+
     public MySqlTableInfor(string tableName) : base(tableName)
     {
     }
@@ -153,34 +155,45 @@ public class MySqlTableInfor<T> : TableInfor<T>
 
         foreach (var propName in propertyNames)
         {
-            var prop = PropertiesCache<T>.GetProperty(propName);
-            if (prop == null)
+            var para = ParameterConverter?.Invoke(data, propName);
+
+            if (para == null)
             {
-                continue;
-            }
+                var prop = PropertiesCache<T>.GetProperty(propName);
 
-            var type = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
+                var type = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
 
-            var para = new MySqlParameter($"@{prop.Name}", prop.GetValue(data) ?? DBNull.Value);
+                para = new MySqlParameter($"@{prop.Name}", prop.GetValue(data) ?? DBNull.Value);
 
-            var paraInfo = new ParameterInfo
-            {
-                Name = para.ParameterName,
-                Parameter = para
-            };
+                var paraInfo = new ParameterInfo
+                {
+                    Name = para.ParameterName,
+                    Parameter = para
+                };
 
-            if (ColumnTypeMappings != null && ColumnTypeMappings.TryGetValue(prop.Name, out var columnType))
-            {
-                paraInfo.Type = columnType;
+                if (ColumnTypeMappings != null && ColumnTypeMappings.TryGetValue(prop.Name, out var columnType))
+                {
+                    paraInfo.Type = columnType;
+                }
+                else
+                {
+                    paraInfo.Type = type.ToMySqlDbType();
+                }
+
+                para.MySqlDbType = paraInfo.Type.ToMySqlDbType();
+
+                parameters.Add(paraInfo);
             }
             else
             {
-                paraInfo.Type = type.ToMySqlDbType();
+                parameters.Add(new ParameterInfo
+                {
+                    Name = para.ParameterName,
+                    Type = para.MySqlDbType.ToString(),
+                    Parameter = para,
+                    FromConverter = true
+                });
             }
-
-            para.MySqlDbType = paraInfo.Type.ToMySqlDbType();
-
-            parameters.Add(paraInfo);
 
             if (autoAdd)
             {

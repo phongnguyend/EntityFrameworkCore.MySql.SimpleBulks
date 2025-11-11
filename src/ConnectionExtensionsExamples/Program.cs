@@ -17,6 +17,15 @@ using System.Linq;
 TableMapper.Register(new MySqlTableInfor<ConfigurationEntry>("ConfigurationEntries")
 {
     PrimaryKeys = ["Id"],
+    ParameterConverter = (data, propertyName) =>
+    {
+        if (propertyName == "CreatedDateTime")
+        {
+            return new MySqlParameter(propertyName, data.CreatedDateTime);
+        }
+
+        return null;
+    }
 });
 
 var existingConfigurationEntries = new List<ConfigurationEntry>();
