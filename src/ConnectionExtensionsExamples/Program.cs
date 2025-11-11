@@ -14,10 +14,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-TableMapper.Register(new MySqlTableInfor<ConfigurationEntry>("ConfigurationEntries")
+TableMapper.Configure<ConfigurationEntry>(config =>
 {
-    PrimaryKeys = ["Id"],
-    ParameterConverter = (data, propertyName) =>
+    config
+    .TableName("ConfigurationEntries")
+    .PrimaryKeys(["Id"])
+    .ParameterConverter((data, propertyName) =>
     {
         if (propertyName == "CreatedDateTime")
         {
@@ -25,7 +27,7 @@ TableMapper.Register(new MySqlTableInfor<ConfigurationEntry>("ConfigurationEntri
         }
 
         return null;
-    }
+    });
 });
 
 var existingConfigurationEntries = new List<ConfigurationEntry>();

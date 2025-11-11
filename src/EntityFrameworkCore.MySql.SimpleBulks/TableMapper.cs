@@ -12,6 +12,13 @@ public static class TableMapper
         _mappings[typeof(T)] = tableInfo;
     }
 
+    public static void Configure<T>(Action<MySqlTableInforBuilder<T>> config)
+    {
+        var builder = new MySqlTableInforBuilder<T>();
+        config(builder);
+        _mappings[typeof(T)] = builder.Build();
+    }
+
     public static TableInfor<T> Resolve<T>()
     {
         if (!_mappings.TryGetValue(typeof(T), out var tableInfo))
