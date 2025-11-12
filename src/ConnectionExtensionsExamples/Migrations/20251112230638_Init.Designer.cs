@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ConnectionExtensionsExamples.Migrations
 {
     [DbContext(typeof(DemoDbContext))]
-    [Migration("20251105090046_Init")]
+    [Migration("20251112230638_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -48,7 +48,8 @@ namespace ConnectionExtensionsExamples.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("char(36)")
+                        .HasColumnName("Id1");
 
                     b.Property<DateTimeOffset>("CreatedDateTime")
                         .HasColumnType("datetime(6)");
@@ -60,7 +61,8 @@ namespace ConnectionExtensionsExamples.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Key")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("Key1");
 
                     b.Property<DateTime?>("RowVersion")
                         .IsConcurrencyToken()

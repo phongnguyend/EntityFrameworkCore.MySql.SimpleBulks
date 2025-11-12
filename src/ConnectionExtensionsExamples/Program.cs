@@ -19,6 +19,8 @@ TableMapper.Configure<ConfigurationEntry>(config =>
     config
     .TableName("ConfigurationEntries")
     .PrimaryKeys(x => x.Id)
+    .ConfigureProperty(x => x.Id, columnName: "Id1")
+    .ConfigureProperty(x => x.Key, columnName: "Key1")
     .IgnoreProperty(x => x.TestNotMapped)
     .ReadOnlyProperty(x => x.RowVersion)
     .ParameterConverter((data, propertyName) =>
@@ -69,7 +71,6 @@ for (int i = 0; i < 1000; i++)
 }
 
 await connection.BulkInsertAsync(configurationEntries,
-    x => new { x.Id, x.Key, x.Value, x.CreatedDateTime, x.UpdatedDateTime, x.IsSensitive, x.Description, x.SeasonAsInt, x.SeasonAsString },
     options: new BulkInsertOptions
     {
         LogTo = Console.WriteLine
@@ -128,7 +129,6 @@ var configurationEntry = new ConfigurationEntry
 };
 
 await connection.DirectInsertAsync(configurationEntry,
-    x => new { x.Id, x.Key, x.Value, x.CreatedDateTime, x.UpdatedDateTime, x.IsSensitive, x.Description, x.SeasonAsInt, x.SeasonAsString },
     options: new BulkInsertOptions
     {
         LogTo = Console.WriteLine

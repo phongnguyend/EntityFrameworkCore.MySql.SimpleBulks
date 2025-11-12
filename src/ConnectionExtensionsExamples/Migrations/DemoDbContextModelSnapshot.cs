@@ -45,7 +45,8 @@ namespace ConnectionExtensionsExamples.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("char(36)")
+                        .HasColumnName("Id1");
 
                     b.Property<DateTimeOffset>("CreatedDateTime")
                         .HasColumnType("datetime(6)");
@@ -57,7 +58,8 @@ namespace ConnectionExtensionsExamples.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Key")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("Key1");
 
                     b.Property<DateTime?>("RowVersion")
                         .IsConcurrencyToken()

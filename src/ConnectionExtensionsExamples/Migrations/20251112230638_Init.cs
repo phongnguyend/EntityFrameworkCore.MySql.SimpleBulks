@@ -36,12 +36,12 @@ namespace ConnectionExtensionsExamples.Migrations
                 name: "ConfigurationEntries",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Id1 = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     RowVersion = table.Column<DateTime>(type: "timestamp(6)", rowVersion: true, nullable: true)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.ComputedColumn),
                     CreatedDateTime = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
                     UpdatedDateTime = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: true),
-                    Key = table.Column<string>(type: "longtext", nullable: true)
+                    Key1 = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Value = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -53,7 +53,7 @@ namespace ConnectionExtensionsExamples.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ConfigurationEntries", x => x.Id);
+                    table.PrimaryKey("PK_ConfigurationEntries", x => x.Id1);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
