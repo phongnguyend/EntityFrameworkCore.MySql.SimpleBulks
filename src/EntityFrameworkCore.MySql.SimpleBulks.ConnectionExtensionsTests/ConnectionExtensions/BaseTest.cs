@@ -51,14 +51,14 @@ public abstract class BaseTest : IDisposable
         {
             config
             .TableName(GetTableName("Customers"))
-            .PropertyNames(["Id", "FirstName", "LastName", "CurrentCountryIsoCode", "Index", "Season", "SeasonAsString"]);
+            .IgnoreProperty(x => x.Contacts);
         });
 
         TableMapper.Configure<Contact>(config =>
         {
             config
             .TableName(GetTableName("Contacts"))
-            .PropertyNames(["Id", "EmailAddress", "PhoneNumber", "CountryIsoCode", "Index", "Season", "SeasonAsString", "CustomerId"]);
+            .IgnoreProperty(x => x.Customer);
         });
     }
 
