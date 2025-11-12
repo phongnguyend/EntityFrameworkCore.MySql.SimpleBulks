@@ -7,21 +7,32 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 
 public static class ConnectionContextExtensions
 {
+    public static void BulkInsert<T>(this ConnectionContext connectionContext, IReadOnlyCollection<T> data, MySqlTableInfor<T> table = null, BulkInsertOptions options = null)
+    {
+        var temp = table ?? TableMapper.Resolve<T>();
+
+        connectionContext.CreateBulkInsertBuilder<T>()
+       .WithColumns(temp.InsertablePropertyNames)
+       .ToTable(temp)
+          .WithBulkOptions(options)
+     .Execute(data);
+    }
+
     public static void BulkInsert<T>(this ConnectionContext connectionContext, IReadOnlyCollection<T> data, Expression<Func<T, object>> columnNamesSelector, MySqlTableInfor<T> table = null, BulkInsertOptions options = null)
     {
         connectionContext.CreateBulkInsertBuilder<T>()
-   .WithColumns(columnNamesSelector)
-       .ToTable(table ?? TableMapper.Resolve<T>())
+        .WithColumns(columnNamesSelector)
+          .ToTable(table ?? TableMapper.Resolve<T>())
        .WithBulkOptions(options)
-    .Execute(data);
+     .Execute(data);
     }
 
     public static void BulkInsert<T>(this ConnectionContext connectionContext, IReadOnlyCollection<T> data, IReadOnlyCollection<string> columnNames, MySqlTableInfor<T> table = null, BulkInsertOptions options = null)
     {
         connectionContext.CreateBulkInsertBuilder<T>()
-       .WithColumns(columnNames)
-             .ToTable(table ?? TableMapper.Resolve<T>())
-          .WithBulkOptions(options)
-           .Execute(data);
+         .WithColumns(columnNames)
+         .ToTable(table ?? TableMapper.Resolve<T>())
+              .WithBulkOptions(options)
+         .Execute(data);
     }
 }

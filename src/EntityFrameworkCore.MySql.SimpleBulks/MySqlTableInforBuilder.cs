@@ -138,6 +138,11 @@ public class MySqlTableInforBuilder<T>
 
     public MySqlTableInfor<T> Build()
     {
+        if (_outputId?.Mode == OutputIdMode.ServerGenerated && _insertablePropertyNames.Contains(_outputId.Name))
+        {
+            _insertablePropertyNames.Remove(_outputId.Name);
+        }
+
         var tableInfor = new MySqlTableInfor<T>(_name)
         {
             PrimaryKeys = _primaryKeys,

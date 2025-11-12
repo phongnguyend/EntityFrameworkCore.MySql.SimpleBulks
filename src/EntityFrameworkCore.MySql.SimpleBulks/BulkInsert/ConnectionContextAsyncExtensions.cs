@@ -9,21 +9,32 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 
 public static class ConnectionContextAsyncExtensions
 {
+    public static Task BulkInsertAsync<T>(this ConnectionContext connectionContext, IReadOnlyCollection<T> data, MySqlTableInfor<T> table = null, BulkInsertOptions options = null, CancellationToken cancellationToken = default)
+    {
+        var temp = table ?? TableMapper.Resolve<T>();
+
+        return connectionContext.CreateBulkInsertBuilder<T>()
+       .WithColumns(temp.InsertablePropertyNames)
+       .ToTable(temp)
+          .WithBulkOptions(options)
+            .ExecuteAsync(data, cancellationToken);
+    }
+
     public static Task BulkInsertAsync<T>(this ConnectionContext connectionContext, IReadOnlyCollection<T> data, Expression<Func<T, object>> columnNamesSelector, MySqlTableInfor<T> table = null, BulkInsertOptions options = null, CancellationToken cancellationToken = default)
     {
         return connectionContext.CreateBulkInsertBuilder<T>()
-   .WithColumns(columnNamesSelector)
-    .ToTable(table ?? TableMapper.Resolve<T>())
-     .WithBulkOptions(options)
-.ExecuteAsync(data, cancellationToken);
+       .WithColumns(columnNamesSelector)
+       .ToTable(table ?? TableMapper.Resolve<T>())
+          .WithBulkOptions(options)
+            .ExecuteAsync(data, cancellationToken);
     }
 
     public static Task BulkInsertAsync<T>(this ConnectionContext connectionContext, IReadOnlyCollection<T> data, IReadOnlyCollection<string> columnNames, MySqlTableInfor<T> table = null, BulkInsertOptions options = null, CancellationToken cancellationToken = default)
     {
         return connectionContext.CreateBulkInsertBuilder<T>()
-        .WithColumns(columnNames)
-       .ToTable(table ?? TableMapper.Resolve<T>())
-           .WithBulkOptions(options)
-         .ExecuteAsync(data, cancellationToken);
+   .WithColumns(columnNames)
+  .ToTable(table ?? TableMapper.Resolve<T>())
+     .WithBulkOptions(options)
+ .ExecuteAsync(data, cancellationToken);
     }
 }

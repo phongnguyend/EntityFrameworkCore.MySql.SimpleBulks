@@ -19,6 +19,8 @@ TableMapper.Configure<ConfigurationEntry>(config =>
     config
     .TableName("ConfigurationEntries")
     .PrimaryKeys(x => x.Id)
+    .IgnoreProperty(x => x.TestNotMapped)
+    .ReadOnlyProperty(x => x.RowVersion)
     .ParameterConverter((data, propertyName) =>
     {
         if (propertyName == "CreatedDateTime")
