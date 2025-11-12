@@ -11,13 +11,14 @@ using EntityFrameworkCore.MySql.SimpleBulks.DirectUpdate;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using (var dbct = new DemoDbContext())
 {
     dbct.Database.Migrate();
     dbct.Database.ExecuteSqlRaw("SET GLOBAL local_infile = 1;");
 
-    var deleteResult = await dbct.BulkDeleteAsync(dbct.Set<ConfigurationEntry>().AsNoTracking(),
+    var deleteResult = await dbct.BulkDeleteAsync(dbct.Set<ConfigurationEntry>().AsNoTracking().ToList(),
         new BulkDeleteOptions
         {
             LogTo = Console.WriteLine
