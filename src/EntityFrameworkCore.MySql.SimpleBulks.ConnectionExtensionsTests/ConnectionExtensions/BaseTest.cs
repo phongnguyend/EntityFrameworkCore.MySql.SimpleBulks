@@ -25,34 +25,40 @@ public abstract class BaseTest : IDisposable
         _connection = new MySqlConnection(connectionString);
         _schema = schema;
 
-        TableMapper.Register(new MySqlTableInfor<SingleKeyRow<int>>(GetTableName("SingleKeyRows"))
+        TableMapper.Configure<SingleKeyRow<int>>(config =>
         {
-            PrimaryKeys = ["Id"],
+            config
+            .TableName(GetTableName("SingleKeyRows"))
+            .PrimaryKeys(x => x.Id);
         });
 
-        TableMapper.Register(new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows"))
+        TableMapper.Configure<CompositeKeyRow<int, int>>(config =>
         {
-            PrimaryKeys = ["Id1", "Id2"],
+            config
+            .TableName(GetTableName("CompositeKeyRows"))
+            .PrimaryKeys(x => new { x.Id1, x.Id2 });
         });
 
-        TableMapper.Register(new MySqlTableInfor<ConfigurationEntry>(GetTableName("ConfigurationEntry"))
+        TableMapper.Configure<ConfigurationEntry>(config =>
         {
-            PrimaryKeys = ["Id"],
-            OutputId = new OutputId
-            {
-                Name = "Id",
-                Mode = OutputIdMode.ClientGenerated,
-            }
+            config
+            .TableName(GetTableName("ConfigurationEntry"))
+            .PrimaryKeys(x => x.Id)
+            .OutputId(x => x.Id, OutputIdMode.ClientGenerated);
         });
 
-        TableMapper.Register(new MySqlTableInfor<Customer>(GetTableName("Customers"))
+        TableMapper.Configure<Customer>(config =>
         {
-            PropertyNames = ["Id", "FirstName", "LastName", "CurrentCountryIsoCode", "Index", "Season", "SeasonAsString"]
+            config
+            .TableName(GetTableName("Customers"))
+            .PropertyNames(["Id", "FirstName", "LastName", "CurrentCountryIsoCode", "Index", "Season", "SeasonAsString"]);
         });
 
-        TableMapper.Register(new MySqlTableInfor<Contact>(GetTableName("Contacts"))
+        TableMapper.Configure<Contact>(config =>
         {
-            PropertyNames = ["Id", "EmailAddress", "PhoneNumber", "CountryIsoCode", "Index", "Season", "SeasonAsString", "CustomerId"]
+            config
+            .TableName(GetTableName("Contacts"))
+            .PropertyNames(["Id", "EmailAddress", "PhoneNumber", "CountryIsoCode", "Index", "Season", "SeasonAsString", "CustomerId"]);
         });
     }
 
