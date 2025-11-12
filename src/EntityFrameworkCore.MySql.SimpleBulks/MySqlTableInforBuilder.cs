@@ -17,8 +17,6 @@ public class MySqlTableInforBuilder<T>
 
     private IReadOnlyList<string> _insertablePropertyNames;
 
-    private IReadOnlyDictionary<string, Type> _propertyTypes;
-
     private IReadOnlyDictionary<string, string> _columnNameMappings;
 
     private IReadOnlyDictionary<string, string> _columnTypeMappings;
@@ -64,12 +62,6 @@ public class MySqlTableInforBuilder<T>
     public MySqlTableInforBuilder<T> InsertablePropertyNames(IReadOnlyList<string> insertablePropertyNames)
     {
         _insertablePropertyNames = insertablePropertyNames;
-        return this;
-    }
-
-    public MySqlTableInforBuilder<T> PropertyTypes(IReadOnlyDictionary<string, Type> propertyTypes)
-    {
-        _propertyTypes = propertyTypes;
         return this;
     }
 
@@ -120,7 +112,6 @@ public class MySqlTableInforBuilder<T>
             PrimaryKeys = _primaryKeys,
             PropertyNames = _propertyNames,
             InsertablePropertyNames = _insertablePropertyNames,
-            PropertyTypes = _propertyTypes,
             ColumnNameMappings = _columnNameMappings,
             ColumnTypeMappings = _columnTypeMappings,
             ValueConverters = _valueConverters,

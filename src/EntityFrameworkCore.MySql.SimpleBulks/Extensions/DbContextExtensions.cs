@@ -25,7 +25,6 @@ public static class DbContextExtensions
     private static readonly ConcurrentDictionary<Type, Func<string, string, string>> _schemaNameTranslators = new ConcurrentDictionary<Type, Func<string, string, string>>();
     private static readonly ConcurrentDictionary<CacheKey, object> _tableInfoCache = [];
     private static readonly ConcurrentDictionary<CacheKey, IReadOnlyList<ColumnInfor>> _propertiesCache = [];
-    private static readonly ConcurrentDictionary<CacheKey, IReadOnlyDictionary<string, Type>> _propertyTypesCache = [];
     private static readonly ConcurrentDictionary<CacheKey, IReadOnlyDictionary<string, string>> _columnNamesCache = [];
     private static readonly ConcurrentDictionary<CacheKey, IReadOnlyDictionary<string, string>> _columnTypesCache = [];
     private static readonly ConcurrentDictionary<CacheKey, IReadOnlyList<string>> _primaryKeysCache = [];
@@ -59,7 +58,6 @@ public static class DbContextExtensions
                 PrimaryKeys = dbContext.GetPrimaryKeys(key.EntityType),
                 PropertyNames = dbContext.GetAllPropertyNames(key.EntityType),
                 InsertablePropertyNames = dbContext.GetInsertablePropertyNames(key.EntityType),
-                PropertyTypes = dbContext.GetPropertyTypes(key.EntityType),
                 ColumnNameMappings = dbContext.GetColumnNames(key.EntityType),
                 ColumnTypeMappings = dbContext.GetColumnTypes(key.EntityType),
                 ValueConverters = dbContext.GetValueConverters(key.EntityType),
@@ -120,16 +118,6 @@ public static class DbContextExtensions
                     ValueConverter = entityProp.GetValueConverter(),
                 }).ToArray();
             return data;
-        });
-    }
-
-    public static IReadOnlyDictionary<string, Type> GetPropertyTypes(this DbContext dbContext, Type type)
-    {
-        var cacheKey = new CacheKey(dbContext.GetType(), type);
-        return _propertyTypesCache.GetOrAdd(cacheKey, (key) =>
-        {
-            var properties = dbContext.GetProperties(key.EntityType);
-            return properties.ToFrozenDictionary(x => x.PropertyName, x => x.PropertyType);
         });
     }
 
