@@ -115,6 +115,32 @@ public class MySqlTableInforBuilder<T>
         return IgnoreProperty(propertyName);
     }
 
+    public MySqlTableInforBuilder<T> ReadOnlyProperty(string name)
+    {
+        if (_insertablePropertyNames != null && _insertablePropertyNames.Contains(name))
+        {
+            _insertablePropertyNames.Remove(name);
+        }
+
+        return this;
+    }
+
+    public MySqlTableInforBuilder<T> ReadOnlyProperty(Expression<Func<T, object>> nameSelector)
+    {
+        var propertyName = nameSelector.Body.GetMemberName();
+
+        return ReadOnlyProperty(propertyName);
+    }
+
+    public MySqlTableInforBuilder<T> ConfigureProperty(string propertyName,
+        string columnName = null,
+        string columnType = null,
+        ValueConverter valueConverter = null)
+    {
+
+        return this;
+    }
+
     public MySqlTableInfor<T> Build()
     {
         var tableInfor = new MySqlTableInfor<T>(_name)
