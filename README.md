@@ -106,9 +106,21 @@ using EntityFrameworkCore.MySql.SimpleBulks.BulkInsert;
 using EntityFrameworkCore.MySql.SimpleBulks.BulkMerge;
 using EntityFrameworkCore.MySql.SimpleBulks.BulkUpdate;
 
-// Register Type - Table Name globaly
-TableMapper.Register(new MySqlTableInfor<Row>("Rows"));
-TableMapper.Register(new MySqlTableInfor<CompositeKeyRow>("CompositeKeyRows"));
+// Configure Mapping globaly
+
+TableMapper.Configure<Row>(config =>
+{
+    config
+    .TableName("Rows")
+    .PrimaryKeys(x => x.Id);
+});
+
+TableMapper.Configure<CompositeKeyRow>(config =>
+{
+    config
+    .TableName("CompositeKeyRows")
+    .PrimaryKeys(x => new { x.Id1, x.Id2 });
+});
 
 var connection = new ConnectionContext(new MySqlConnection(connectionString), null);
 
