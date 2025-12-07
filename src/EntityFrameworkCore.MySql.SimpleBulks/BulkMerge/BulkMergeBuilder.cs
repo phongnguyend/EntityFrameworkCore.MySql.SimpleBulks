@@ -199,7 +199,7 @@ public class BulkMergeBuilder<T>
             sqlOperator = "+=";
         }
 
-        return $"`{_table.GetDbColumnName(sqlProp)}` {sqlOperator} @{sqlProp}";
+        return $"`{_table.GetDbColumnName(sqlProp)}` {sqlOperator} {_table.CreateParameterName(sqlProp)}";
     }
 
     private static string RemoveOperator(string prop)
@@ -356,7 +356,7 @@ public class BulkMergeBuilder<T>
                 }));
 
             insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{_table.GetDbColumnName(x)}`"))})");
-            insertStatementBuilder.AppendLine($"SELECT {string.Join(", ", _insertColumnNames.Select(x => $"@{x}"))}");
+            insertStatementBuilder.AppendLine($"SELECT {_table.CreateParameterNames(_insertColumnNames)}");
             insertStatementBuilder.AppendLine($"WHERE NOT EXISTS ({whereCondition});");
         }
 
@@ -434,7 +434,7 @@ public class BulkMergeBuilder<T>
             }));
 
             insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{_table.GetDbColumnName(x)}`"))})");
-            insertStatementBuilder.AppendLine($"SELECT {string.Join(", ", _insertColumnNames.Select(x => $"@{x}"))}");
+            insertStatementBuilder.AppendLine($"SELECT {_table.CreateParameterNames(_insertColumnNames)}");
             insertStatementBuilder.AppendLine($"WHERE NOT EXISTS ({whereCondition});");
         }
 

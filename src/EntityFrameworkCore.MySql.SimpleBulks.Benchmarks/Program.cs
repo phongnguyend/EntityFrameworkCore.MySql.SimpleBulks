@@ -24,4 +24,6 @@ _ = BenchmarkRunner.Run<BulkMatchSingleColumnBenchmarks1>();
 _ = BenchmarkRunner.Run<BulkMatchSingleColumnBenchmarks2>();
 _ = BenchmarkRunner.Run<BulkMatchMultipleColumnsBenchmarks1>();
 _ = BenchmarkRunner.Run<BulkMatchMultipleColumnsBenchmarks2>();
+_ = BenchmarkRunner.Run<PropertiesCacheGetValueBenchmarks>();
+_ = BenchmarkRunner.Run<PropertiesCacheSetValueBenchmarks>();
 _ = BenchmarkRunner.Run<TempTableBenchmarks>();

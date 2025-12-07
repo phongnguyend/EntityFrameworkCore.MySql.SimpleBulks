@@ -1,0 +1,6 @@
+﻿CREATE TEMPORARY TABLE OwnedTypeOrders (
+	`Id` int NULL,
+	`ShippingAddress.Street` longtext NULL,
+	`ShippingAddress.Location.Lat` double NULL,
+	`ShippingAddress.Location.Lng` double NULL
+);

@@ -88,4 +88,178 @@ public class GetPropertiesTests
             Assert.Equal(properties, task.Result);
         }
     }
+
+    [Fact]
+    public void GetProperties_ComplexType_ReturnsCorrectColumnInformation()
+    {
+        // Arrange
+        var dbContext = GetDbContext("Tests", "");
+
+        // Act
+        var properties = dbContext.GetProperties(typeof(ComplexTypeOrder));
+
+        // Assert
+        Assert.Equal(4, properties.Count);
+
+        var property = properties.First(p => p.PropertyName == "Id");
+        Assert.Equal(typeof(int), property.PropertyType);
+        Assert.Equal("Id", property.ColumnName);
+        Assert.Equal("int", property.ColumnType);
+        Assert.Equal(ValueGenerated.OnAdd, property.ValueGenerated);
+        Assert.Null(property.DefaultValueSql);
+        Assert.True(property.IsPrimaryKey);
+        Assert.False(property.IsRowVersion);
+
+        property = properties.First(p => p.PropertyName == "ShippingAddress.Street");
+        Assert.Equal(typeof(string), property.PropertyType);
+        Assert.Equal("ShippingAddress_Street", property.ColumnName);
+        Assert.Equal("longtext", property.ColumnType);
+        Assert.Equal(ValueGenerated.Never, property.ValueGenerated);
+        Assert.Null(property.DefaultValueSql);
+        Assert.False(property.IsPrimaryKey);
+        Assert.False(property.IsRowVersion);
+
+        property = properties.First(p => p.PropertyName == "ShippingAddress.Location.Lat");
+        Assert.Equal(typeof(double), property.PropertyType);
+        Assert.Equal("ShippingAddress_Location_Lat", property.ColumnName);
+        Assert.Equal("double", property.ColumnType);
+        Assert.Equal(ValueGenerated.Never, property.ValueGenerated);
+        Assert.Null(property.DefaultValueSql);
+        Assert.False(property.IsPrimaryKey);
+        Assert.False(property.IsRowVersion);
+
+        property = properties.First(p => p.PropertyName == "ShippingAddress.Location.Lng");
+        Assert.Equal(typeof(double), property.PropertyType);
+        Assert.Equal("ShippingAddress_Location_Lng", property.ColumnName);
+        Assert.Equal("double", property.ColumnType);
+        Assert.Equal(ValueGenerated.Never, property.ValueGenerated);
+        Assert.Null(property.DefaultValueSql);
+        Assert.False(property.IsPrimaryKey);
+        Assert.False(property.IsRowVersion);
+    }
+
+    [Fact]
+    public void GetProperties_OwnedType_ReturnsCorrectColumnInformation()
+    {
+        // Arrange
+        var dbContext = GetDbContext("Tests", "");
+
+        // Act
+        var properties = dbContext.GetProperties(typeof(OwnedTypeOrder));
+
+        // Assert
+        Assert.Equal(4, properties.Count);
+
+        var property = properties.First(p => p.PropertyName == "Id");
+        Assert.Equal(typeof(int), property.PropertyType);
+        Assert.Equal("Id", property.ColumnName);
+        Assert.Equal("int", property.ColumnType);
+        Assert.Equal(ValueGenerated.OnAdd, property.ValueGenerated);
+        Assert.Null(property.DefaultValueSql);
+        Assert.True(property.IsPrimaryKey);
+        Assert.False(property.IsRowVersion);
+
+        property = properties.First(p => p.PropertyName == "ShippingAddress.Street");
+        Assert.Equal(typeof(string), property.PropertyType);
+        Assert.Equal("ShippingAddress_Street", property.ColumnName);
+        Assert.Equal("longtext", property.ColumnType);
+        Assert.Equal(ValueGenerated.Never, property.ValueGenerated);
+        Assert.Null(property.DefaultValueSql);
+        Assert.False(property.IsPrimaryKey);
+        Assert.False(property.IsRowVersion);
+
+        property = properties.First(p => p.PropertyName == "ShippingAddress.Location.Lat");
+        Assert.Equal(typeof(double), property.PropertyType);
+        Assert.Equal("ShippingAddress_Location_Lat", property.ColumnName);
+        Assert.Equal("double", property.ColumnType);
+        Assert.Equal(ValueGenerated.Never, property.ValueGenerated);
+        Assert.Null(property.DefaultValueSql);
+        Assert.False(property.IsPrimaryKey);
+        Assert.False(property.IsRowVersion);
+
+        property = properties.First(p => p.PropertyName == "ShippingAddress.Location.Lng");
+        Assert.Equal(typeof(double), property.PropertyType);
+        Assert.Equal("ShippingAddress_Location_Lng", property.ColumnName);
+        Assert.Equal("double", property.ColumnType);
+        Assert.Equal(ValueGenerated.Never, property.ValueGenerated);
+        Assert.Null(property.DefaultValueSql);
+        Assert.False(property.IsPrimaryKey);
+        Assert.False(property.IsRowVersion);
+    }
+
+    [Fact]
+    public void GetProperties_ComplexOwnedType_ReturnsCorrectColumnInformation()
+    {
+        // Arrange
+        var dbContext = GetDbContext("Tests", "");
+
+        // Act
+        var properties = dbContext.GetProperties(typeof(ComplexOwnedTypeOrder));
+
+        // Assert
+        Assert.Equal(7, properties.Count);
+
+        var property = properties.First(p => p.PropertyName == "Id");
+        Assert.Equal(typeof(int), property.PropertyType);
+        Assert.Equal("Id", property.ColumnName);
+        Assert.Equal("int", property.ColumnType);
+        Assert.Equal(ValueGenerated.OnAdd, property.ValueGenerated);
+        Assert.Null(property.DefaultValueSql);
+        Assert.True(property.IsPrimaryKey);
+        Assert.False(property.IsRowVersion);
+
+        property = properties.First(p => p.PropertyName == "ComplexShippingAddress.Street");
+        Assert.Equal(typeof(string), property.PropertyType);
+        Assert.Equal("ComplexShippingAddress_Street", property.ColumnName);
+        Assert.Equal("longtext", property.ColumnType);
+        Assert.Equal(ValueGenerated.Never, property.ValueGenerated);
+        Assert.Null(property.DefaultValueSql);
+        Assert.False(property.IsPrimaryKey);
+        Assert.False(property.IsRowVersion);
+
+        property = properties.First(p => p.PropertyName == "ComplexShippingAddress.Location.Lat");
+        Assert.Equal(typeof(double), property.PropertyType);
+        Assert.Equal("ComplexShippingAddress_Location_Lat", property.ColumnName);
+        Assert.Equal("double", property.ColumnType);
+        Assert.Equal(ValueGenerated.Never, property.ValueGenerated);
+        Assert.Null(property.DefaultValueSql);
+        Assert.False(property.IsPrimaryKey);
+        Assert.False(property.IsRowVersion);
+
+        property = properties.First(p => p.PropertyName == "ComplexShippingAddress.Location.Lng");
+        Assert.Equal(typeof(double), property.PropertyType);
+        Assert.Equal("ComplexShippingAddress_Location_Lng", property.ColumnName);
+        Assert.Equal("double", property.ColumnType);
+        Assert.Equal(ValueGenerated.Never, property.ValueGenerated);
+        Assert.Null(property.DefaultValueSql);
+        Assert.False(property.IsPrimaryKey);
+        Assert.False(property.IsRowVersion);
+
+        property = properties.First(p => p.PropertyName == "OwnedShippingAddress.Street");
+        Assert.Equal(typeof(string), property.PropertyType);
+        Assert.Equal("OwnedShippingAddress_Street", property.ColumnName);
+        Assert.Equal("longtext", property.ColumnType);
+        Assert.Equal(ValueGenerated.Never, property.ValueGenerated);
+        Assert.Null(property.DefaultValueSql);
+        Assert.False(property.IsPrimaryKey);
+        Assert.False(property.IsRowVersion);
+
+        property = properties.First(p => p.PropertyName == "OwnedShippingAddress.Location.Lat");
+        Assert.Equal(typeof(double), property.PropertyType);
+        Assert.Equal("OwnedShippingAddress_Location_Lat", property.ColumnName);
+        Assert.Equal("double", property.ColumnType);
+        Assert.Equal(ValueGenerated.Never, property.ValueGenerated);
+        Assert.Null(property.DefaultValueSql);
+        Assert.False(property.IsPrimaryKey);
+        Assert.False(property.IsRowVersion);
+
+        property = properties.First(p => p.PropertyName == "OwnedShippingAddress.Location.Lng");
+        Assert.Equal(typeof(double), property.PropertyType);
+        Assert.Equal("OwnedShippingAddress_Location_Lng", property.ColumnName);
+        Assert.Equal("double", property.ColumnType);
+        Assert.Equal(ValueGenerated.Never, property.ValueGenerated);
+        Assert.Null(property.DefaultValueSql);
+        Assert.False(property.IsPrimaryKey);
+        Assert.False(property.IsRowVersion);
+    }
 }
