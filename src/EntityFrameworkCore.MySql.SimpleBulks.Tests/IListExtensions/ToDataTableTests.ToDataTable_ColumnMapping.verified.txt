@@ -1,0 +1,7 @@
+﻿CREATE TEMPORARY TABLE ConfigurationEntries (
+	`Id1` char(36) NULL,
+	`Key1` longtext NULL,
+	`Value` longtext NULL,
+	`Description` longtext NULL,
+	`CreatedDateTime` datetime(6) NULL
+);
