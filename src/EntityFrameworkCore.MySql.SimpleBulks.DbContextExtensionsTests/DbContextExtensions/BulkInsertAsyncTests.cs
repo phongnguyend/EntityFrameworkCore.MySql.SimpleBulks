@@ -68,7 +68,7 @@ public class BulkInsertAsyncTests : BaseTest
 
         var options = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         await _context.BulkInsertAsync(rows,
@@ -188,7 +188,7 @@ public class BulkInsertAsyncTests : BaseTest
 
         var options = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         await _context.BulkInsertAsync(rows,
@@ -305,7 +305,7 @@ public class BulkInsertAsyncTests : BaseTest
 
         var options = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         await _context.BulkInsertAsync(rows,
@@ -361,7 +361,7 @@ public class BulkInsertAsyncTests : BaseTest
         var options = new BulkInsertOptions
         {
             KeepIdentity = true,
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         await _context.BulkInsertAsync(configurationEntries, options);
@@ -400,7 +400,7 @@ public class BulkInsertAsyncTests : BaseTest
 
         var options = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         await _context.BulkInsertAsync(configurationEntries, options);

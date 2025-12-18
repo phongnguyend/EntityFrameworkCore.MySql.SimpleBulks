@@ -63,7 +63,7 @@ public class BulkInsertBuilder<T>
 
     public void Execute(IReadOnlyCollection<T> data)
     {
-        if (data.Count() == 1)
+        if (data.Count == 1)
         {
             SingleInsert(data.First());
             return;
@@ -72,7 +72,7 @@ public class BulkInsertBuilder<T>
         DataTable dataTable;
         if (string.IsNullOrWhiteSpace(_outputIdColumn))
         {
-            dataTable = data.ToDataTable(_columnNames, valueConverters: _table.ValueConverters);
+            dataTable = data.ToDataTable(_columnNames, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator);
 
             _connectionContext.EnsureOpen();
 
@@ -90,7 +90,7 @@ public class BulkInsertBuilder<T>
                 columnsToInsert.Add(_outputIdColumn);
             }
 
-            dataTable = data.ToDataTable(columnsToInsert, valueConverters: _table.ValueConverters);
+            dataTable = data.ToDataTable(columnsToInsert, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator);
 
             _connectionContext.EnsureOpen();
 
@@ -116,7 +116,7 @@ public class BulkInsertBuilder<T>
                 setId(row, SequentialGuidGenerator.Next());
             }
 
-            dataTable = data.ToDataTable(columnsToInsert, valueConverters: _table.ValueConverters);
+            dataTable = data.ToDataTable(columnsToInsert, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator);
 
             _connectionContext.EnsureOpen();
 
@@ -126,7 +126,7 @@ public class BulkInsertBuilder<T>
             return;
         }
 
-        dataTable = data.ToDataTable(_columnNames, valueConverters: _table.ValueConverters);
+        dataTable = data.ToDataTable(_columnNames, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator);
 
         _connectionContext.EnsureOpen();
 
@@ -162,15 +162,15 @@ public class BulkInsertBuilder<T>
             setId(dataToInsert, SequentialGuidGenerator.Next());
         }
 
-        insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName} ({string.Join(", ", columnsToInsert.Select(x => $"`{_table.GetDbColumnName(x)}`"))})");
-        insertStatementBuilder.AppendLine($"VALUES ({_table.CreateParameterNames(columnsToInsert)})");
+        insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName} ({_table.CreateDbColumnNames(columnsToInsert, includeDiscriminator: true)})");
+        insertStatementBuilder.AppendLine($"VALUES ({_table.CreateParameterNames(columnsToInsert, includeDiscriminator: true)})");
 
         var insertStatement = insertStatementBuilder.ToString();
 
         Log($"Begin inserting: {Environment.NewLine}{insertStatement}");
 
         using var insertCommand = _connectionContext.CreateTextCommand(insertStatement, _options);
-        LogParameters(_table.CreateMySqlParameters(insertCommand, dataToInsert, columnsToInsert, autoAdd: true));
+        LogParameters(_table.CreateMySqlParameters(insertCommand, dataToInsert, columnsToInsert, includeDiscriminator: true, autoAdd: true));
 
         _connectionContext.EnsureOpen();
 
@@ -199,7 +199,7 @@ public class BulkInsertBuilder<T>
 
     public async Task ExecuteAsync(IReadOnlyCollection<T> data, CancellationToken cancellationToken = default)
     {
-        if (data.Count() == 1)
+        if (data.Count == 1)
         {
             await SingleInsertAsync(data.First(), cancellationToken);
             return;
@@ -208,7 +208,7 @@ public class BulkInsertBuilder<T>
         DataTable dataTable;
         if (string.IsNullOrWhiteSpace(_outputIdColumn))
         {
-            dataTable = await data.ToDataTableAsync(_columnNames, valueConverters: _table.ValueConverters, cancellationToken: cancellationToken);
+            dataTable = await data.ToDataTableAsync(_columnNames, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator, cancellationToken: cancellationToken);
 
             await _connectionContext.EnsureOpenAsync(cancellationToken);
 
@@ -226,7 +226,7 @@ public class BulkInsertBuilder<T>
                 columnsToInsert.Add(_outputIdColumn);
             }
 
-            dataTable = await data.ToDataTableAsync(columnsToInsert, valueConverters: _table.ValueConverters, cancellationToken: cancellationToken);
+            dataTable = await data.ToDataTableAsync(columnsToInsert, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator, cancellationToken: cancellationToken);
 
             await _connectionContext.EnsureOpenAsync(cancellationToken);
 
@@ -252,7 +252,7 @@ public class BulkInsertBuilder<T>
                 setId(row, SequentialGuidGenerator.Next());
             }
 
-            dataTable = await data.ToDataTableAsync(columnsToInsert, valueConverters: _table.ValueConverters, cancellationToken: cancellationToken);
+            dataTable = await data.ToDataTableAsync(columnsToInsert, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator, cancellationToken: cancellationToken);
 
             await _connectionContext.EnsureOpenAsync(cancellationToken);
 
@@ -262,7 +262,7 @@ public class BulkInsertBuilder<T>
             return;
         }
 
-        dataTable = await data.ToDataTableAsync(_columnNames, valueConverters: _table.ValueConverters, cancellationToken: cancellationToken);
+        dataTable = await data.ToDataTableAsync(_columnNames, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator, cancellationToken: cancellationToken);
 
         await _connectionContext.EnsureOpenAsync(cancellationToken);
 
@@ -298,15 +298,15 @@ public class BulkInsertBuilder<T>
             setId(dataToInsert, SequentialGuidGenerator.Next());
         }
 
-        insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName} ({string.Join(", ", columnsToInsert.Select(x => $"`{_table.GetDbColumnName(x)}`"))})");
-        insertStatementBuilder.AppendLine($"VALUES ({_table.CreateParameterNames(columnsToInsert)})");
+        insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName} ({_table.CreateDbColumnNames(columnsToInsert, includeDiscriminator: true)})");
+        insertStatementBuilder.AppendLine($"VALUES ({_table.CreateParameterNames(columnsToInsert, includeDiscriminator: true)})");
 
         var insertStatement = insertStatementBuilder.ToString();
 
         Log($"Begin inserting: {Environment.NewLine}{insertStatement}");
 
         using var insertCommand = _connectionContext.CreateTextCommand(insertStatement, _options);
-        LogParameters(_table.CreateMySqlParameters(insertCommand, dataToInsert, columnsToInsert, autoAdd: true));
+        LogParameters(_table.CreateMySqlParameters(insertCommand, dataToInsert, columnsToInsert, includeDiscriminator: true, autoAdd: true));
 
         await _connectionContext.EnsureOpenAsync(cancellationToken);
 

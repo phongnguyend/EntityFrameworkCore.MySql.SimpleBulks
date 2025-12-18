@@ -68,7 +68,7 @@ public class BulkInsertTests : BaseTest
 
         var options = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         _context.BulkInsert(rows,
@@ -188,7 +188,7 @@ public class BulkInsertTests : BaseTest
 
         var options = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         _context.BulkInsert(rows,
@@ -305,7 +305,7 @@ public class BulkInsertTests : BaseTest
 
         var options = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         _context.BulkInsert(rows,
@@ -361,7 +361,7 @@ public class BulkInsertTests : BaseTest
         var options = new BulkInsertOptions
         {
             KeepIdentity = true,
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         _context.BulkInsert(configurationEntries, options);
@@ -400,7 +400,7 @@ public class BulkInsertTests : BaseTest
 
         var options = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         _context.BulkInsert(configurationEntries, options);

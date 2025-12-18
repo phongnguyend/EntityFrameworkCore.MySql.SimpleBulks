@@ -76,9 +76,60 @@ public class BulkMergeBuilder<T>
         return this;
     }
 
+    private List<string> GetKeys()
+    {
+        var copiedPropertyNames = _idColumns.ToList();
+
+        if (_table.Discriminator != null && !copiedPropertyNames.Contains(_table.Discriminator.PropertyName))
+        {
+            copiedPropertyNames.Add(_table.Discriminator.PropertyName);
+        }
+
+        return copiedPropertyNames;
+    }
+
+    private string CreateJoinCondition(System.Data.DataTable dataTable)
+    {
+        return string.Join(" and ", GetKeys().Select(x =>
+        {
+            string collation = !string.IsNullOrEmpty(_options.Collation) && dataTable.Columns[x].DataType == typeof(string) ?
+            $" collate {_options.Collation}" : string.Empty;
+            return $"s.`{x}`{collation} = t.`{_table.GetDbColumnName(x)}`{collation}";
+        }));
+    }
+
+    private string CreateWhereIsNullCondition()
+    {
+        return string.Join(" and ", GetKeys().Select(x =>
+        {
+            return $"t.`{_table.GetDbColumnName(x)}` IS NULL";
+        }));
+    }
+
+    private string CreateWhereCondition()
+    {
+        return string.Join(" AND ", GetKeys().Select(x =>
+        {
+            return CreateSetStatement(x);
+        }));
+    }
+
+    private string CreateWhereNotExistsCondition()
+    {
+        return $"SELECT 1 FROM {_table.SchemaQualifiedTableName} WHERE " + string.Join(" AND ", GetKeys().Select(x =>
+        {
+            return CreateSetStatement(x);
+        }));
+    }
+
+    private string CreateIndex(string tableName)
+    {
+        return $"CREATE INDEX Idx_Id ON {tableName} ({string.Join(",", GetKeys().Select(x => $"`{x}`"))});";
+    }
+
     public BulkMergeResult Execute(IReadOnlyCollection<T> data)
     {
-        if (data.Count() == 1)
+        if (data.Count == 1)
         {
             return SingleMerge(data.First());
         }
@@ -95,21 +146,13 @@ public class BulkMergeBuilder<T>
         propertyNames.AddRange(_insertColumnNames);
         propertyNames = propertyNames.Distinct().ToList();
 
-        var dataTable = data.ToDataTable(propertyNames, valueConverters: _table.ValueConverters);
+        var dataTable = data.ToDataTable(propertyNames, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _table.ColumnTypeMappings);
-        sqlCreateTemptable += $"\nCREATE INDEX Idx_Id ON {temptableName} ({string.Join(",", _idColumns.Select(x => $"`{x}`"))});";
+        sqlCreateTemptable += $"\n{CreateIndex(temptableName)}";
 
-        var joinCondition = string.Join(" and ", _idColumns.Select(x =>
-              {
-                  string collation = !string.IsNullOrEmpty(_options.Collation) && dataTable.Columns[x].DataType == typeof(string) ?
-                 $" collate {_options.Collation}" : string.Empty;
-                  return $"s.`{x}`{collation} = t.`{_table.GetDbColumnName(x)}`{collation}";
-              }));
+        var joinCondition = CreateJoinCondition(dataTable);
 
-        var whereCondition = string.Join(" and ", _idColumns.Select(x =>
-        {
-            return $"t.`{_table.GetDbColumnName(x)}` IS NULL";
-        }));
+        var whereCondition = CreateWhereIsNullCondition();
 
         var insertStatementBuilder = new StringBuilder();
         var updateStatementBuilder = new StringBuilder();
@@ -122,8 +165,8 @@ public class BulkMergeBuilder<T>
 
         if (_insertColumnNames.Any())
         {
-            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{_table.GetDbColumnName(x)}`"))})");
-            insertStatementBuilder.AppendLine($"SELECT {string.Join(", ", _insertColumnNames.Select(x => $"s.`{x}`"))}");
+            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({_table.CreateDbColumnNames(_insertColumnNames, includeDiscriminator: true)})");
+            insertStatementBuilder.AppendLine($"SELECT {_table.CreateColumnNames(_insertColumnNames, "s", includeDiscriminator: true)}");
             insertStatementBuilder.AppendLine($"FROM {temptableName} s");
             insertStatementBuilder.AppendLine($"LEFT JOIN {_table.SchemaQualifiedTableName} t ON {joinCondition}");
             insertStatementBuilder.AppendLine($"WHERE {whereCondition};");
@@ -228,7 +271,7 @@ public class BulkMergeBuilder<T>
 
     public async Task<BulkMergeResult> ExecuteAsync(IReadOnlyCollection<T> data, CancellationToken cancellationToken = default)
     {
-        if (data.Count() == 1)
+        if (data.Count == 1)
         {
             return await SingleMergeAsync(data.First(), cancellationToken);
         }
@@ -245,21 +288,13 @@ public class BulkMergeBuilder<T>
         propertyNames.AddRange(_insertColumnNames);
         propertyNames = propertyNames.Distinct().ToList();
 
-        var dataTable = await data.ToDataTableAsync(propertyNames, valueConverters: _table.ValueConverters, cancellationToken: cancellationToken);
+        var dataTable = await data.ToDataTableAsync(propertyNames, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator, cancellationToken: cancellationToken);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _table.ColumnTypeMappings);
-        sqlCreateTemptable += $"\nCREATE INDEX Idx_Id ON {temptableName} ({string.Join(",", _idColumns.Select(x => $"`{x}`"))});";
+        sqlCreateTemptable += $"\n{CreateIndex(temptableName)}";
 
-        var joinCondition = string.Join(" and ", _idColumns.Select(x =>
-        {
-            string collation = !string.IsNullOrEmpty(_options.Collation) && dataTable.Columns[x].DataType == typeof(string) ?
-           $" collate {_options.Collation}" : string.Empty;
-            return $"s.`{x}`{collation} = t.`{_table.GetDbColumnName(x)}`{collation}";
-        }));
+        var joinCondition = CreateJoinCondition(dataTable);
 
-        var whereCondition = string.Join(" and ", _idColumns.Select(x =>
-        {
-            return $"t.`{_table.GetDbColumnName(x)}` IS NULL";
-        }));
+        var whereCondition = CreateWhereIsNullCondition();
 
         var insertStatementBuilder = new StringBuilder();
         var updateStatementBuilder = new StringBuilder();
@@ -272,8 +307,8 @@ public class BulkMergeBuilder<T>
 
         if (_insertColumnNames.Any())
         {
-            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{_table.GetDbColumnName(x)}`"))})");
-            insertStatementBuilder.AppendLine($"SELECT {string.Join(", ", _insertColumnNames.Select(x => $"s.`{x}`"))}");
+            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({_table.CreateDbColumnNames(_insertColumnNames, includeDiscriminator: true)})");
+            insertStatementBuilder.AppendLine($"SELECT {_table.CreateColumnNames(_insertColumnNames, "s", includeDiscriminator: true)}");
             insertStatementBuilder.AppendLine($"FROM {temptableName} s");
             insertStatementBuilder.AppendLine($"LEFT JOIN {_table.SchemaQualifiedTableName} t ON {joinCondition}");
             insertStatementBuilder.AppendLine($"WHERE {whereCondition};");
@@ -338,10 +373,7 @@ public class BulkMergeBuilder<T>
 
         if (_updateColumnNames.Any())
         {
-            var whereCondition = string.Join(" AND ", _idColumns.Select(x =>
-               {
-                   return CreateSetStatement(x);
-               }));
+            var whereCondition = CreateWhereCondition();
 
             updateStatementBuilder.AppendLine($"UPDATE {_table.SchemaQualifiedTableName} SET");
             updateStatementBuilder.AppendLine(string.Join("," + Environment.NewLine, _updateColumnNames.Select(x => CreateSetStatement(x))));
@@ -350,13 +382,10 @@ public class BulkMergeBuilder<T>
 
         if (_insertColumnNames.Any())
         {
-            var whereCondition = $"SELECT 1 FROM {_table.SchemaQualifiedTableName} WHERE " + string.Join(" AND ", _idColumns.Select(x =>
-                {
-                    return CreateSetStatement(x);
-                }));
+            var whereCondition = CreateWhereNotExistsCondition();
 
-            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{_table.GetDbColumnName(x)}`"))})");
-            insertStatementBuilder.AppendLine($"SELECT {_table.CreateParameterNames(_insertColumnNames)}");
+            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({_table.CreateDbColumnNames(_insertColumnNames, includeDiscriminator: true)})");
+            insertStatementBuilder.AppendLine($"SELECT {_table.CreateParameterNames(_insertColumnNames, includeDiscriminator: true)}");
             insertStatementBuilder.AppendLine($"WHERE NOT EXISTS ({whereCondition});");
         }
 
@@ -375,7 +404,7 @@ public class BulkMergeBuilder<T>
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
             using var updateCommand = _connectionContext.CreateTextCommand(sqlUpdateStatement, _options);
-            LogParameters(_table.CreateMySqlParameters(updateCommand, data, propertyNamesIncludeId, autoAdd: true));
+            LogParameters(_table.CreateMySqlParameters(updateCommand, data, propertyNamesIncludeId, includeDiscriminator: true, autoAdd: true));
 
             result.UpdatedRows = updateCommand.ExecuteNonQuery();
 
@@ -393,7 +422,7 @@ public class BulkMergeBuilder<T>
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
             using var insertCommand = _connectionContext.CreateTextCommand(sqlInsertStatement, _options);
-            LogParameters(_table.CreateMySqlParameters(insertCommand, data, propertyNamesIncludeId, autoAdd: true));
+            LogParameters(_table.CreateMySqlParameters(insertCommand, data, propertyNamesIncludeId, includeDiscriminator: true, autoAdd: true));
 
             result.InsertedRows = insertCommand.ExecuteNonQuery();
 
@@ -416,10 +445,7 @@ public class BulkMergeBuilder<T>
 
         if (_updateColumnNames.Any())
         {
-            var whereCondition = string.Join(" AND ", _idColumns.Select(x =>
-                 {
-                     return CreateSetStatement(x);
-                 }));
+            var whereCondition = CreateWhereCondition();
 
             updateStatementBuilder.AppendLine($"UPDATE {_table.SchemaQualifiedTableName} SET");
             updateStatementBuilder.AppendLine(string.Join("," + Environment.NewLine, _updateColumnNames.Select(x => CreateSetStatement(x))));
@@ -428,13 +454,10 @@ public class BulkMergeBuilder<T>
 
         if (_insertColumnNames.Any())
         {
-            var whereCondition = $"SELECT 1 FROM {_table.SchemaQualifiedTableName} WHERE " + string.Join(" AND ", _idColumns.Select(x =>
-            {
-                return CreateSetStatement(x);
-            }));
+            var whereCondition = CreateWhereNotExistsCondition();
 
-            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({string.Join(", ", _insertColumnNames.Select(x => $"`{_table.GetDbColumnName(x)}`"))})");
-            insertStatementBuilder.AppendLine($"SELECT {_table.CreateParameterNames(_insertColumnNames)}");
+            insertStatementBuilder.AppendLine($"INSERT INTO {_table.SchemaQualifiedTableName}({_table.CreateDbColumnNames(_insertColumnNames, includeDiscriminator: true)})");
+            insertStatementBuilder.AppendLine($"SELECT {_table.CreateParameterNames(_insertColumnNames, includeDiscriminator: true)}");
             insertStatementBuilder.AppendLine($"WHERE NOT EXISTS ({whereCondition});");
         }
 
@@ -453,7 +476,7 @@ public class BulkMergeBuilder<T>
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
             using var updateCommand = _connectionContext.CreateTextCommand(sqlUpdateStatement, _options);
-            LogParameters(_table.CreateMySqlParameters(updateCommand, data, propertyNamesIncludeId, autoAdd: true));
+            LogParameters(_table.CreateMySqlParameters(updateCommand, data, propertyNamesIncludeId, includeDiscriminator: true, autoAdd: true));
 
             result.UpdatedRows = await updateCommand.ExecuteNonQueryAsync(cancellationToken);
 
@@ -471,7 +494,7 @@ public class BulkMergeBuilder<T>
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
 
             using var insertCommand = _connectionContext.CreateTextCommand(sqlInsertStatement, _options);
-            LogParameters(_table.CreateMySqlParameters(insertCommand, data, propertyNamesIncludeId, autoAdd: true));
+            LogParameters(_table.CreateMySqlParameters(insertCommand, data, propertyNamesIncludeId, includeDiscriminator: true, autoAdd: true));
 
             result.InsertedRows = await insertCommand.ExecuteNonQueryAsync(cancellationToken);
 

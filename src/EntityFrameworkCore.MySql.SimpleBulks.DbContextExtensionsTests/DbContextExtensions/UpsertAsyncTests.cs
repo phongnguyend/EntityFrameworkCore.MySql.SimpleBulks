@@ -140,7 +140,7 @@ public class UpsertAsyncTests : BaseTest
                 },
                 new BulkMergeOptions
                 {
-                    LogTo = _output.WriteLine
+                    LogTo = LogTo
                 });
 
         var result2 = await _context.UpsertAsync(existingCompositeKeyRows,
@@ -149,7 +149,7 @@ public class UpsertAsyncTests : BaseTest
                 row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
                 new BulkMergeOptions
                 {
-                    LogTo = _output.WriteLine
+                    LogTo = LogTo
                 });
 
         tran.Commit();
@@ -292,7 +292,7 @@ public class UpsertAsyncTests : BaseTest
                 },
                 new BulkMergeOptions
                 {
-                    LogTo = _output.WriteLine
+                    LogTo = LogTo
                 });
 
         var result2 = await _context.UpsertAsync(newCompositeKeyRow,
@@ -301,7 +301,7 @@ public class UpsertAsyncTests : BaseTest
                 row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
                 new BulkMergeOptions
                 {
-                    LogTo = _output.WriteLine
+                    LogTo = LogTo
                 });
 
         tran.Commit();
@@ -386,7 +386,7 @@ public class UpsertAsyncTests : BaseTest
             ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
             new BulkMergeOptions
             {
-                LogTo = _output.WriteLine
+                LogTo = LogTo
             });
 
         var result2 = await _context.UpsertAsync(existingCompositeKeyRows,
@@ -395,7 +395,7 @@ public class UpsertAsyncTests : BaseTest
             ["Id1", "Id2", "Column1", "Column2", "Column3", "Season", "SeasonAsString"],
             new BulkMergeOptions
             {
-                LogTo = _output.WriteLine
+                LogTo = LogTo
             });
 
         tran.Commit();
@@ -512,7 +512,7 @@ public class UpsertAsyncTests : BaseTest
             "OwnedShippingAddress.Location.Lng", "BulkId"],
             new BulkMergeOptions
             {
-                LogTo = _output.WriteLine
+                LogTo = LogTo
             });
 
         var result2 = await _context.UpsertAsync(newCompositeKeyRow,
@@ -521,7 +521,7 @@ public class UpsertAsyncTests : BaseTest
             ["Id1", "Id2", "Column1", "Column2", "Column3", "Season", "SeasonAsString"],
             new BulkMergeOptions
             {
-                LogTo = _output.WriteLine
+                LogTo = LogTo
             });
 
         tran.Commit();
@@ -593,7 +593,7 @@ public class UpsertAsyncTests : BaseTest
 
         _context.BulkInsert(configurationEntries, new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         });
 
         var entry = configurationEntries.First();
@@ -606,7 +606,7 @@ public class UpsertAsyncTests : BaseTest
              x => new { },
              new BulkMergeOptions
              {
-                 LogTo = _output.WriteLine
+                 LogTo = LogTo
              });
 
         // Assert
@@ -651,7 +651,7 @@ public class UpsertAsyncTests : BaseTest
 
         _context.BulkInsert(configurationEntries, new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         });
 
         var entry = configurationEntries.First();
@@ -664,7 +664,7 @@ public class UpsertAsyncTests : BaseTest
             x => new { x.Key, x.Value, x.Description, x.IsSensitive, x.CreatedDateTime },
             new BulkMergeOptions
             {
-                LogTo = _output.WriteLine
+                LogTo = LogTo
             });
 
         // Assert
@@ -710,7 +710,7 @@ public class UpsertAsyncTests : BaseTest
 
         _context.BulkInsert(configurationEntries, new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         });
 
         for (int i = length; i < length * 2; i++)
@@ -732,7 +732,7 @@ public class UpsertAsyncTests : BaseTest
                 x => new { x.Id, x.Key, x.Value, x.Description, x.IsSensitive, x.CreatedDateTime },
                 new BulkMergeOptions
                 {
-                    LogTo = _output.WriteLine
+                    LogTo = LogTo
                 });
 
             Assert.Equal(1, result.AffectedRows);
@@ -780,7 +780,7 @@ public class UpsertAsyncTests : BaseTest
 
         _context.BulkInsert(configurationEntries, new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         });
 
         for (int i = length; i < length * 2; i++)
@@ -802,7 +802,7 @@ public class UpsertAsyncTests : BaseTest
                 x => new { x.Id, x.Key, x.Value, x.Description, x.IsSensitive, x.CreatedDateTime },
                 new BulkMergeOptions
                 {
-                    LogTo = _output.WriteLine
+                    LogTo = LogTo
                 });
 
             Assert.Equal(1, result.AffectedRows);
@@ -849,7 +849,7 @@ public class UpsertAsyncTests : BaseTest
 
         _context.BulkInsert(configurationEntries, new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         });
 
         var entry = configurationEntries.First();
@@ -862,7 +862,7 @@ public class UpsertAsyncTests : BaseTest
             x => new { },
             new BulkMergeOptions
             {
-                LogTo = _output.WriteLine
+                LogTo = LogTo
             });
 
         Assert.Equal(0, result1.AffectedRows);
@@ -875,7 +875,7 @@ public class UpsertAsyncTests : BaseTest
             x => new { x.Key, x.Value, x.Description, x.IsSensitive, x.CreatedDateTime },
             new BulkMergeOptions
             {
-                LogTo = _output.WriteLine
+                LogTo = LogTo
             });
 
         Assert.Equal(0, result2.AffectedRows);
@@ -932,7 +932,7 @@ public class UpsertAsyncTests : BaseTest
 
         _context.BulkInsert(configurationEntries, new()
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         });
 
         var entry = new ConfigurationEntry
@@ -949,7 +949,7 @@ public class UpsertAsyncTests : BaseTest
             x => new { },
             new()
             {
-                LogTo = _output.WriteLine
+                LogTo = LogTo
             });
 
         Assert.Equal(0, result1.AffectedRows);
@@ -962,7 +962,7 @@ public class UpsertAsyncTests : BaseTest
             x => new { },
             new()
             {
-                LogTo = _output.WriteLine
+                LogTo = LogTo
             });
 
         Assert.Equal(0, result2.AffectedRows);

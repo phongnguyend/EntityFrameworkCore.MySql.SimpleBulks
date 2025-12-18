@@ -76,7 +76,7 @@ public class BulkDeleteTests : BaseTest
 
         var options = new BulkDeleteOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var deleteResult1 = _context.BulkDelete(rows, options);

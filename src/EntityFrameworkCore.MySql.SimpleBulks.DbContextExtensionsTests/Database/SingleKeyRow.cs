@@ -44,3 +44,7 @@ public class SingleKeyRow<TId>
 
     public int? BulkIndex { get; set; }
 }
+
+public class ExtendedSingleKeyRow<TId> : SingleKeyRow<TId>
+{
+}
