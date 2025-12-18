@@ -76,7 +76,7 @@ public class BulkDeleteAsyncTests : BaseTest
 
         var options = new BulkDeleteOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var deleteResult1 = await _context.BulkDeleteAsync(rows, options);

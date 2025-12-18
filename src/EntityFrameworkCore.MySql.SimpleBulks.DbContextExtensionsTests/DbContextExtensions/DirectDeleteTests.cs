@@ -77,7 +77,7 @@ public class DirectDeleteTests : BaseTest
 
         var options = new BulkDeleteOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var deleteResult1 = _context.DirectDelete(row, options);
@@ -110,7 +110,7 @@ public class DirectDeleteTests : BaseTest
 
         var options = new BulkDeleteOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var deleteResult1 = _context.DirectDelete(row, options);

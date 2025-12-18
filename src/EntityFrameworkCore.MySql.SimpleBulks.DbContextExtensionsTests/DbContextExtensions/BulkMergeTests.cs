@@ -145,7 +145,7 @@ public class BulkMergeTests : BaseTest
 
         var mergeOptions = new BulkMergeOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var result1 = _context.BulkMerge(rows,
@@ -306,7 +306,7 @@ public class BulkMergeTests : BaseTest
 
         var mergeOptions = new BulkMergeOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var result1 = _context.BulkMerge(rows,
@@ -397,7 +397,7 @@ public class BulkMergeTests : BaseTest
 
         var insertOptions = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         _context.BulkInsert(configurationEntries, insertOptions);
@@ -421,7 +421,7 @@ public class BulkMergeTests : BaseTest
 
         var mergeOptions = new BulkMergeOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var result = _context.BulkMerge(configurationEntries,
@@ -470,7 +470,7 @@ public class BulkMergeTests : BaseTest
 
         var insertOptions = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         _context.BulkInsert(configurationEntries, insertOptions);
@@ -495,7 +495,7 @@ public class BulkMergeTests : BaseTest
 
         var mergeOptions = new BulkMergeOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var result = _context.BulkMerge(configurationEntries,
@@ -554,7 +554,7 @@ x => x.Id,
 
         var insertOptions = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         _context.BulkInsert(configurationEntries, insertOptions);
@@ -578,7 +578,7 @@ x => x.Id,
 
         var mergeOptions = new BulkMergeOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var result = _context.BulkMerge(configurationEntries,

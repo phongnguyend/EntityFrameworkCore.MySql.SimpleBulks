@@ -77,7 +77,7 @@ public class BulkMatchAsyncTests : BaseTest
 
         var matchOptions = new BulkMatchOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         // Act
@@ -108,7 +108,7 @@ public class BulkMatchAsyncTests : BaseTest
 
         var matchOptions = new BulkMatchOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         // Act
@@ -138,7 +138,7 @@ public class BulkMatchAsyncTests : BaseTest
 
         var matchOptions = new BulkMatchOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         // Act
@@ -174,7 +174,7 @@ public class BulkMatchAsyncTests : BaseTest
 
         var matchOptions = new BulkMatchOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         // Act
@@ -207,7 +207,7 @@ public class BulkMatchAsyncTests : BaseTest
 
         var matchOptions = new BulkMatchOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         // Act
@@ -242,7 +242,7 @@ public class BulkMatchAsyncTests : BaseTest
 
         var matchOptions = new BulkMatchOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         // Act

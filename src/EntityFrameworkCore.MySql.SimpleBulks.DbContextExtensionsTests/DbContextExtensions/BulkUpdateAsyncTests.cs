@@ -113,14 +113,14 @@ public class BulkUpdateAsyncTests : BaseTest
     },
        new BulkUpdateOptions
        {
-           LogTo = _output.WriteLine
+           LogTo = LogTo
        });
 
         var updateResult2 = await _context.BulkUpdateAsync(compositeKeyRows,
    row => new { row.Column3, row.Column2, row.Season, row.SeasonAsString },
      new BulkUpdateOptions
      {
-         LogTo = _output.WriteLine
+         LogTo = LogTo
      });
 
         tran.Commit();
@@ -189,14 +189,14 @@ public class BulkUpdateAsyncTests : BaseTest
               ["Column3", "Column2", "Season", "SeasonAsString"],
         new BulkUpdateOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         });
 
         var updateResult2 = await _context.BulkUpdateAsync(compositeKeyRows,
     ["Column3", "Column2", "Season", "SeasonAsString"],
       new BulkUpdateOptions
       {
-          LogTo = _output.WriteLine
+          LogTo = LogTo
       });
 
         tran.Commit();

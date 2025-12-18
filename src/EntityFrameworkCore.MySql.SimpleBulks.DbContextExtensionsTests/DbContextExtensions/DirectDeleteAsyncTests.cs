@@ -77,7 +77,7 @@ public class DirectDeleteAsyncTests : BaseTest
 
         var options = new BulkDeleteOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var deleteResult1 = await _context.DirectDeleteAsync(row, options);
@@ -110,7 +110,7 @@ public class DirectDeleteAsyncTests : BaseTest
 
         var options = new BulkDeleteOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var deleteResult1 = await _context.DirectDeleteAsync(row, options);

@@ -110,14 +110,14 @@ public class DirectUpdateTests : BaseTest
     },
             new BulkUpdateOptions
             {
-                LogTo = _output.WriteLine
+                LogTo = LogTo
             });
 
         var updateResult2 = _context.DirectUpdate(compositeKeyRow,
                 row => new { row.Column3, row.Column2, row.Season, row.SeasonAsString },
     new BulkUpdateOptions
     {
-        LogTo = _output.WriteLine
+        LogTo = LogTo
     });
 
         tran.Commit();
@@ -182,14 +182,14 @@ public class DirectUpdateTests : BaseTest
          ["Column3", "Column2", "Season", "SeasonAsString"],
               new BulkUpdateOptions
               {
-                  LogTo = _output.WriteLine
+                  LogTo = LogTo
               });
 
         var updateResult2 = _context.DirectUpdate(compositeKeyRow,
             ["Column3", "Column2", "Season", "SeasonAsString"],
         new BulkUpdateOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         });
 
         tran.Commit();

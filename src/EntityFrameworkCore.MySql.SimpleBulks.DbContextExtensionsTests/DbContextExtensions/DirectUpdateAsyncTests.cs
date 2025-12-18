@@ -96,7 +96,7 @@ public class DirectUpdateAsyncTests : BaseTest
 
         var updateOptions = new BulkUpdateOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var updateResult1 = await _context.DirectUpdateAsync(row,
@@ -179,7 +179,7 @@ public class DirectUpdateAsyncTests : BaseTest
 
         var updateOptions = new BulkUpdateOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var updateResult1 = await _context.DirectUpdateAsync(row,

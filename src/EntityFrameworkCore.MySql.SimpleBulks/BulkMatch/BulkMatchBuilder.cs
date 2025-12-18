@@ -60,19 +60,36 @@ public class BulkMatchBuilder<T>
         return this;
     }
 
+    private List<string> GetKeys()
+    {
+        var copiedPropertyNames = _matchedColumns.ToList();
+
+        if (_table.Discriminator != null && !copiedPropertyNames.Contains(_table.Discriminator.PropertyName))
+        {
+            copiedPropertyNames.Add(_table.Discriminator.PropertyName);
+        }
+
+        return copiedPropertyNames;
+    }
+
+    private string CreateJoinCondition(DataTable dataTable)
+    {
+        return string.Join(" AND ", GetKeys().Select(x =>
+        {
+            string collation = !string.IsNullOrEmpty(_options.Collation) && dataTable.Columns[x].DataType == typeof(string) ?
+            $" COLLATE {_options.Collation}" : string.Empty;
+            return $"a.`{_table.GetDbColumnName(x)}`{collation} = b.`{x}`{collation}";
+        }));
+    }
+
     public List<T> Execute(IReadOnlyCollection<T> machedValues)
     {
         var temptableName = $"`{Guid.NewGuid()}`";
 
-        var dataTable = machedValues.ToDataTable(_matchedColumns, valueConverters: _table.ValueConverters);
+        var dataTable = machedValues.ToDataTable(_matchedColumns, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _table.ColumnTypeMappings);
 
-        var joinCondition = string.Join(" AND ", _matchedColumns.Select(x =>
-    {
-        string collation = !string.IsNullOrEmpty(_options.Collation) && dataTable.Columns[x].DataType == typeof(string) ?
- $" COLLATE {_options.Collation}" : string.Empty;
-        return $"a.`{_table.GetDbColumnName(x)}`{collation} = b.`{x}`{collation}";
-    }));
+        var joinCondition = CreateJoinCondition(dataTable);
 
         var selectQueryBuilder = new StringBuilder();
         selectQueryBuilder.AppendLine($"SELECT {string.Join(", ", _returnedColumns.Select(x => CreateSelectStatement(x)))} ");
@@ -138,15 +155,10 @@ public class BulkMatchBuilder<T>
     {
         var temptableName = $"`{Guid.NewGuid()}`";
 
-        var dataTable = await machedValues.ToDataTableAsync(_matchedColumns, valueConverters: _table.ValueConverters, cancellationToken: cancellationToken);
+        var dataTable = await machedValues.ToDataTableAsync(_matchedColumns, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator, cancellationToken: cancellationToken);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _table.ColumnTypeMappings);
 
-        var joinCondition = string.Join(" AND ", _matchedColumns.Select(x =>
-          {
-              string collation = !string.IsNullOrEmpty(_options.Collation) && dataTable.Columns[x].DataType == typeof(string) ?
-              $" COLLATE {_options.Collation}" : string.Empty;
-              return $"a.`{_table.GetDbColumnName(x)}`{collation} = b.`{x}`{collation}";
-          }));
+        var joinCondition = CreateJoinCondition(dataTable);
 
         var selectQueryBuilder = new StringBuilder();
         selectQueryBuilder.AppendLine($"SELECT {string.Join(", ", _returnedColumns.Select(x => CreateSelectStatement(x)))} ");
