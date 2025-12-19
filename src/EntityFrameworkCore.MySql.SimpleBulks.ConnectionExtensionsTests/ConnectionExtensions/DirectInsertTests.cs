@@ -42,7 +42,7 @@ public class DirectInsertTests : BaseTest
 
         var options = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         connectionContext.DirectInsert(row,
@@ -109,7 +109,7 @@ public class DirectInsertTests : BaseTest
 
         var options = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         connectionContext.DirectInsert(row,
@@ -174,7 +174,7 @@ public class DirectInsertTests : BaseTest
 
         var options = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         connectionContext.DirectInsert(row,
@@ -212,7 +212,7 @@ public class DirectInsertTests : BaseTest
         var options = new BulkInsertOptions
         {
             KeepIdentity = true,
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         connectionContext.DirectInsert(configurationEntry, x => new { x.Id, x.Key, x.Value, x.CreatedDateTime, x.UpdatedDateTime, x.IsSensitive, x.Description }, options: options);
@@ -242,7 +242,7 @@ public class DirectInsertTests : BaseTest
 
         var options = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         connectionContext.DirectInsert(configurationEntry, x => new { x.Id, x.Key, x.Value, x.CreatedDateTime, x.UpdatedDateTime, x.IsSensitive, x.Description }, options: options);

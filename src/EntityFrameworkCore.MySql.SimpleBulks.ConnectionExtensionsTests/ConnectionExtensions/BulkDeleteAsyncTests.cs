@@ -33,11 +33,9 @@ public class BulkDeleteAsyncTests : BaseTest
             });
         }
 
-        _context.BulkInsert(rows,
-                row => new { row.Column1, row.Column2, row.Column3 });
+        _context.BulkInsert(rows);
 
-        _context.BulkInsert(compositeKeyRows,
-                row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 });
+        _context.BulkInsert(compositeKeyRows);
     }
 
     [Theory]
@@ -53,7 +51,7 @@ public class BulkDeleteAsyncTests : BaseTest
 
         var options = new BulkDeleteOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         if (useLinq)

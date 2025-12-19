@@ -37,11 +37,9 @@ public class BulkUpdateAsyncTests : BaseTest
             });
         }
 
-        _context.BulkInsert(rows,
-                row => new { row.Column1, row.Column2, row.Column3 });
+        _context.BulkInsert(rows);
 
-        _context.BulkInsert(compositeKeyRows,
-                row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 });
+        _context.BulkInsert(compositeKeyRows);
 
         tran.Commit();
     }
@@ -72,12 +70,12 @@ public class BulkUpdateAsyncTests : BaseTest
 
         var updateOptions = new BulkUpdateOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var mergeOptions = new BulkMergeOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         if (useLinq)

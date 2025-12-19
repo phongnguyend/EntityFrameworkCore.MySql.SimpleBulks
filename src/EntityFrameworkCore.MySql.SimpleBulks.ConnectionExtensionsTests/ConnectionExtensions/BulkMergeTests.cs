@@ -42,11 +42,9 @@ public class BulkMergeTests : BaseTest
             });
         }
 
-        _context.BulkInsert(rows,
- row => new { row.Column1, row.Column2, row.Column3, row.Season });
+        _context.BulkInsert(rows);
 
-        _context.BulkInsert(compositeKeyRows,
-        row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season });
+        _context.BulkInsert(compositeKeyRows);
 
         tran.Commit();
     }
@@ -109,7 +107,7 @@ public class BulkMergeTests : BaseTest
 
         var mergeOptions = new BulkMergeOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var result1 = connectionContext.BulkMerge(rows,
@@ -217,7 +215,7 @@ public class BulkMergeTests : BaseTest
 
         var mergeOptions = new BulkMergeOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var result1 = connectionContext.BulkMerge(rows,
@@ -290,7 +288,7 @@ public class BulkMergeTests : BaseTest
 
         var insertOptions = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         _context.BulkInsert(configurationEntries, insertOptions);
@@ -314,7 +312,7 @@ public class BulkMergeTests : BaseTest
 
         var mergeOptions = new BulkMergeOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var result = connectionContext.BulkMerge(configurationEntries,
@@ -365,7 +363,7 @@ public class BulkMergeTests : BaseTest
 
         var insertOptions = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         _context.BulkInsert(configurationEntries, insertOptions);
@@ -390,7 +388,7 @@ public class BulkMergeTests : BaseTest
 
         var mergeOptions = new BulkMergeOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var result = connectionContext.BulkMerge(configurationEntries,
@@ -451,7 +449,7 @@ x => x.Id,
 
         var insertOptions = new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         _context.BulkInsert(configurationEntries, insertOptions);
@@ -475,7 +473,7 @@ x => x.Id,
 
         var mergeOptions = new BulkMergeOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         };
 
         var result = connectionContext.BulkMerge(configurationEntries,

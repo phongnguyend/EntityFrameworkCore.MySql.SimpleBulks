@@ -42,11 +42,9 @@ public class BulkMergeAsyncTests : BaseTest
             });
         }
 
-        _context.BulkInsert(rows,
-                row => new { row.Column1, row.Column2, row.Column3, row.Season });
+        _context.BulkInsert(rows);
 
-        _context.BulkInsert(compositeKeyRows,
-                row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season });
+        _context.BulkInsert(compositeKeyRows);
 
         tran.Commit();
     }
@@ -113,7 +111,7 @@ public class BulkMergeAsyncTests : BaseTest
                 row => new { row.Column1, row.Column2, row.Column3, row.Season, row.BulkId },
                 options: new BulkMergeOptions
                 {
-                    LogTo = _output.WriteLine
+                    LogTo = LogTo
                 });
 
         var result2 = await connectionContext.BulkMergeAsync(compositeKeyRows,
@@ -122,7 +120,7 @@ public class BulkMergeAsyncTests : BaseTest
                 row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season },
                 options: new BulkMergeOptions
                 {
-                    LogTo = _output.WriteLine
+                    LogTo = LogTo
                 });
 
         tran.Commit();
@@ -222,7 +220,7 @@ public class BulkMergeAsyncTests : BaseTest
             ["Column1", "Column2", "Column3", "Season", "BulkId"],
             options: new BulkMergeOptions
             {
-                LogTo = _output.WriteLine
+                LogTo = LogTo
             });
 
         var result2 = await connectionContext.BulkMergeAsync(compositeKeyRows,
@@ -231,7 +229,7 @@ public class BulkMergeAsyncTests : BaseTest
             ["Id1", "Id2", "Column1", "Column2", "Column3", "Season"],
             options: new BulkMergeOptions
             {
-                LogTo = _output.WriteLine
+                LogTo = LogTo
             });
 
         tran.Commit();
@@ -292,7 +290,7 @@ public class BulkMergeAsyncTests : BaseTest
 
         await _context.BulkInsertAsync(configurationEntries, new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         });
 
         foreach (var entry in configurationEntries)
@@ -318,7 +316,7 @@ public class BulkMergeAsyncTests : BaseTest
                  x => new { },
        options: new BulkMergeOptions
        {
-           LogTo = _output.WriteLine
+           LogTo = LogTo
        });
 
         // Assert
@@ -363,7 +361,7 @@ public class BulkMergeAsyncTests : BaseTest
 
         await _context.BulkInsertAsync(configurationEntries, new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         });
 
         foreach (var entry in configurationEntries)
@@ -390,7 +388,7 @@ public class BulkMergeAsyncTests : BaseTest
       x => new { x.Id, x.Key, x.Value, x.Description, x.IsSensitive, x.CreatedDateTime },
              options: new BulkMergeOptions
              {
-                 LogTo = _output.WriteLine
+                 LogTo = LogTo
              });
 
         // Assert
@@ -445,7 +443,7 @@ public class BulkMergeAsyncTests : BaseTest
 
         await _context.BulkInsertAsync(configurationEntries, new BulkInsertOptions
         {
-            LogTo = _output.WriteLine
+            LogTo = LogTo
         });
 
         foreach (var entry in configurationEntries)
@@ -471,7 +469,7 @@ public class BulkMergeAsyncTests : BaseTest
    x => new { },
              options: new BulkMergeOptions
              {
-                 LogTo = _output.WriteLine
+                 LogTo = LogTo
              });
 
         // Assert

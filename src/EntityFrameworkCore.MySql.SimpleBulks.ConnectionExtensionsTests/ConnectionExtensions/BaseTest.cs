@@ -11,19 +11,19 @@ public abstract class BaseTest : IDisposable
     protected readonly MySqlFixture _fixture;
     protected readonly TestDbContext _context;
     protected readonly MySqlConnection _connection;
-    private string _schema = "";
+    private string _schema = Environment.GetEnvironmentVariable("SCHEMA") ?? "";
 
-    protected BaseTest(ITestOutputHelper output, MySqlFixture fixture, string dbPrefixName, string schema = "")
+    protected BaseTest(ITestOutputHelper output, MySqlFixture fixture, string dbPrefixName)
     {
         _output = output;
         _fixture = fixture;
+
         var connectionString = _fixture.GetConnectionString(dbPrefixName);
 
-        _context = GetDbContext(connectionString, schema);
+        _context = GetDbContext(connectionString);
         _context.Database.EnsureCreated();
         _context.Database.ExecuteSqlRaw("SET GLOBAL local_infile = 1;");
         _connection = new MySqlConnection(connectionString);
-        _schema = schema;
 
         TableMapper.Configure<SingleKeyRow<int>>(config =>
         {
@@ -67,13 +67,19 @@ public abstract class BaseTest : IDisposable
         _context.Database.EnsureDeleted();
     }
 
-    protected TestDbContext GetDbContext(string connectionString, string schema)
+    protected TestDbContext GetDbContext(string connectionString)
     {
-        return new TestDbContext(connectionString, schema);
+        return new TestDbContext(connectionString, _schema);
     }
 
     protected string GetTableName(string tableName)
     {
         return string.IsNullOrEmpty(_schema) ? tableName : $"{_schema}_{tableName}";
+    }
+
+    public void LogTo(string log)
+    {
+        _output.WriteLine(log);
+        Console.WriteLine(log);
     }
 }
