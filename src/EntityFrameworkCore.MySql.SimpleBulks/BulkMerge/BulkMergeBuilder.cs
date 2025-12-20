@@ -12,7 +12,7 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.BulkMerge;
 public class BulkMergeBuilder<T>
 {
     private TableInfor<T> _table;
-    private IReadOnlyCollection<string> _idColumns;
+    private IReadOnlyCollection<string> _mergeKeys;
     private IReadOnlyCollection<string> _updateColumnNames;
     private IReadOnlyCollection<string> _insertColumnNames;
     private string _outputIdColumn;
@@ -35,14 +35,14 @@ public class BulkMergeBuilder<T>
 
     public BulkMergeBuilder<T> WithId(IReadOnlyCollection<string> idColumns)
     {
-        _idColumns = idColumns;
+        _mergeKeys = idColumns;
         return this;
     }
 
     public BulkMergeBuilder<T> WithId(Expression<Func<T, object>> idSelector)
     {
         var idColumn = idSelector.Body.GetMemberName();
-        _idColumns = string.IsNullOrEmpty(idColumn) ? idSelector.Body.GetMemberNames() : [idColumn];
+        _mergeKeys = string.IsNullOrEmpty(idColumn) ? idSelector.Body.GetMemberNames() : [idColumn];
         return this;
     }
 
@@ -76,16 +76,9 @@ public class BulkMergeBuilder<T>
         return this;
     }
 
-    private List<string> GetKeys()
+    private IReadOnlyCollection<string> GetKeys()
     {
-        var copiedPropertyNames = _idColumns.ToList();
-
-        if (_table.Discriminator != null && !copiedPropertyNames.Contains(_table.Discriminator.PropertyName))
-        {
-            copiedPropertyNames.Add(_table.Discriminator.PropertyName);
-        }
-
-        return copiedPropertyNames;
+        return _table.IncludeDiscriminator(_mergeKeys);
     }
 
     private string CreateJoinCondition(System.Data.DataTable dataTable)
@@ -142,7 +135,7 @@ public class BulkMergeBuilder<T>
         var temptableName = $"`{Guid.NewGuid()}`";
 
         var propertyNames = _updateColumnNames.Select(RemoveOperator).ToList();
-        propertyNames.AddRange(_idColumns);
+        propertyNames.AddRange(_mergeKeys);
         propertyNames.AddRange(_insertColumnNames);
         propertyNames = propertyNames.Distinct().ToList();
 
@@ -284,7 +277,7 @@ public class BulkMergeBuilder<T>
         var temptableName = $"`{Guid.NewGuid()}`";
 
         var propertyNames = _updateColumnNames.Select(RemoveOperator).ToList();
-        propertyNames.AddRange(_idColumns);
+        propertyNames.AddRange(_mergeKeys);
         propertyNames.AddRange(_insertColumnNames);
         propertyNames = propertyNames.Distinct().ToList();
 
@@ -398,7 +391,7 @@ public class BulkMergeBuilder<T>
             var sqlUpdateStatement = updateStatementBuilder.ToString();
 
             var propertyNamesIncludeId = _updateColumnNames.Select(RemoveOperator).ToList();
-            propertyNamesIncludeId.AddRange(_idColumns);
+            propertyNamesIncludeId.AddRange(_mergeKeys);
             propertyNamesIncludeId = propertyNamesIncludeId.Distinct().ToList();
 
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
@@ -416,7 +409,7 @@ public class BulkMergeBuilder<T>
             var sqlInsertStatement = insertStatementBuilder.ToString();
 
             var propertyNamesIncludeId = _insertColumnNames.ToList();
-            propertyNamesIncludeId.AddRange(_idColumns);
+            propertyNamesIncludeId.AddRange(_mergeKeys);
             propertyNamesIncludeId = propertyNamesIncludeId.Distinct().ToList();
 
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");
@@ -470,7 +463,7 @@ public class BulkMergeBuilder<T>
             var sqlUpdateStatement = updateStatementBuilder.ToString();
 
             var propertyNamesIncludeId = _updateColumnNames.Select(RemoveOperator).ToList();
-            propertyNamesIncludeId.AddRange(_idColumns);
+            propertyNamesIncludeId.AddRange(_mergeKeys);
             propertyNamesIncludeId = propertyNamesIncludeId.Distinct().ToList();
 
             Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
@@ -488,7 +481,7 @@ public class BulkMergeBuilder<T>
             var sqlInsertStatement = insertStatementBuilder.ToString();
 
             var propertyNamesIncludeId = _insertColumnNames.ToList();
-            propertyNamesIncludeId.AddRange(_idColumns);
+            propertyNamesIncludeId.AddRange(_mergeKeys);
             propertyNamesIncludeId = propertyNamesIncludeId.Distinct().ToList();
 
             Log($"Begin inserting:{Environment.NewLine}{sqlInsertStatement}");

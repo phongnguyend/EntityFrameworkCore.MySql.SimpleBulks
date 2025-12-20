@@ -13,7 +13,7 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.BulkUpdate;
 public class BulkUpdateBuilder<T>
 {
     private TableInfor<T> _table;
-    private IReadOnlyCollection<string> _idColumns;
+    private IReadOnlyCollection<string> _updateKeys;
     private IReadOnlyCollection<string> _columnNames;
     private BulkUpdateOptions _options = BulkUpdateOptions.DefaultOptions;
     private readonly ConnectionContext _connectionContext;
@@ -31,14 +31,14 @@ public class BulkUpdateBuilder<T>
 
     public BulkUpdateBuilder<T> WithId(IReadOnlyCollection<string> idColumns)
     {
-        _idColumns = idColumns;
+        _updateKeys = idColumns;
         return this;
     }
 
     public BulkUpdateBuilder<T> WithId(Expression<Func<T, object>> idSelector)
     {
         var idColumn = idSelector.Body.GetMemberName();
-        _idColumns = string.IsNullOrEmpty(idColumn) ? idSelector.Body.GetMemberNames() : new List<string> { idColumn };
+        _updateKeys = string.IsNullOrEmpty(idColumn) ? idSelector.Body.GetMemberNames() : new List<string> { idColumn };
         return this;
     }
 
@@ -60,16 +60,9 @@ public class BulkUpdateBuilder<T>
         return this;
     }
 
-    private List<string> GetKeys()
+    private IReadOnlyCollection<string> GetKeys()
     {
-        var copiedPropertyNames = _idColumns.ToList();
-
-        if (_table.Discriminator != null && !copiedPropertyNames.Contains(_table.Discriminator.PropertyName))
-        {
-            copiedPropertyNames.Add(_table.Discriminator.PropertyName);
-        }
-
-        return copiedPropertyNames;
+        return _table.IncludeDiscriminator(_updateKeys);
     }
 
     private string CreateIndex(string tableName)
@@ -105,7 +98,7 @@ public class BulkUpdateBuilder<T>
         var temptableName = $"`{Guid.NewGuid()}`";
 
         var propertyNamesIncludeId = _columnNames.Select(RemoveOperator).ToList();
-        propertyNamesIncludeId.AddRange(_idColumns);
+        propertyNamesIncludeId.AddRange(_updateKeys);
 
         var dataTable = data.ToDataTable(propertyNamesIncludeId, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _table.ColumnTypeMappings);
@@ -155,7 +148,7 @@ public class BulkUpdateBuilder<T>
         var sqlUpdateStatement = updateStatementBuilder.ToString();
 
         var propertyNamesIncludeId = _columnNames.Select(RemoveOperator).ToList();
-        propertyNamesIncludeId.AddRange(_idColumns);
+        propertyNamesIncludeId.AddRange(_updateKeys);
 
         Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
@@ -235,7 +228,7 @@ public class BulkUpdateBuilder<T>
         var temptableName = $"`{Guid.NewGuid()}`";
 
         var propertyNamesIncludeId = _columnNames.Select(RemoveOperator).ToList();
-        propertyNamesIncludeId.AddRange(_idColumns);
+        propertyNamesIncludeId.AddRange(_updateKeys);
 
         var dataTable = await data.ToDataTableAsync(propertyNamesIncludeId, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator, cancellationToken: cancellationToken);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _table.ColumnTypeMappings);
@@ -285,7 +278,7 @@ public class BulkUpdateBuilder<T>
         var sqlUpdateStatement = updateStatementBuilder.ToString();
 
         var propertyNamesIncludeId = _columnNames.Select(RemoveOperator).ToList();
-        propertyNamesIncludeId.AddRange(_idColumns);
+        propertyNamesIncludeId.AddRange(_updateKeys);
 
         Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
 
