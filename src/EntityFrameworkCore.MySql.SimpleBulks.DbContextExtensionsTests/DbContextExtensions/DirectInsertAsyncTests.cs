@@ -15,7 +15,7 @@ public class DirectInsertAsyncTests : BaseTest
     }
 
     [Fact]
-    public async Task Direct_Insert_Using_Linq_Without_Transaction()
+    public async Task DirectInsert_Using_Linq_Without_Transaction()
     {
         var bulkId = SequentialGuidGenerator.Next();
 
@@ -118,7 +118,7 @@ public class DirectInsertAsyncTests : BaseTest
     }
 
     [Fact]
-    public async Task Direct_Insert_Using_Linq_With_Transaction_Committed()
+    public async Task DirectInsert_Using_Linq_With_Transaction_Committed()
     {
         var tran = _context.Database.BeginTransaction();
 
@@ -224,7 +224,7 @@ public class DirectInsertAsyncTests : BaseTest
     }
 
     [Fact]
-    public async Task Direct_Insert_Using_Linq_With_Transaction_RolledBack()
+    public async Task DirectInsert_Using_Linq_With_Transaction_RolledBack()
     {
         var tran = _context.Database.BeginTransaction();
 
@@ -303,7 +303,7 @@ public class DirectInsertAsyncTests : BaseTest
     }
 
     [Fact]
-    public async Task Direct_Insert_KeepIdentity()
+    public async Task DirectInsert_KeepIdentity()
     {
         var configurationEntry = new ConfigurationEntry
         {
@@ -333,7 +333,7 @@ public class DirectInsertAsyncTests : BaseTest
     }
 
     [Fact]
-    public async Task Direct_Insert_Return_GeneratedId()
+    public async Task DirectInsert_Return_GeneratedId()
     {
         var configurationEntry = new ConfigurationEntry
         {
@@ -359,5 +359,114 @@ public class DirectInsertAsyncTests : BaseTest
         Assert.Equal(configurationEntry.Value, configurationEntriesInDb[0].Value);
         Assert.Equal(configurationEntry.Description, configurationEntriesInDb[0].Description);
         Assert.Equal(configurationEntry.CreatedDateTime.TruncateToMicroseconds(), configurationEntriesInDb[0].CreatedDateTime);
+    }
+
+    [Fact]
+    public async Task DirectInsert_Using_DynamicString()
+    {
+        var bulkId = SequentialGuidGenerator.Next();
+
+        var row = new SingleKeyRow<int>
+        {
+            Column1 = 1,
+            Column2 = "" + 1,
+            Column3 = DateTime.Now,
+            Season = Season.Spring,
+            SeasonAsString = Season.Summer,
+            ComplexShippingAddress = new ComplexTypeAddress
+            {
+                Street = "Street " + 1,
+                Location = new ComplexTypeLocation
+                {
+                    Lat = 40.7128 + 1,
+                    Lng = -74.0060 - 1
+                }
+            },
+            OwnedShippingAddress = new OwnedTypeAddress
+            {
+                Street = "Street " + 1,
+                Location = new OwnedTypeLocation
+                {
+                    Lat = 40.7128 + 1,
+                    Lng = -74.0060 - 1
+                }
+            },
+            BulkId = bulkId,
+        };
+
+        var compositeKeyRow = new CompositeKeyRow<int, int>
+        {
+            Id1 = 1,
+            Id2 = 1,
+            Column1 = 1,
+            Column2 = "" + 1,
+            Column3 = DateTime.Now,
+            Season = Season.Spring,
+            SeasonAsString = Season.Summer
+        };
+
+        var options = new BulkInsertOptions
+        {
+            LogTo = LogTo
+        };
+
+        await _context.DirectInsertAsync(row,
+            [
+            "Column1",
+            "Column2",
+            "Column3",
+            "Season",
+            "SeasonAsString",
+            "ComplexShippingAddress.Street",
+            "ComplexShippingAddress.Location.Lat",
+            "ComplexShippingAddress.Location.Lng",
+            "OwnedShippingAddress.Street",
+            "OwnedShippingAddress.Location.Lat",
+            "OwnedShippingAddress.Location.Lng",
+            "BulkId"
+            ],
+            options);
+
+        row.Id = _context.SingleKeyRows.Where(x => x.BulkId == bulkId).Select(x => x.Id).FirstOrDefault();
+
+        await _context.DirectInsertAsync(compositeKeyRow,
+            [
+            "Id1",
+            "Id2",
+            "Column1",
+            "Column2",
+            "Column3",
+            "Season",
+            "SeasonAsString"
+            ],
+            options);
+
+        // Assert
+        var dbRows = _context.SingleKeyRows.AsNoTracking().ToList();
+        var dbCompositeKeyRows = _context.CompositeKeyRows.AsNoTracking().ToList();
+
+        Assert.Single(dbRows);
+        Assert.Single(dbCompositeKeyRows);
+
+        Assert.Equal(row.Id, dbRows[0].Id);
+        Assert.Equal(row.Column1, dbRows[0].Column1);
+        Assert.Equal(row.Column2, dbRows[0].Column2);
+        Assert.Equal(row.Column3.TruncateToMicroseconds(), dbRows[0].Column3);
+        Assert.Equal(row.Season, dbRows[0].Season);
+        Assert.Equal(row.SeasonAsString, dbRows[0].SeasonAsString);
+        Assert.Equal(row.ComplexShippingAddress?.Street, dbRows[0].ComplexShippingAddress?.Street);
+        Assert.Equal(row.ComplexShippingAddress?.Location?.Lat, dbRows[0].ComplexShippingAddress?.Location?.Lat);
+        Assert.Equal(row.ComplexShippingAddress?.Location?.Lng, dbRows[0].ComplexShippingAddress?.Location?.Lng);
+        Assert.Equal(row.OwnedShippingAddress?.Street, dbRows[0].OwnedShippingAddress?.Street);
+        Assert.Equal(row.OwnedShippingAddress?.Location?.Lat, dbRows[0].OwnedShippingAddress?.Location?.Lat);
+        Assert.Equal(row.OwnedShippingAddress?.Location?.Lng, dbRows[0].OwnedShippingAddress?.Location?.Lng);
+
+        Assert.Equal(compositeKeyRow.Id1, dbCompositeKeyRows[0].Id1);
+        Assert.Equal(compositeKeyRow.Id2, dbCompositeKeyRows[0].Id2);
+        Assert.Equal(compositeKeyRow.Column1, dbCompositeKeyRows[0].Column1);
+        Assert.Equal(compositeKeyRow.Column2, dbCompositeKeyRows[0].Column2);
+        Assert.Equal(compositeKeyRow.Column3.TruncateToMicroseconds(), dbCompositeKeyRows[0].Column3);
+        Assert.Equal(compositeKeyRow.Season, dbCompositeKeyRows[0].Season);
+        Assert.Equal(compositeKeyRow.SeasonAsString, dbCompositeKeyRows[0].SeasonAsString);
     }
 }
