@@ -44,7 +44,8 @@ public abstract class BaseTest : IDisposable
             config
             .TableName(GetTableName("ConfigurationEntry"))
             .PrimaryKeys(x => x.Id)
-            .OutputId(x => x.Id, OutputIdMode.ClientGenerated);
+            .OutputId(x => x.Id, OutputIdMode.ClientGenerated)
+            .ReadOnlyProperty(x => x.RowVersion);
         });
 
         TableMapper.Configure<Customer>(config =>
