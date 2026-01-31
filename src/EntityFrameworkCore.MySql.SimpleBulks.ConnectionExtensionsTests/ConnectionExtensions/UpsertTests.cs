@@ -29,7 +29,8 @@ public class UpsertTests : BaseTest
                 Column1 = i,
                 Column2 = "" + i,
                 Column3 = DateTime.Now,
-                Season = Season.Winter
+                Season = Season.Winter,
+                SeasonAsString = Season.Winter
             });
 
             compositeKeyRows.Add(new CompositeKeyRow<int, int>
@@ -39,7 +40,8 @@ public class UpsertTests : BaseTest
                 Column1 = i,
                 Column2 = "" + i,
                 Column3 = DateTime.Now,
-                Season = Season.Winter
+                Season = Season.Winter,
+                SeasonAsString = Season.Winter
             });
         }
 
@@ -71,6 +73,7 @@ public class UpsertTests : BaseTest
         existingRow.Column2 = "abc";
         existingRow.Column3 = DateTime.Now;
         existingRow.Season = Season.Spring;
+        existingRow.SeasonAsString = Season.Spring;
 
 
         var existingCompositeKeyRows = compositeKeyRows.First();
@@ -78,6 +81,7 @@ public class UpsertTests : BaseTest
         existingCompositeKeyRows.Column2 = "abc";
         existingCompositeKeyRows.Column3 = DateTime.Now;
         existingCompositeKeyRows.Season = Season.Spring;
+        existingCompositeKeyRows.SeasonAsString = Season.Spring;
 
         var result1 = connectionContext.Upsert(existingRow,
                 row => row.Id,
@@ -87,6 +91,7 @@ public class UpsertTests : BaseTest
                     row.Column2,
                     row.Column3,
                     row.Season,
+                    row.SeasonAsString,
                     row.NullableBool,
                     row.NullableDateTime,
                     row.NullableDateTimeOffset,
@@ -99,7 +104,7 @@ public class UpsertTests : BaseTest
                     row.NullableFloat,
                     row.NullableString
                 },
-                row => new { row.Column1, row.Column2, row.Column3, row.Season },
+                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
                 options: new BulkMergeOptions
                 {
                     LogTo = LogTo
@@ -107,8 +112,8 @@ public class UpsertTests : BaseTest
 
         var result2 = connectionContext.Upsert(existingCompositeKeyRows,
                 row => new { row.Id1, row.Id2 },
-                row => new { row.Column1, row.Column2, row.Column3, row.Season },
-                row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season },
+                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
+                row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
                 options: new BulkMergeOptions
                 {
                     LogTo = LogTo
@@ -138,6 +143,7 @@ public class UpsertTests : BaseTest
             Assert.Equal(rows[i].Column2, dbRows[i].Column2);
             Assert.Equal(rows[i].Column3.TruncateToMicroseconds(), dbRows[i].Column3);
             Assert.Equal(rows[i].Season, dbRows[i].Season);
+            Assert.Equal(rows[i].SeasonAsString, dbRows[i].SeasonAsString);
 
             Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
             Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);
@@ -145,6 +151,7 @@ public class UpsertTests : BaseTest
             Assert.Equal(compositeKeyRows[i].Column2, dbCompositeKeyRows[i].Column2);
             Assert.Equal(compositeKeyRows[i].Column3.TruncateToMicroseconds(), dbCompositeKeyRows[i].Column3);
             Assert.Equal(compositeKeyRows[i].Season, dbCompositeKeyRows[i].Season);
+            Assert.Equal(compositeKeyRows[i].SeasonAsString, dbCompositeKeyRows[i].SeasonAsString);
         }
     }
 
@@ -173,6 +180,7 @@ public class UpsertTests : BaseTest
             Column2 = "Inserted using Upsert" + length,
             Column3 = DateTime.Now,
             Season = Season.Summer,
+            SeasonAsString = Season.Summer,
             BulkId = bulkId
         };
 
@@ -183,7 +191,8 @@ public class UpsertTests : BaseTest
             Column1 = length,
             Column2 = "Inserted using Upsert" + length,
             Column3 = DateTime.Now,
-            Season = Season.Summer
+            Season = Season.Summer,
+            SeasonAsString = Season.Summer
         };
 
         var result1 = connectionContext.Upsert(newRow,
@@ -194,6 +203,7 @@ public class UpsertTests : BaseTest
                     row.Column2,
                     row.Column3,
                     row.Season,
+                    row.SeasonAsString,
                     row.NullableBool,
                     row.NullableDateTime,
                     row.NullableDateTimeOffset,
@@ -206,7 +216,7 @@ public class UpsertTests : BaseTest
                     row.NullableFloat,
                     row.NullableString
                 },
-                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.BulkId },
+                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString, row.BulkId },
                 options: new BulkMergeOptions
                 {
                     LogTo = LogTo
@@ -214,8 +224,8 @@ public class UpsertTests : BaseTest
 
         var result2 = connectionContext.Upsert(newCompositeKeyRow,
                 row => new { row.Id1, row.Id2 },
-                row => new { row.Column1, row.Column2, row.Column3, row.Season },
-                row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season },
+                row => new { row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
+                row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3, row.Season, row.SeasonAsString },
                 options: new BulkMergeOptions
                 {
                     LogTo = LogTo
@@ -252,6 +262,7 @@ public class UpsertTests : BaseTest
             Assert.Equal(rows[i].Column2, dbRows[i].Column2);
             Assert.Equal(rows[i].Column3.TruncateToMicroseconds(), dbRows[i].Column3);
             Assert.Equal(rows[i].Season, dbRows[i].Season);
+            Assert.Equal(rows[i].SeasonAsString, dbRows[i].SeasonAsString);
 
             Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
             Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);
@@ -259,6 +270,7 @@ public class UpsertTests : BaseTest
             Assert.Equal(compositeKeyRows[i].Column2, dbCompositeKeyRows[i].Column2);
             Assert.Equal(compositeKeyRows[i].Column3.TruncateToMicroseconds(), dbCompositeKeyRows[i].Column3);
             Assert.Equal(compositeKeyRows[i].Season, dbCompositeKeyRows[i].Season);
+            Assert.Equal(compositeKeyRows[i].SeasonAsString, dbCompositeKeyRows[i].SeasonAsString);
         }
     }
 
@@ -283,6 +295,7 @@ public class UpsertTests : BaseTest
         existingRow.Column2 = "abc";
         existingRow.Column3 = DateTime.Now;
         existingRow.Season = Season.Spring;
+        existingRow.SeasonAsString = Season.Spring;
 
 
         var existingCompositeKeyRows = compositeKeyRows.First();
@@ -290,11 +303,12 @@ public class UpsertTests : BaseTest
         existingCompositeKeyRows.Column2 = "abc";
         existingCompositeKeyRows.Column3 = DateTime.Now;
         existingCompositeKeyRows.Season = Season.Spring;
+        existingCompositeKeyRows.SeasonAsString = Season.Spring;
 
         var result1 = connectionContext.Upsert(existingRow,
             ["Id"],
-            ["Column1", "Column2", "Column3", "Season"],
-            ["Column1", "Column2", "Column3", "Season"],
+            ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
+            ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
             options: new BulkMergeOptions
             {
                 LogTo = LogTo
@@ -302,8 +316,8 @@ public class UpsertTests : BaseTest
 
         var result2 = connectionContext.Upsert(existingCompositeKeyRows,
             ["Id1", "Id2"],
-            ["Column1", "Column2", "Column3", "Season"],
-            ["Id1", "Id2", "Column1", "Column2", "Column3", "Season"],
+            ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
+            ["Id1", "Id2", "Column1", "Column2", "Column3", "Season", "SeasonAsString"],
             options: new BulkMergeOptions
             {
                 LogTo = LogTo
@@ -333,6 +347,7 @@ public class UpsertTests : BaseTest
             Assert.Equal(rows[i].Column2, dbRows[i].Column2);
             Assert.Equal(rows[i].Column3.TruncateToMicroseconds(), dbRows[i].Column3);
             Assert.Equal(rows[i].Season, dbRows[i].Season);
+            Assert.Equal(rows[i].SeasonAsString, dbRows[i].SeasonAsString);
 
             Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
             Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);
@@ -340,6 +355,7 @@ public class UpsertTests : BaseTest
             Assert.Equal(compositeKeyRows[i].Column2, dbCompositeKeyRows[i].Column2);
             Assert.Equal(compositeKeyRows[i].Column3.TruncateToMicroseconds(), dbCompositeKeyRows[i].Column3);
             Assert.Equal(compositeKeyRows[i].Season, dbCompositeKeyRows[i].Season);
+            Assert.Equal(compositeKeyRows[i].SeasonAsString, dbCompositeKeyRows[i].SeasonAsString);
         }
     }
 
@@ -368,6 +384,7 @@ public class UpsertTests : BaseTest
             Column2 = "Inserted using Upsert" + length,
             Column3 = DateTime.Now,
             Season = Season.Summer,
+            SeasonAsString = Season.Summer,
             BulkId = bulkId
         };
 
@@ -378,13 +395,14 @@ public class UpsertTests : BaseTest
             Column1 = length,
             Column2 = "Inserted using Upsert" + length,
             Column3 = DateTime.Now,
-            Season = Season.Summer
+            Season = Season.Summer,
+            SeasonAsString = Season.Summer
         };
 
         var result1 = connectionContext.Upsert(newRow,
             ["Id"],
-            ["Column1", "Column2", "Column3", "Season"],
-            ["Column1", "Column2", "Column3", "Season", "BulkId"],
+            ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
+            ["Column1", "Column2", "Column3", "Season", "SeasonAsString", "BulkId"],
             options: new BulkMergeOptions
             {
                 LogTo = LogTo
@@ -392,8 +410,8 @@ public class UpsertTests : BaseTest
 
         var result2 = connectionContext.Upsert(newCompositeKeyRow,
             ["Id1", "Id2"],
-            ["Column1", "Column2", "Column3", "Season"],
-            ["Id1", "Id2", "Column1", "Column2", "Column3", "Season"],
+            ["Column1", "Column2", "Column3", "Season", "SeasonAsString"],
+            ["Id1", "Id2", "Column1", "Column2", "Column3", "Season", "SeasonAsString"],
             options: new BulkMergeOptions
             {
                 LogTo = LogTo
@@ -430,6 +448,7 @@ public class UpsertTests : BaseTest
             Assert.Equal(rows[i].Column2, dbRows[i].Column2);
             Assert.Equal(rows[i].Column3.TruncateToMicroseconds(), dbRows[i].Column3);
             Assert.Equal(rows[i].Season, dbRows[i].Season);
+            Assert.Equal(rows[i].SeasonAsString, dbRows[i].SeasonAsString);
 
             Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
             Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);
@@ -437,6 +456,7 @@ public class UpsertTests : BaseTest
             Assert.Equal(compositeKeyRows[i].Column2, dbCompositeKeyRows[i].Column2);
             Assert.Equal(compositeKeyRows[i].Column3.TruncateToMicroseconds(), dbCompositeKeyRows[i].Column3);
             Assert.Equal(compositeKeyRows[i].Season, dbCompositeKeyRows[i].Season);
+            Assert.Equal(compositeKeyRows[i].SeasonAsString, dbCompositeKeyRows[i].SeasonAsString);
         }
     }
 

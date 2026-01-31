@@ -37,6 +37,7 @@ public class BulkInsertTests : BaseTest
                 Column2 = "" + i,
                 Column3 = DateTime.Now,
                 Season = Season.Autumn,
+                SeasonAsString = Season.Autumn,
                 BulkId = bulkId,
                 BulkIndex = i
             });
@@ -49,6 +50,7 @@ public class BulkInsertTests : BaseTest
                 Column2 = "" + i,
                 Column3 = DateTime.Now,
                 Season = Season.Autumn,
+                SeasonAsString = Season.Autumn,
             });
         }
 
@@ -70,6 +72,7 @@ public class BulkInsertTests : BaseTest
                         row.Column2,
                         row.Column3,
                         row.Season,
+                        row.SeasonAsString,
                         row.NullableBool,
                         row.NullableDateTime,
                         row.NullableDateTimeOffset,
@@ -99,6 +102,7 @@ public class BulkInsertTests : BaseTest
                         row.Column2,
                         row.Column3,
                         row.Season,
+                        row.SeasonAsString,
                         row.NullableBool,
                         row.NullableDateTime,
                         row.NullableDateTimeOffset,
@@ -113,12 +117,12 @@ public class BulkInsertTests : BaseTest
                         row.BulkId,
                         row.BulkIndex
                     },
-                    new MySqlTableInfor<SingleKeyRow<int>>(GetTableName("SingleKeyRows")),
+                    _singleKeyRowTableInfor,
                     options: options);
 
                 connectionContext.BulkInsert(compositeKeyRows,
                     row => new { row.Id1, row.Id2, row.Column1, row.Column2, row.Column3 },
-                    new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows")),
+                    _compositeKeyRowTableInfor,
                     options: options);
             }
 
@@ -139,12 +143,12 @@ public class BulkInsertTests : BaseTest
             {
                 connectionContext.BulkInsert(rows,
                     ["Column1", "Column2", "Column3", "BulkId", "BulkIndex"],
-                    new MySqlTableInfor<SingleKeyRow<int>>(GetTableName("SingleKeyRows")),
+                    _singleKeyRowTableInfor,
                     options: options);
 
                 connectionContext.BulkInsert(compositeKeyRows,
                     ["Id1", "Id2", "Column1", "Column2", "Column3"],
-                    new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows")),
+                    _compositeKeyRowTableInfor,
                     options: options);
             }
 

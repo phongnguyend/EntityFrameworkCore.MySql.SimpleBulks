@@ -1,5 +1,4 @@
 ﻿using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
@@ -134,6 +133,18 @@ public class MySqlTableInforBuilder<T>
         var propertyName = nameSelector.Body.GetMemberName();
 
         return ConfigureProperty(propertyName, columnName, columnType);
+    }
+
+    public MySqlTableInforBuilder<T> ConfigurePropertyConversion<TProperty, TProvider>(Expression<Func<T, TProperty>> nameSelector, Func<TProperty, TProvider?> convertToProvider, Func<TProvider?, TProperty?> convertFromProvider)
+    {
+        var propertyName = nameSelector.Body.GetMemberName();
+        _valueConverters[propertyName] = new ValueConverter
+        {
+            ProviderClrType = typeof(TProvider),
+            ConvertToProvider = obj => convertToProvider((TProperty?)obj),
+            ConvertFromProvider = obj => convertFromProvider((TProvider?)obj),
+        };
+        return this;
     }
 
     public MySqlTableInfor<T> Build()
