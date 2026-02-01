@@ -1,4 +1,5 @@
 ﻿using EntityFrameworkCore.MySql.SimpleBulks.ConnectionExtensionsTests.Database;
+using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 using Xunit.Abstractions;
@@ -14,6 +15,7 @@ public abstract class BaseTest : IDisposable
     protected readonly MySqlTableInfor<SingleKeyRow<int>> _singleKeyRowTableInfor;
     protected readonly MySqlTableInfor<CompositeKeyRow<int, int>> _compositeKeyRowTableInfor;
     private string _schema = Environment.GetEnvironmentVariable("SCHEMA") ?? "";
+    private bool _enableDiscriminator = (Environment.GetEnvironmentVariable("DISCRIMINATOR") ?? "") == "true";
 
     protected BaseTest(ITestOutputHelper output, MySqlFixture fixture, string dbPrefixName)
     {
@@ -32,12 +34,21 @@ public abstract class BaseTest : IDisposable
             PrimaryKeys = ["Id"],
             ColumnTypeMappings = new Dictionary<string, string>
             {
-                {"SeasonAsString", "longtext" }
+                {"SeasonAsString", "longtext" },
+                {"Discriminator", _enableDiscriminator ? _context.GetDiscriminator(typeof(SingleKeyRow<int>)).ColumnType : null }
             },
             ValueConverters = new Dictionary<string, ValueConverter>
             {
                 {"SeasonAsString", new ValueConverter(typeof(string),x => x.ToString(),v => (Season)Enum.Parse(typeof(Season), (string)v))}
-            }
+            },
+            Discriminator = _enableDiscriminator ? new Discriminator
+            {
+                PropertyName = "Discriminator",
+                PropertyType = typeof(string),
+                PropertyValue = "SingleKeyRow<int>",
+                ColumnName = "Discriminator",
+                ColumnType = _context.GetDiscriminator(typeof(SingleKeyRow<int>)).ColumnType
+            } : null
         };
 
         _compositeKeyRowTableInfor = new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows"))
@@ -45,12 +56,21 @@ public abstract class BaseTest : IDisposable
             PrimaryKeys = ["Id1", "Id2"],
             ColumnTypeMappings = new Dictionary<string, string>
             {
-                {"SeasonAsString", "longtext" }
+                {"SeasonAsString", "longtext" },
+                {"Discriminator", _enableDiscriminator ? _context.GetDiscriminator(typeof(CompositeKeyRow<int, int>)).ColumnType : null }
             },
             ValueConverters = new Dictionary<string, ValueConverter>
             {
                 {"SeasonAsString", new ValueConverter(typeof(string),x => x.ToString(),v => (Season)Enum.Parse(typeof(Season), (string)v))}
-            }
+            },
+            Discriminator = _enableDiscriminator ? new Discriminator
+            {
+                PropertyName = "Discriminator",
+                PropertyType = typeof(string),
+                PropertyValue = "CompositeKeyRow<int, int>",
+                ColumnName = "Discriminator",
+                ColumnType = _context.GetDiscriminator(typeof(CompositeKeyRow<int, int>)).ColumnType
+            } : null
         };
 
         TableMapper.Configure<SingleKeyRow<int>>(config =>
@@ -60,6 +80,12 @@ public abstract class BaseTest : IDisposable
             .PrimaryKeys(x => x.Id)
             .ConfigureProperty(x => x.SeasonAsString, columnType: "longtext")
             .ConfigurePropertyConversion(x => x.SeasonAsString, y => y.ToString(), z => (Season)Enum.Parse(typeof(Season), z));
+
+            if (_enableDiscriminator)
+            {
+                config.ConfigureDiscriminator("Discriminator", value: "SingleKeyRow<int>", columnName: "Discriminator", columnType: _context.GetDiscriminator(typeof(SingleKeyRow<int>)).ColumnType);
+            }
+
         });
 
         TableMapper.Configure<CompositeKeyRow<int, int>>(config =>
@@ -69,6 +95,11 @@ public abstract class BaseTest : IDisposable
             .PrimaryKeys(x => new { x.Id1, x.Id2 })
             .ConfigureProperty(x => x.SeasonAsString, columnType: "longtext")
             .ConfigurePropertyConversion(x => x.SeasonAsString, y => y.ToString(), z => (Season)Enum.Parse(typeof(Season), z));
+
+            if (_enableDiscriminator)
+            {
+                config.ConfigureDiscriminator("Discriminator", value: "CompositeKeyRow<int, int>", columnName: "Discriminator", columnType: _context.GetDiscriminator(typeof(CompositeKeyRow<int, int>)).ColumnType);
+            }
         });
 
         TableMapper.Configure<ConfigurationEntry>(config =>
@@ -77,7 +108,12 @@ public abstract class BaseTest : IDisposable
             .TableName(GetTableName("ConfigurationEntry"))
             .PrimaryKeys(x => x.Id)
             .OutputId(x => x.Id, OutputIdMode.ClientGenerated)
-            .ReadOnlyProperty(x => x.RowVersion);
+            .ConfigureProperty(x => x.RowVersion, readOnly: true);
+
+            if (_enableDiscriminator)
+            {
+                config.ConfigureDiscriminator("Discriminator", value: "ConfigurationEntry", columnName: "Discriminator", columnType: _context.GetDiscriminator(typeof(ConfigurationEntry)).ColumnType);
+            }
         });
 
         TableMapper.Configure<Customer>(config =>
@@ -106,7 +142,9 @@ public abstract class BaseTest : IDisposable
 
     protected TestDbContext GetDbContext(string connectionString)
     {
-        return new TestDbContext(connectionString, _schema);
+        Console.WriteLine($"Schema: {_schema}, Enable Discriminator: {_enableDiscriminator}");
+
+        return new TestDbContext(connectionString, _schema, _enableDiscriminator);
     }
 
     protected string GetTableName(string tableName)
