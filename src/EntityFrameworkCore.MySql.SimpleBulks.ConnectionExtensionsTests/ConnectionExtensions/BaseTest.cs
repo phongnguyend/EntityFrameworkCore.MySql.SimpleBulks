@@ -11,6 +11,8 @@ public abstract class BaseTest : IDisposable
     protected readonly MySqlFixture _fixture;
     protected readonly TestDbContext _context;
     protected readonly MySqlConnection _connection;
+    protected readonly MySqlTableInfor<SingleKeyRow<int>> _singleKeyRowTableInfor;
+    protected readonly MySqlTableInfor<CompositeKeyRow<int, int>> _compositeKeyRowTableInfor;
     private string _schema = Environment.GetEnvironmentVariable("SCHEMA") ?? "";
 
     protected BaseTest(ITestOutputHelper output, MySqlFixture fixture, string dbPrefixName)
@@ -25,18 +27,48 @@ public abstract class BaseTest : IDisposable
         _context.Database.ExecuteSqlRaw("SET GLOBAL local_infile = 1;");
         _connection = new MySqlConnection(connectionString);
 
+        _singleKeyRowTableInfor = new MySqlTableInfor<SingleKeyRow<int>>(GetTableName("SingleKeyRows"))
+        {
+            PrimaryKeys = ["Id"],
+            ColumnTypeMappings = new Dictionary<string, string>
+            {
+                {"SeasonAsString", "longtext" }
+            },
+            ValueConverters = new Dictionary<string, ValueConverter>
+            {
+                {"SeasonAsString", new ValueConverter(typeof(string),x => x.ToString(),v => (Season)Enum.Parse(typeof(Season), (string)v))}
+            }
+        };
+
+        _compositeKeyRowTableInfor = new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows"))
+        {
+            PrimaryKeys = ["Id1", "Id2"],
+            ColumnTypeMappings = new Dictionary<string, string>
+            {
+                {"SeasonAsString", "longtext" }
+            },
+            ValueConverters = new Dictionary<string, ValueConverter>
+            {
+                {"SeasonAsString", new ValueConverter(typeof(string),x => x.ToString(),v => (Season)Enum.Parse(typeof(Season), (string)v))}
+            }
+        };
+
         TableMapper.Configure<SingleKeyRow<int>>(config =>
         {
             config
             .TableName(GetTableName("SingleKeyRows"))
-            .PrimaryKeys(x => x.Id);
+            .PrimaryKeys(x => x.Id)
+            .ConfigureProperty(x => x.SeasonAsString, columnType: "longtext")
+            .ConfigurePropertyConversion(x => x.SeasonAsString, y => y.ToString(), z => (Season)Enum.Parse(typeof(Season), z));
         });
 
         TableMapper.Configure<CompositeKeyRow<int, int>>(config =>
         {
             config
             .TableName(GetTableName("CompositeKeyRows"))
-            .PrimaryKeys(x => new { x.Id1, x.Id2 });
+            .PrimaryKeys(x => new { x.Id1, x.Id2 })
+            .ConfigureProperty(x => x.SeasonAsString, columnType: "longtext")
+            .ConfigurePropertyConversion(x => x.SeasonAsString, y => y.ToString(), z => (Season)Enum.Parse(typeof(Season), z));
         });
 
         TableMapper.Configure<ConfigurationEntry>(config =>
@@ -52,14 +84,18 @@ public abstract class BaseTest : IDisposable
         {
             config
             .TableName(GetTableName("Customers"))
-            .IgnoreProperty(x => x.Contacts);
+            .IgnoreProperty(x => x.Contacts)
+            .ConfigureProperty(x => x.SeasonAsString, columnType: "longtext")
+            .ConfigurePropertyConversion(x => x.SeasonAsString, y => y.ToString(), z => (Season)Enum.Parse(typeof(Season), z));
         });
 
         TableMapper.Configure<Contact>(config =>
         {
             config
             .TableName(GetTableName("Contacts"))
-            .IgnoreProperty(x => x.Customer);
+            .IgnoreProperty(x => x.Customer)
+            .ConfigureProperty(x => x.SeasonAsString, columnType: "longtext")
+            .ConfigurePropertyConversion(x => x.SeasonAsString, y => y.ToString(), z => (Season)Enum.Parse(typeof(Season), z));
         });
     }
 
