@@ -36,6 +36,10 @@ public class SingleKeyRow<TId>
 
     public string? NullableString { get; set; }
 
+    public ComplexTypeAddress ComplexShippingAddress { get; set; }
+
+    public OwnedTypeAddress OwnedShippingAddress { get; set; }
+
     public Guid? BulkId { get; set; }
 
     public int? BulkIndex { get; set; }

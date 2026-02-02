@@ -25,7 +25,25 @@ public class BulkUpdateAsyncTests : BaseTest
                 Column2 = "" + i,
                 Column3 = DateTime.Now,
                 Season = Season.Winter,
-                SeasonAsString = Season.Winter
+                SeasonAsString = Season.Winter,
+                ComplexShippingAddress = new ComplexTypeAddress
+                {
+                    Street = "Street " + i,
+                    Location = new ComplexTypeLocation
+                    {
+                        Lat = 40.7128 + i,
+                        Lng = -74.0060 - i
+                    }
+                },
+                OwnedShippingAddress = new OwnedTypeAddress
+                {
+                    Street = "Street " + i,
+                    Location = new OwnedTypeLocation
+                    {
+                        Lat = 40.7128 + i,
+                        Lng = -74.0060 - i
+                    }
+                }
             });
 
             compositeKeyRows.Add(new CompositeKeyRow<int, int>
@@ -137,6 +155,12 @@ public class BulkUpdateAsyncTests : BaseTest
             Assert.Equal(rows[i].Column1, dbRows[i].Column1);
             Assert.Equal(rows[i].Column2, dbRows[i].Column2);
             Assert.Equal(rows[i].Column3.TruncateToMicroseconds(), dbRows[i].Column3);
+            Assert.Equal(rows[i].ComplexShippingAddress?.Street, dbRows[i].ComplexShippingAddress?.Street);
+            Assert.Equal(rows[i].ComplexShippingAddress?.Location?.Lat, dbRows[i].ComplexShippingAddress?.Location?.Lat);
+            Assert.Equal(rows[i].ComplexShippingAddress?.Location?.Lng, dbRows[i].ComplexShippingAddress?.Location?.Lng);
+            Assert.Equal(rows[i].OwnedShippingAddress?.Street, dbRows[i].OwnedShippingAddress?.Street);
+            Assert.Equal(rows[i].OwnedShippingAddress?.Location?.Lat, dbRows[i].OwnedShippingAddress?.Location?.Lat);
+            Assert.Equal(rows[i].OwnedShippingAddress?.Location?.Lng, dbRows[i].OwnedShippingAddress?.Location?.Lng);
 
             Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
             Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);
@@ -236,6 +260,12 @@ public class BulkUpdateAsyncTests : BaseTest
             Assert.Equal(rows[i].Column1, dbRows[i].Column1);
             Assert.Equal(rows[i].Column2, dbRows[i].Column2);
             Assert.Equal(rows[i].Column3.TruncateToMicroseconds(), dbRows[i].Column3);
+            Assert.Equal(rows[i].ComplexShippingAddress?.Street, dbRows[i].ComplexShippingAddress?.Street);
+            Assert.Equal(rows[i].ComplexShippingAddress?.Location?.Lat, dbRows[i].ComplexShippingAddress?.Location?.Lat);
+            Assert.Equal(rows[i].ComplexShippingAddress?.Location?.Lng, dbRows[i].ComplexShippingAddress?.Location?.Lng);
+            Assert.Equal(rows[i].OwnedShippingAddress?.Street, dbRows[i].OwnedShippingAddress?.Street);
+            Assert.Equal(rows[i].OwnedShippingAddress?.Location?.Lat, dbRows[i].OwnedShippingAddress?.Location?.Lat);
+            Assert.Equal(rows[i].OwnedShippingAddress?.Location?.Lng, dbRows[i].OwnedShippingAddress?.Location?.Lng);
 
             Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
             Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);

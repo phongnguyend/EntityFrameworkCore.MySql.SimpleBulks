@@ -38,6 +38,24 @@ public class BulkInsertAsyncTests : BaseTest
                 Column3 = DateTime.Now,
                 Season = Season.Autumn,
                 SeasonAsString = Season.Autumn,
+                ComplexShippingAddress = new ComplexTypeAddress
+                {
+                    Street = "Street " + i,
+                    Location = new ComplexTypeLocation
+                    {
+                        Lat = 40.7128 + i,
+                        Lng = -74.0060 - i
+                    }
+                },
+                OwnedShippingAddress = new OwnedTypeAddress
+                {
+                    Street = "Street " + i,
+                    Location = new OwnedTypeLocation
+                    {
+                        Lat = 40.7128 + i,
+                        Lng = -74.0060 - i
+                    }
+                },
                 BulkId = bulkId,
                 BulkIndex = i
             });
@@ -84,6 +102,12 @@ public class BulkInsertAsyncTests : BaseTest
                         row.NullableLong,
                         row.NullableFloat,
                         row.NullableString,
+                        row.ComplexShippingAddress.Street,
+                        row.ComplexShippingAddress.Location.Lat,
+                        row.ComplexShippingAddress.Location.Lng,
+                        a = row.OwnedShippingAddress.Street,
+                        b = row.OwnedShippingAddress.Location.Lat,
+                        c = row.OwnedShippingAddress.Location.Lng,
                         row.BulkId,
                         row.BulkIndex
                     },
@@ -114,6 +138,12 @@ public class BulkInsertAsyncTests : BaseTest
                         row.NullableLong,
                         row.NullableFloat,
                         row.NullableString,
+                        row.ComplexShippingAddress.Street,
+                        row.ComplexShippingAddress.Location.Lat,
+                        row.ComplexShippingAddress.Location.Lng,
+                        a = row.OwnedShippingAddress.Street,
+                        b = row.OwnedShippingAddress.Location.Lat,
+                        c = row.OwnedShippingAddress.Location.Lng,
                         row.BulkId,
                         row.BulkIndex
                     },
@@ -132,7 +162,19 @@ public class BulkInsertAsyncTests : BaseTest
             if (omitTableName)
             {
                 await connectionContext.BulkInsertAsync(rows,
-                    ["Column1", "Column2", "Column3", "BulkId", "BulkIndex"],
+                    [
+                        "Column1",
+                        "Column2",
+                        "Column3",
+                        "ComplexShippingAddress.Street",
+                        "ComplexShippingAddress.Location.Lat",
+                        "ComplexShippingAddress.Location.Lng",
+                        "OwnedShippingAddress.Street",
+                        "OwnedShippingAddress.Location.Lat",
+                        "OwnedShippingAddress.Location.Lng",
+                        "BulkId",
+                        "BulkIndex"
+                    ],
                     options: options);
 
                 await connectionContext.BulkInsertAsync(compositeKeyRows,
@@ -142,7 +184,19 @@ public class BulkInsertAsyncTests : BaseTest
             else
             {
                 await connectionContext.BulkInsertAsync(rows,
-                    ["Column1", "Column2", "Column3", "BulkId", "BulkIndex"],
+                    [
+                        "Column1",
+                        "Column2",
+                        "Column3",
+                        "ComplexShippingAddress.Street",
+                        "ComplexShippingAddress.Location.Lat",
+                        "ComplexShippingAddress.Location.Lng",
+                        "OwnedShippingAddress.Street",
+                        "OwnedShippingAddress.Location.Lat",
+                        "OwnedShippingAddress.Location.Lng",
+                        "BulkId",
+                        "BulkIndex"
+                    ],
                     _singleKeyRowTableInfor,
                     options: options);
 
@@ -172,6 +226,12 @@ public class BulkInsertAsyncTests : BaseTest
             Assert.Equal(rows[i].Column1, dbRows[i].Column1);
             Assert.Equal(rows[i].Column2, dbRows[i].Column2);
             Assert.Equal(rows[i].Column3.TruncateToMicroseconds(), dbRows[i].Column3);
+            Assert.Equal(rows[i].ComplexShippingAddress?.Street, dbRows[i].ComplexShippingAddress?.Street);
+            Assert.Equal(rows[i].ComplexShippingAddress?.Location?.Lat, dbRows[i].ComplexShippingAddress?.Location?.Lat);
+            Assert.Equal(rows[i].ComplexShippingAddress?.Location?.Lng, dbRows[i].ComplexShippingAddress?.Location?.Lng);
+            Assert.Equal(rows[i].OwnedShippingAddress?.Street, dbRows[i].OwnedShippingAddress?.Street);
+            Assert.Equal(rows[i].OwnedShippingAddress?.Location?.Lat, dbRows[i].OwnedShippingAddress?.Location?.Lat);
+            Assert.Equal(rows[i].OwnedShippingAddress?.Location?.Lng, dbRows[i].OwnedShippingAddress?.Location?.Lng);
 
             Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
             Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);
