@@ -37,6 +37,15 @@ public abstract class BaseTest : IDisposable
                 {"SeasonAsString", "longtext" },
                 {"Discriminator", _enableDiscriminator ? _context.GetDiscriminator(typeof(SingleKeyRow<int>)).ColumnType : null }
             },
+            ColumnNameMappings = new Dictionary<string, string>
+            {
+                {"ComplexShippingAddress.Street", "ComplexShippingAddress_Street" },
+                {"ComplexShippingAddress.Location.Lat", "ComplexShippingAddress_Location_Lat" },
+                {"ComplexShippingAddress.Location.Lng", "ComplexShippingAddress_Location_Lng" },
+                {"OwnedShippingAddress.Street", "OwnedShippingAddress_Street" },
+                {"OwnedShippingAddress.Location.Lat", "OwnedShippingAddress_Location_Lat" },
+                {"OwnedShippingAddress.Location.Lng", "OwnedShippingAddress_Location_Lng" }
+            },
             ValueConverters = new Dictionary<string, ValueConverter>
             {
                 {"SeasonAsString", new ValueConverter(typeof(string),x => x.ToString(),v => (Season)Enum.Parse(typeof(Season), (string)v))}
@@ -79,6 +88,10 @@ public abstract class BaseTest : IDisposable
             .TableName(GetTableName("SingleKeyRows"))
             .PrimaryKeys(x => x.Id)
             .ConfigureProperty(x => x.SeasonAsString, columnType: "longtext")
+            .ConfigureComplexProperty(x => x.ComplexShippingAddress)
+            .ConfigureComplexProperty(x => x.ComplexShippingAddress.Location)
+            .ConfigureComplexProperty(x => x.OwnedShippingAddress)
+            .ConfigureComplexProperty(x => x.OwnedShippingAddress.Location)
             .ConfigurePropertyConversion(x => x.SeasonAsString, y => y.ToString(), z => (Season)Enum.Parse(typeof(Season), z));
 
             if (_enableDiscriminator)
