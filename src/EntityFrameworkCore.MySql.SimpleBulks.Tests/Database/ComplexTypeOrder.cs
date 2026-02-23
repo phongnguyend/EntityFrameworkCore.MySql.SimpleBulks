@@ -24,3 +24,10 @@ public class ComplexTypeLocation
 
     public double Lng { get; set; }
 }
+
+public class JsonComplexTypeOrder
+{
+    public int Id { get; set; }
+
+    public ComplexTypeAddress ShippingAddress { get; set; }
+}

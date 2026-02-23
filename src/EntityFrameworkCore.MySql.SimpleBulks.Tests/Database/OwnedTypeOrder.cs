@@ -24,3 +24,10 @@ public class OwnedTypeLocation
 
     public double Lng { get; set; }
 }
+
+public class JsonOwnedTypeOrder
+{
+    public int Id { get; set; }
+
+    public OwnedTypeAddress ShippingAddress { get; set; }
+}

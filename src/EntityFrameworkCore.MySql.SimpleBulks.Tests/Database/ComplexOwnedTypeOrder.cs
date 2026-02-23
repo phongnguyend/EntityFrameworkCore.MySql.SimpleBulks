@@ -8,3 +8,12 @@ public class ComplexOwnedTypeOrder
 
     public OwnedTypeAddress OwnedShippingAddress { get; set; }
 }
+
+public class JsonComplexOwnedTypeOrder
+{
+    public int Id { get; set; }
+
+    public ComplexTypeAddress ComplexShippingAddress { get; set; }
+
+    public OwnedTypeAddress OwnedShippingAddress { get; set; }
+}
