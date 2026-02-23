@@ -84,7 +84,7 @@ public class BulkUpdateBuilder<T>
     {
         return string.Join(" AND ", GetKeys().Select(x =>
         {
-            return CreateSetStatement(x);
+            return CreateWhereStatement(x);
         }));
     }
 
@@ -97,7 +97,7 @@ public class BulkUpdateBuilder<T>
 
         var temptableName = $"`{Guid.NewGuid()}`";
 
-        var propertyNamesIncludeId = _columnNames.Select(RemoveOperator).ToList();
+        var propertyNamesIncludeId = _columnNames.ToList();
         propertyNamesIncludeId.AddRange(_updateKeys);
 
         var dataTable = data.ToDataTable(propertyNamesIncludeId, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator);
@@ -147,7 +147,7 @@ public class BulkUpdateBuilder<T>
 
         var sqlUpdateStatement = updateStatementBuilder.ToString();
 
-        var propertyNamesIncludeId = _columnNames.Select(RemoveOperator).ToList();
+        var propertyNamesIncludeId = _columnNames.ToList();
         propertyNamesIncludeId.AddRange(_updateKeys);
 
         Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");
@@ -170,34 +170,19 @@ public class BulkUpdateBuilder<T>
 
     private string CreateSetStatement(string prop, string leftTable, string rightTable)
     {
-        string sqlOperator = "=";
-        string sqlProp = RemoveOperator(prop);
-
-        if (prop.EndsWith("+="))
-        {
-            sqlOperator = "+=";
-        }
-
-        return $"{leftTable}.`{_table.GetDbColumnName(sqlProp)}` {sqlOperator} {rightTable}.`{sqlProp}`";
+        return _table.CreateSetStatement(prop, leftTable, rightTable, _options.ConfigureSetStatement);
     }
 
     private string CreateSetStatement(string prop)
     {
-        string sqlOperator = "=";
-        string sqlProp = RemoveOperator(prop);
-
-        if (prop.EndsWith("+="))
-        {
-            sqlOperator = "+=";
-        }
-
-        return $"`{_table.GetDbColumnName(sqlProp)}` {sqlOperator} {_table.CreateParameterName(sqlProp)}";
+        return _table.CreateSetStatement(prop, _options.ConfigureSetStatement);
     }
 
-    private static string RemoveOperator(string prop)
+    private string CreateWhereStatement(string prop)
     {
-        var rs = prop.Replace("+=", "");
-        return rs;
+        string sqlOperator = "=";
+
+        return $"`{_table.GetDbColumnName(prop)}` {sqlOperator} {_table.CreateParameterName(prop)}";
     }
 
     private void Log(string message)
@@ -227,7 +212,7 @@ public class BulkUpdateBuilder<T>
 
         var temptableName = $"`{Guid.NewGuid()}`";
 
-        var propertyNamesIncludeId = _columnNames.Select(RemoveOperator).ToList();
+        var propertyNamesIncludeId = _columnNames.ToList();
         propertyNamesIncludeId.AddRange(_updateKeys);
 
         var dataTable = await data.ToDataTableAsync(propertyNamesIncludeId, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator, cancellationToken: cancellationToken);
@@ -277,7 +262,7 @@ public class BulkUpdateBuilder<T>
 
         var sqlUpdateStatement = updateStatementBuilder.ToString();
 
-        var propertyNamesIncludeId = _columnNames.Select(RemoveOperator).ToList();
+        var propertyNamesIncludeId = _columnNames.ToList();
         propertyNamesIncludeId.AddRange(_updateKeys);
 
         Log($"Begin updating:{Environment.NewLine}{sqlUpdateStatement}");

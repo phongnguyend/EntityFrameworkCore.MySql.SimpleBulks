@@ -12,8 +12,6 @@ public abstract class BaseTest : IDisposable
     protected readonly MySqlFixture _fixture;
     protected readonly TestDbContext _context;
     protected readonly MySqlConnection _connection;
-    protected readonly MySqlTableInfor<SingleKeyRow<int>> _singleKeyRowTableInfor;
-    protected readonly MySqlTableInfor<CompositeKeyRow<int, int>> _compositeKeyRowTableInfor;
     private string _schema = Environment.GetEnvironmentVariable("SCHEMA") ?? "";
     private bool _enableDiscriminator = (Environment.GetEnvironmentVariable("DISCRIMINATOR") ?? "") == "true";
 
@@ -28,59 +26,6 @@ public abstract class BaseTest : IDisposable
         _context.Database.EnsureCreated();
         _context.Database.ExecuteSqlRaw("SET GLOBAL local_infile = 1;");
         _connection = new MySqlConnection(connectionString);
-
-        _singleKeyRowTableInfor = new MySqlTableInfor<SingleKeyRow<int>>(GetTableName("SingleKeyRows"))
-        {
-            PrimaryKeys = ["Id"],
-            ColumnTypeMappings = new Dictionary<string, string>
-            {
-                {"SeasonAsString", "longtext" },
-                {"Discriminator", _enableDiscriminator ? _context.GetDiscriminator(typeof(SingleKeyRow<int>)).ColumnType : null }
-            },
-            ColumnNameMappings = new Dictionary<string, string>
-            {
-                {"ComplexShippingAddress.Street", "ComplexShippingAddress_Street" },
-                {"ComplexShippingAddress.Location.Lat", "ComplexShippingAddress_Location_Lat" },
-                {"ComplexShippingAddress.Location.Lng", "ComplexShippingAddress_Location_Lng" },
-                {"OwnedShippingAddress.Street", "OwnedShippingAddress_Street" },
-                {"OwnedShippingAddress.Location.Lat", "OwnedShippingAddress_Location_Lat" },
-                {"OwnedShippingAddress.Location.Lng", "OwnedShippingAddress_Location_Lng" }
-            },
-            ValueConverters = new Dictionary<string, ValueConverter>
-            {
-                {"SeasonAsString", new ValueConverter(typeof(string),x => x.ToString(),v => (Season)Enum.Parse(typeof(Season), (string)v))}
-            },
-            Discriminator = _enableDiscriminator ? new Discriminator
-            {
-                PropertyName = "Discriminator",
-                PropertyType = typeof(string),
-                PropertyValue = "SingleKeyRow<int>",
-                ColumnName = "Discriminator",
-                ColumnType = _context.GetDiscriminator(typeof(SingleKeyRow<int>)).ColumnType
-            } : null
-        };
-
-        _compositeKeyRowTableInfor = new MySqlTableInfor<CompositeKeyRow<int, int>>(GetTableName("CompositeKeyRows"))
-        {
-            PrimaryKeys = ["Id1", "Id2"],
-            ColumnTypeMappings = new Dictionary<string, string>
-            {
-                {"SeasonAsString", "longtext" },
-                {"Discriminator", _enableDiscriminator ? _context.GetDiscriminator(typeof(CompositeKeyRow<int, int>)).ColumnType : null }
-            },
-            ValueConverters = new Dictionary<string, ValueConverter>
-            {
-                {"SeasonAsString", new ValueConverter(typeof(string),x => x.ToString(),v => (Season)Enum.Parse(typeof(Season), (string)v))}
-            },
-            Discriminator = _enableDiscriminator ? new Discriminator
-            {
-                PropertyName = "Discriminator",
-                PropertyType = typeof(string),
-                PropertyValue = "CompositeKeyRow<int, int>",
-                ColumnName = "Discriminator",
-                ColumnType = _context.GetDiscriminator(typeof(CompositeKeyRow<int, int>)).ColumnType
-            } : null
-        };
 
         TableMapper.Configure<SingleKeyRow<int>>(config =>
         {

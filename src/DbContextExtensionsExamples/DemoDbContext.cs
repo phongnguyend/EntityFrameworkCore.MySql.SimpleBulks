@@ -1,5 +1,6 @@
 ﻿using DbContextExtensionsExamples.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using System;
 
@@ -21,6 +22,10 @@ public class DemoDbContext : DbContext
         optionsBuilder.UseMySql(_connectionString, serverVersion)
             .LogTo(Console.WriteLine, LogLevel.Information)
             .EnableSensitiveDataLogging();
+
+#if NET9_0_OR_GREATER
+        optionsBuilder.ConfigureWarnings(x => x.Log([RelationalEventId.PendingModelChangesWarning]));
+#endif
 
         base.OnConfiguring(optionsBuilder);
     }

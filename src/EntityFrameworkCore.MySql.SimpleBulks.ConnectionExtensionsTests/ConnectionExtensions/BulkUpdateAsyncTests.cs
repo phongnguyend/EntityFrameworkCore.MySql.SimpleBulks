@@ -66,11 +66,9 @@ public class BulkUpdateAsyncTests : BaseTest
     }
 
     [Theory]
-    [InlineData(true, true)]
-    [InlineData(true, false)]
-    [InlineData(false, true)]
-    [InlineData(false, false)]
-    public async Task BulkUpdate_PrimaryKeys(bool useLinq, bool omitTableName)
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task BulkUpdate_PrimaryKeys(bool useLinq)
     {
         var connectionContext = new ConnectionContext(_connection, null);
 
@@ -96,53 +94,23 @@ public class BulkUpdateAsyncTests : BaseTest
 
         if (useLinq)
         {
-            if (omitTableName)
-            {
-                await connectionContext.BulkUpdateAsync(rows,
-                    row => new { row.Column3, row.Column2 },
-                    options: updateOptions);
+            await connectionContext.BulkUpdateAsync(rows,
+                row => new { row.Column3, row.Column2 },
+                options: updateOptions);
 
-                await connectionContext.BulkUpdateAsync(compositeKeyRows,
-                    row => new { row.Column3, row.Column2 },
-                    options: updateOptions);
-            }
-            else
-            {
-                await connectionContext.BulkUpdateAsync(rows,
-                    row => new { row.Column3, row.Column2 },
-                    _singleKeyRowTableInfor,
-                    options: updateOptions);
-
-                await connectionContext.BulkUpdateAsync(compositeKeyRows,
-                    row => new { row.Column3, row.Column2 },
-                    _compositeKeyRowTableInfor,
-                    options: updateOptions);
-            }
+            await connectionContext.BulkUpdateAsync(compositeKeyRows,
+                row => new { row.Column3, row.Column2 },
+                options: updateOptions);
         }
         else
         {
-            if (omitTableName)
-            {
-                await connectionContext.BulkUpdateAsync(rows,
-                    ["Column3", "Column2"],
-                    options: updateOptions);
+            await connectionContext.BulkUpdateAsync(rows,
+                ["Column3", "Column2"],
+                options: updateOptions);
 
-                await connectionContext.BulkUpdateAsync(compositeKeyRows,
-                    ["Column3", "Column2"],
-                    options: updateOptions);
-            }
-            else
-            {
-                await connectionContext.BulkUpdateAsync(rows,
-                    ["Column3", "Column2"],
-                    _singleKeyRowTableInfor,
-                    options: updateOptions);
-
-                await connectionContext.BulkUpdateAsync(compositeKeyRows,
-                    ["Column3", "Column2"],
-                    _compositeKeyRowTableInfor,
-                    options: updateOptions);
-            }
+            await connectionContext.BulkUpdateAsync(compositeKeyRows,
+                ["Column3", "Column2"],
+                options: updateOptions);
         }
 
         // Assert
@@ -171,11 +139,9 @@ public class BulkUpdateAsyncTests : BaseTest
     }
 
     [Theory]
-    [InlineData(true, true)]
-    [InlineData(true, false)]
-    [InlineData(false, true)]
-    [InlineData(false, false)]
-    public async Task BulkUpdate_SpecifiedKeys(bool useLinq, bool omitTableName)
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task BulkUpdate_SpecifiedKeys(bool useLinq)
     {
         var connectionContext = new ConnectionContext(_connection, null);
 
@@ -201,53 +167,23 @@ public class BulkUpdateAsyncTests : BaseTest
 
         if (useLinq)
         {
-            if (omitTableName)
-            {
-                await connectionContext.BulkUpdateAsync(rows, x => x.Id,
-                    row => new { row.Column3, row.Column2 },
-                    options: updateOptions);
+            await connectionContext.BulkUpdateAsync(rows, x => x.Id,
+                row => new { row.Column3, row.Column2 },
+                options: updateOptions);
 
-                await connectionContext.BulkUpdateAsync(compositeKeyRows, x => new { x.Id1, x.Id2 },
-                    row => new { row.Column3, row.Column2 },
-                    options: updateOptions);
-            }
-            else
-            {
-                await connectionContext.BulkUpdateAsync(rows, x => x.Id,
-                    row => new { row.Column3, row.Column2 },
-                    _singleKeyRowTableInfor,
-                    options: updateOptions);
-
-                await connectionContext.BulkUpdateAsync(compositeKeyRows, x => new { x.Id1, x.Id2 },
-                    row => new { row.Column3, row.Column2 },
-                    _compositeKeyRowTableInfor,
-                    options: updateOptions);
-            }
+            await connectionContext.BulkUpdateAsync(compositeKeyRows, x => new { x.Id1, x.Id2 },
+                row => new { row.Column3, row.Column2 },
+                options: updateOptions);
         }
         else
         {
-            if (omitTableName)
-            {
-                await connectionContext.BulkUpdateAsync(rows, ["Id"],
-                    ["Column3", "Column2"],
-                    options: updateOptions);
+            await connectionContext.BulkUpdateAsync(rows, ["Id"],
+                ["Column3", "Column2"],
+                options: updateOptions);
 
-                await connectionContext.BulkUpdateAsync(compositeKeyRows, ["Id1", "Id2"],
-                    ["Column3", "Column2"],
-                    options: updateOptions);
-            }
-            else
-            {
-                await connectionContext.BulkUpdateAsync(rows, ["Id"],
-                    ["Column3", "Column2"],
-                    _singleKeyRowTableInfor,
-                    options: updateOptions);
-
-                await connectionContext.BulkUpdateAsync(compositeKeyRows, ["Id1", "Id2"],
-                    ["Column3", "Column2"],
-                    _compositeKeyRowTableInfor,
-                    options: updateOptions);
-            }
+            await connectionContext.BulkUpdateAsync(compositeKeyRows, ["Id1", "Id2"],
+                ["Column3", "Column2"],
+                options: updateOptions);
         }
 
         // Assert

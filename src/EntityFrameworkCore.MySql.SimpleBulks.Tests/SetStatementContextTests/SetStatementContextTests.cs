@@ -1,0 +1,103 @@
+﻿using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
+using EntityFrameworkCore.MySql.SimpleBulks.Tests.Database;
+
+namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.SetStatementContextTests;
+
+public class SetStatementContextTests
+{
+    protected string GetConnectionString(string dbPrefixName)
+    {
+        return $"server=localhost;database={dbPrefixName}.{Guid.NewGuid()};user=root;password=mysql;AllowLoadLocalInfile=true";
+    }
+
+    protected TestDbContext GetDbContext(string dbPrefixName, string schema)
+    {
+        return new TestDbContext(GetConnectionString(dbPrefixName), schema);
+    }
+
+    [Fact]
+    public void GetTargetTableColumn_ReturnsCorrectColumnInformation()
+    {
+        // Arrange
+        var dbContext = GetDbContext("", "");
+
+        // Act
+        var table = dbContext.GetTableInfor<ConfigurationEntry>();
+
+        var ctx = new SetStatementContext
+        {
+            TableInfor = table,
+        };
+
+        // Assert
+        Assert.Equal("`Id1`", ctx.GetTargetTableColumn("Id"));
+        Assert.Equal("`Key1`", ctx.GetTargetTableColumn("Key"));
+        Assert.Equal("`Value`", ctx.GetTargetTableColumn("Value"));
+        Assert.Equal("`Description`", ctx.GetTargetTableColumn("Description"));
+    }
+
+    [Fact]
+    public void GetTargetTableColumn_WithTargetTableAlias_ReturnsCorrectColumnInformation()
+    {
+        // Arrange
+        var dbContext = GetDbContext("", "");
+
+        // Act
+        var table = dbContext.GetTableInfor<ConfigurationEntry>();
+
+        var ctx = new SetStatementContext
+        {
+            TableInfor = table,
+            TargetTableAlias = "t",
+        };
+
+        // Assert
+        Assert.Equal("t.`Id1`", ctx.GetTargetTableColumn("Id"));
+        Assert.Equal("t.`Key1`", ctx.GetTargetTableColumn("Key"));
+        Assert.Equal("t.`Value`", ctx.GetTargetTableColumn("Value"));
+        Assert.Equal("t.`Description`", ctx.GetTargetTableColumn("Description"));
+    }
+
+    [Fact]
+    public void GetSourceTableColumn_ReturnsCorrectColumnInformation()
+    {
+        // Arrange
+        var dbContext = GetDbContext("", "");
+
+        // Act
+        var table = dbContext.GetTableInfor<ConfigurationEntry>();
+
+        var ctx = new SetStatementContext
+        {
+            TableInfor = table,
+        };
+
+        // Assert
+        Assert.Equal("@Id", ctx.GetSourceTableColumn("Id"));
+        Assert.Equal("@Key", ctx.GetSourceTableColumn("Key"));
+        Assert.Equal("@Value", ctx.GetSourceTableColumn("Value"));
+        Assert.Equal("@Description", ctx.GetSourceTableColumn("Description"));
+    }
+
+    [Fact]
+    public void GetSourceTableColumn_WithSourceTableAlias_ReturnsCorrectColumnInformation()
+    {
+        // Arrange
+        var dbContext = GetDbContext("", "");
+
+        // Act
+        var table = dbContext.GetTableInfor<ConfigurationEntry>();
+
+        var ctx = new SetStatementContext
+        {
+            TableInfor = table,
+            SourceTableAlias = "s",
+        };
+
+        // Assert
+        Assert.Equal("s.`Id`", ctx.GetSourceTableColumn("Id"));
+        Assert.Equal("s.`Key`", ctx.GetSourceTableColumn("Key"));
+        Assert.Equal("s.`Value`", ctx.GetSourceTableColumn("Value"));
+        Assert.Equal("s.`Description`", ctx.GetSourceTableColumn("Description"));
+    }
+}
