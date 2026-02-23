@@ -28,8 +28,8 @@ public class BulkDeleteTests : BaseTest
                     Street = "Street " + i,
                     Location = new ComplexTypeLocation
                     {
-                        Lat = 40.7128 + i,
-                        Lng = -74.0060 - i
+                        Lat = 40.7128m + i,
+                        Lng = -74.0060m - i
                     }
                 },
                 OwnedShippingAddress = new OwnedTypeAddress
@@ -37,8 +37,26 @@ public class BulkDeleteTests : BaseTest
                     Street = "Street " + i,
                     Location = new OwnedTypeLocation
                     {
-                        Lat = 40.7128 + i,
-                        Lng = -74.0060 - i
+                        Lat = 40.7128m + i,
+                        Lng = -74.0060m - i
+                    }
+                },
+                JsonComplexShippingAddress = new JsonComplexTypeAddress
+                {
+                    Street = "Street " + i,
+                    Location = new ComplexTypeLocation
+                    {
+                        Lat = 40.7128m + i,
+                        Lng = -74.0060m - i
+                    }
+                },
+                JsonOwnedShippingAddress = new JsonOwnedTypeAddress
+                {
+                    Street = "Street " + i,
+                    Location = new OwnedTypeLocation
+                    {
+                        Lat = 40.7128m + i,
+                        Lng = -74.0060m - i
                     }
                 }
             });

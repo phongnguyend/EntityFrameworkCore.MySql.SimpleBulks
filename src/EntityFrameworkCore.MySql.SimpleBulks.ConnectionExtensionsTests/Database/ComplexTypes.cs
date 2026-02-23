@@ -13,7 +13,14 @@ public class ComplexTypeAddress
 [ComplexType]
 public class ComplexTypeLocation
 {
-    public double Lat { get; set; }
+    public decimal Lat { get; set; }
 
-    public double Lng { get; set; }
+    public decimal Lng { get; set; }
+}
+
+public class JsonComplexTypeAddress
+{
+    public string Street { get; set; }
+
+    public ComplexTypeLocation Location { get; set; }
 }
