@@ -1,27 +1,11 @@
-﻿#if NET9_0_OR_GREATER
-using System;
-
-namespace EntityFrameworkCore.MySql.SimpleBulks;
-
-public static class SequentialGuidGenerator
-{
-    public static Guid Next()
-    {
-        return Next(DateTimeOffset.UtcNow);
-    }
-
-    public static Guid Next(DateTimeOffset timeNow)
-    {
-        return Guid.CreateVersion7(timeNow);
-    }
-}
-
-#else
-using System;
+﻿using System;
 using System.Security.Cryptography;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks;
 
+/// <summary>
+/// https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql/blob/main/src/EFCore.MySql/ValueGeneration/Internal/MySqlSequentialGuidValueGenerator.cs
+/// </summary>
 public static class SequentialGuidGenerator
 {
     private static readonly RandomNumberGenerator _rng = RandomNumberGenerator.Create();
@@ -56,5 +40,3 @@ public static class SequentialGuidGenerator
         return guid;
     }
 }
-
-#endif

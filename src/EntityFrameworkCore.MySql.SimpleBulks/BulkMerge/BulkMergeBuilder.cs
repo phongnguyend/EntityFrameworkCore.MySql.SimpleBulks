@@ -103,7 +103,7 @@ public class BulkMergeBuilder<T>
     {
         return string.Join(" AND ", GetKeys().Select(x =>
         {
-            return CreateSetStatement(x);
+            return CreateWhereStatement(x);
         }));
     }
 
@@ -111,7 +111,7 @@ public class BulkMergeBuilder<T>
     {
         return $"SELECT 1 FROM {_table.SchemaQualifiedTableName} WHERE " + string.Join(" AND ", GetKeys().Select(x =>
         {
-            return CreateSetStatement(x);
+            return CreateWhereStatement(x);
         }));
     }
 
@@ -134,7 +134,7 @@ public class BulkMergeBuilder<T>
 
         var temptableName = $"`{Guid.NewGuid()}`";
 
-        var propertyNames = _updateColumnNames.Select(RemoveOperator).ToList();
+        var propertyNames = _updateColumnNames.ToList();
         propertyNames.AddRange(_mergeKeys);
         propertyNames.AddRange(_insertColumnNames);
         propertyNames = propertyNames.Distinct().ToList();
@@ -214,34 +214,19 @@ public class BulkMergeBuilder<T>
 
     private string CreateSetStatement(string prop, string leftTable, string rightTable)
     {
-        string sqlOperator = "=";
-        string sqlProp = RemoveOperator(prop);
-
-        if (prop.EndsWith("+="))
-        {
-            sqlOperator = "+=";
-        }
-
-        return $"{leftTable}.`{_table.GetDbColumnName(sqlProp)}` {sqlOperator} {rightTable}.`{sqlProp}`";
+        return _table.CreateSetStatement(prop, leftTable, rightTable, _options.ConfigureSetStatement);
     }
 
     private string CreateSetStatement(string prop)
     {
-        string sqlOperator = "=";
-        string sqlProp = RemoveOperator(prop);
-
-        if (prop.EndsWith("+="))
-        {
-            sqlOperator = "+=";
-        }
-
-        return $"`{_table.GetDbColumnName(sqlProp)}` {sqlOperator} {_table.CreateParameterName(sqlProp)}";
+        return _table.CreateSetStatement(prop, _options.ConfigureSetStatement);
     }
 
-    private static string RemoveOperator(string prop)
+    private string CreateWhereStatement(string prop)
     {
-        var rs = prop.Replace("+=", "");
-        return rs;
+        string sqlOperator = "=";
+
+        return $"`{_table.GetDbColumnName(prop)}` {sqlOperator} {_table.CreateParameterName(prop)}";
     }
 
     private void Log(string message)
@@ -276,7 +261,7 @@ public class BulkMergeBuilder<T>
 
         var temptableName = $"`{Guid.NewGuid()}`";
 
-        var propertyNames = _updateColumnNames.Select(RemoveOperator).ToList();
+        var propertyNames = _updateColumnNames.ToList();
         propertyNames.AddRange(_mergeKeys);
         propertyNames.AddRange(_insertColumnNames);
         propertyNames = propertyNames.Distinct().ToList();
@@ -390,7 +375,7 @@ public class BulkMergeBuilder<T>
         {
             var sqlUpdateStatement = updateStatementBuilder.ToString();
 
-            var propertyNamesIncludeId = _updateColumnNames.Select(RemoveOperator).ToList();
+            var propertyNamesIncludeId = _updateColumnNames.ToList();
             propertyNamesIncludeId.AddRange(_mergeKeys);
             propertyNamesIncludeId = propertyNamesIncludeId.Distinct().ToList();
 
@@ -462,7 +447,7 @@ public class BulkMergeBuilder<T>
         {
             var sqlUpdateStatement = updateStatementBuilder.ToString();
 
-            var propertyNamesIncludeId = _updateColumnNames.Select(RemoveOperator).ToList();
+            var propertyNamesIncludeId = _updateColumnNames.ToList();
             propertyNamesIncludeId.AddRange(_mergeKeys);
             propertyNamesIncludeId = propertyNamesIncludeId.Distinct().ToList();
 

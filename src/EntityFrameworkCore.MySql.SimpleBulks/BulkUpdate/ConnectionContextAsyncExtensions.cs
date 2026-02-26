@@ -9,50 +9,50 @@ namespace EntityFrameworkCore.MySql.SimpleBulks.BulkUpdate;
 
 public static class ConnectionContextAsyncExtensions
 {
-    public static Task<BulkUpdateResult> BulkUpdateAsync<T>(this ConnectionContext connectionContext, IReadOnlyCollection<T> data, Expression<Func<T, object>> columnNamesSelector, MySqlTableInfor<T> table = null, BulkUpdateOptions options = null, CancellationToken cancellationToken = default)
+    public static Task<BulkUpdateResult> BulkUpdateAsync<T>(this ConnectionContext connectionContext, IReadOnlyCollection<T> data, Expression<Func<T, object>> columnNamesSelector, BulkUpdateOptions options = null, CancellationToken cancellationToken = default)
     {
-        var temp = table ?? TableMapper.Resolve<T>();
+        var table = TableMapper.Resolve<T>(options);
 
         return connectionContext.CreateBulkUpdateBuilder<T>()
-            .WithId(temp.PrimaryKeys)
+            .WithId(table.PrimaryKeys)
             .WithColumns(columnNamesSelector)
-            .ToTable(temp)
+            .ToTable(table)
             .WithBulkOptions(options)
             .ExecuteAsync(data, cancellationToken);
     }
 
-    public static Task<BulkUpdateResult> BulkUpdateAsync<T>(this ConnectionContext connectionContext, IReadOnlyCollection<T> data, IReadOnlyCollection<string> columnNames, MySqlTableInfor<T> table = null, BulkUpdateOptions options = null, CancellationToken cancellationToken = default)
+    public static Task<BulkUpdateResult> BulkUpdateAsync<T>(this ConnectionContext connectionContext, IReadOnlyCollection<T> data, IReadOnlyCollection<string> columnNames, BulkUpdateOptions options = null, CancellationToken cancellationToken = default)
     {
-        var temp = table ?? TableMapper.Resolve<T>();
+        var table = TableMapper.Resolve<T>(options);
 
         return connectionContext.CreateBulkUpdateBuilder<T>()
-            .WithId(temp.PrimaryKeys)
+            .WithId(table.PrimaryKeys)
             .WithColumns(columnNames)
-            .ToTable(temp)
+            .ToTable(table)
             .WithBulkOptions(options)
             .ExecuteAsync(data, cancellationToken);
     }
 
-    public static Task<BulkUpdateResult> BulkUpdateAsync<T>(this ConnectionContext connectionContext, IReadOnlyCollection<T> data, Expression<Func<T, object>> keySelector, Expression<Func<T, object>> columnNamesSelector, MySqlTableInfor<T> table = null, BulkUpdateOptions options = null, CancellationToken cancellationToken = default)
+    public static Task<BulkUpdateResult> BulkUpdateAsync<T>(this ConnectionContext connectionContext, IReadOnlyCollection<T> data, Expression<Func<T, object>> keySelector, Expression<Func<T, object>> columnNamesSelector, BulkUpdateOptions options = null, CancellationToken cancellationToken = default)
     {
-        var temp = table ?? TableMapper.Resolve<T>();
+        var table = TableMapper.Resolve<T>(options);
 
         return connectionContext.CreateBulkUpdateBuilder<T>()
             .WithId(keySelector)
             .WithColumns(columnNamesSelector)
-            .ToTable(temp)
+            .ToTable(table)
             .WithBulkOptions(options)
             .ExecuteAsync(data, cancellationToken);
     }
 
-    public static Task<BulkUpdateResult> BulkUpdateAsync<T>(this ConnectionContext connectionContext, IReadOnlyCollection<T> data, IReadOnlyCollection<string> keys, IReadOnlyCollection<string> columnNames, MySqlTableInfor<T> table = null, BulkUpdateOptions options = null, CancellationToken cancellationToken = default)
+    public static Task<BulkUpdateResult> BulkUpdateAsync<T>(this ConnectionContext connectionContext, IReadOnlyCollection<T> data, IReadOnlyCollection<string> keys, IReadOnlyCollection<string> columnNames, BulkUpdateOptions options = null, CancellationToken cancellationToken = default)
     {
-        var temp = table ?? TableMapper.Resolve<T>();
+        var table = TableMapper.Resolve<T>(options);
 
         return connectionContext.CreateBulkUpdateBuilder<T>()
             .WithId(keys)
             .WithColumns(columnNames)
-            .ToTable(temp)
+            .ToTable(table)
             .WithBulkOptions(options)
             .ExecuteAsync(data, cancellationToken);
     }

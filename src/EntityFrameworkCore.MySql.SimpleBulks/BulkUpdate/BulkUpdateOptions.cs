@@ -1,8 +1,12 @@
-﻿namespace EntityFrameworkCore.MySql.SimpleBulks.BulkUpdate;
+﻿using System;
+
+namespace EntityFrameworkCore.MySql.SimpleBulks.BulkUpdate;
 
 public class BulkUpdateOptions : BulkOptions
 {
     public static readonly BulkUpdateOptions DefaultOptions = new BulkUpdateOptions();
 
     public string Collation { get; set; } = Constants.DefaultCollation;
+
+    public Func<SetStatementContext, string> ConfigureSetStatement { get; set; }
 }
