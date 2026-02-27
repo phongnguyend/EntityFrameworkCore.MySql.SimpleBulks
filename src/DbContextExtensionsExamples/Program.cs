@@ -61,7 +61,7 @@ using (var dbct = new DemoDbContext())
         new BulkUpdateOptions
         {
             LogTo = Console.WriteLine,
-            ConfigureSetStatement = ctx =>
+            ConfigureSetClause = ctx =>
             {
                 if (ctx.PropertyName == "SeasonAsInt")
                 {
@@ -91,7 +91,7 @@ using (var dbct = new DemoDbContext())
         new BulkMergeOptions
         {
             LogTo = Console.WriteLine,
-            ConfigureSetStatement = ctx =>
+            ConfigureSetClause = ctx =>
             {
                 if (ctx.PropertyName == "SeasonAsInt")
                 {
@@ -99,6 +99,15 @@ using (var dbct = new DemoDbContext())
                 }
 
                 return null;
+            },
+            ConfigureWhenNotMatchedBySource = ctx =>
+            {
+                return new WhenNotMatchedBySourceAction
+                {
+                    AndCondition = $"{ctx.GetTargetTableColumnWithAlias("Key")} LIKE 'Key%'",
+                    ActionType = WhenNotMatchedBySourceActionType.Update,
+                    SetClause = $"{ctx.GetTargetTableColumnWithoutAlias("Key")} = 'xxx'"
+                };
             }
         });
 
@@ -132,7 +141,7 @@ using (var dbct = new DemoDbContext())
         new BulkUpdateOptions
         {
             LogTo = Console.WriteLine,
-            ConfigureSetStatement = ctx =>
+            ConfigureSetClause = ctx =>
             {
                 if (ctx.PropertyName == "SeasonAsInt")
                 {

@@ -120,6 +120,64 @@ public class BulkMergeBuilder<T>
         return $"CREATE INDEX Idx_Id ON {tableName} ({string.Join(",", GetKeys().Select(x => $"`{x}`"))});";
     }
 
+    private WhenNotMatchedBySourceAction? GetWhenNotMatchedBySourceAction(string targetTableAlias, string sourceTableAlias)
+    {
+        if (_options?.ConfigureWhenNotMatchedBySource == null)
+        {
+            return null;
+        }
+
+        var context = new MergeContext
+        {
+            TableInfor = _table,
+            TargetTableAlias = targetTableAlias,
+            SourceTableAlias = sourceTableAlias
+        };
+
+        return _options.ConfigureWhenNotMatchedBySource(context);
+    }
+
+    private static bool HasWhenNotMatchedBySourceAction(WhenNotMatchedBySourceAction? action)
+    {
+        if (!action.HasValue)
+        {
+            return false;
+        }
+
+        var value = action.Value;
+        if (value.ActionType == WhenNotMatchedBySourceActionType.Update && string.IsNullOrEmpty(value.SetClause))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private string BuildNotMatchedBySourceStatement(WhenNotMatchedBySourceAction action, string tableAlias, string whereClause)
+    {
+        var builder = new StringBuilder();
+
+        if (action.ActionType == WhenNotMatchedBySourceActionType.Delete)
+        {
+            builder.AppendLine($"DELETE FROM {_table.SchemaQualifiedTableName} {tableAlias}".TrimEnd());
+        }
+        else if (action.ActionType == WhenNotMatchedBySourceActionType.Update)
+        {
+            builder.AppendLine($"UPDATE {_table.SchemaQualifiedTableName} {tableAlias}".TrimEnd());
+            builder.AppendLine($"SET {action.SetClause}");
+        }
+
+        builder.AppendLine($"WHERE {whereClause}");
+
+        if (!string.IsNullOrEmpty(action.AndCondition))
+        {
+            builder.AppendLine($"AND {action.AndCondition}");
+        }
+
+        builder.Append(";");
+        return builder.ToString();
+    }
+
     public BulkMergeResult Execute(IReadOnlyCollection<T> data)
     {
         if (data.Count == 1)
@@ -127,7 +185,10 @@ public class BulkMergeBuilder<T>
             return SingleMerge(data.First());
         }
 
-        if (!_updateColumnNames.Any() && !_insertColumnNames.Any())
+        var whenNotMatchedBySourceAction = GetWhenNotMatchedBySourceAction("t", "s");
+        bool hasWhenNotMatchedBySourceAction = HasWhenNotMatchedBySourceAction(whenNotMatchedBySourceAction);
+
+        if (!_updateColumnNames.Any() && !_insertColumnNames.Any() && !hasWhenNotMatchedBySourceAction)
         {
             return new BulkMergeResult();
         }
@@ -149,6 +210,7 @@ public class BulkMergeBuilder<T>
 
         var insertStatementBuilder = new StringBuilder();
         var updateStatementBuilder = new StringBuilder();
+        string notMatchedBySourceStatement = null;
 
         if (_updateColumnNames.Any())
         {
@@ -163,6 +225,12 @@ public class BulkMergeBuilder<T>
             insertStatementBuilder.AppendLine($"FROM {temptableName} s");
             insertStatementBuilder.AppendLine($"LEFT JOIN {_table.SchemaQualifiedTableName} t ON {joinCondition}");
             insertStatementBuilder.AppendLine($"WHERE {whereCondition};");
+        }
+
+        if (hasWhenNotMatchedBySourceAction)
+        {
+            var notExistsWhereClause = $"NOT EXISTS (SELECT 1 FROM {temptableName} s WHERE {joinCondition})";
+            notMatchedBySourceStatement = BuildNotMatchedBySourceStatement(whenNotMatchedBySourceAction.Value, "t", notExistsWhereClause);
         }
 
         _connectionContext.EnsureOpen();
@@ -181,6 +249,7 @@ public class BulkMergeBuilder<T>
         Log("End executing SqlBulkCopy.");
 
         var result = new BulkMergeResult();
+        var notMatchedBySourceRows = 0;
 
         if (_updateColumnNames.Any())
         {
@@ -208,18 +277,29 @@ public class BulkMergeBuilder<T>
             Log("End inserting.");
         }
 
-        result.AffectedRows = result.UpdatedRows + result.InsertedRows;
+        if (hasWhenNotMatchedBySourceAction)
+        {
+            Log($"Begin when not matched by source:{Environment.NewLine}{notMatchedBySourceStatement}");
+
+            using var notMatchedBySourceCommand = _connectionContext.CreateTextCommand(notMatchedBySourceStatement, _options);
+
+            notMatchedBySourceRows = notMatchedBySourceCommand.ExecuteNonQuery();
+
+            Log("End when not matched by source.");
+        }
+
+        result.AffectedRows = result.UpdatedRows + result.InsertedRows + notMatchedBySourceRows;
         return result;
     }
 
     private string CreateSetStatement(string prop, string leftTable, string rightTable)
     {
-        return _table.CreateSetStatement(prop, leftTable, rightTable, _options.ConfigureSetStatement);
+        return _table.CreateSetClause(prop, leftTable, rightTable, _options.ConfigureSetClause);
     }
 
     private string CreateSetStatement(string prop)
     {
-        return _table.CreateSetStatement(prop, _options.ConfigureSetStatement);
+        return _table.CreateSetClause(prop, _options.ConfigureSetClause);
     }
 
     private string CreateWhereStatement(string prop)
@@ -254,7 +334,10 @@ public class BulkMergeBuilder<T>
             return await SingleMergeAsync(data.First(), cancellationToken);
         }
 
-        if (!_updateColumnNames.Any() && !_insertColumnNames.Any())
+        var whenNotMatchedBySourceAction = GetWhenNotMatchedBySourceAction("t", "s");
+        bool hasWhenNotMatchedBySourceAction = HasWhenNotMatchedBySourceAction(whenNotMatchedBySourceAction);
+
+        if (!_updateColumnNames.Any() && !_insertColumnNames.Any() && !hasWhenNotMatchedBySourceAction)
         {
             return new BulkMergeResult();
         }
@@ -276,6 +359,7 @@ public class BulkMergeBuilder<T>
 
         var insertStatementBuilder = new StringBuilder();
         var updateStatementBuilder = new StringBuilder();
+        string notMatchedBySourceStatement = null;
 
         if (_updateColumnNames.Any())
         {
@@ -290,6 +374,12 @@ public class BulkMergeBuilder<T>
             insertStatementBuilder.AppendLine($"FROM {temptableName} s");
             insertStatementBuilder.AppendLine($"LEFT JOIN {_table.SchemaQualifiedTableName} t ON {joinCondition}");
             insertStatementBuilder.AppendLine($"WHERE {whereCondition};");
+        }
+
+        if (hasWhenNotMatchedBySourceAction)
+        {
+            var notExistsWhereClause = $"NOT EXISTS (SELECT 1 FROM {temptableName} s WHERE {joinCondition})";
+            notMatchedBySourceStatement = BuildNotMatchedBySourceStatement(whenNotMatchedBySourceAction.Value, "t", notExistsWhereClause);
         }
 
         await _connectionContext.EnsureOpenAsync(cancellationToken);
@@ -308,6 +398,7 @@ public class BulkMergeBuilder<T>
         Log("End executing SqlBulkCopy.");
 
         var result = new BulkMergeResult();
+        var notMatchedBySourceRows = 0;
 
         if (_updateColumnNames.Any())
         {
@@ -335,19 +426,34 @@ public class BulkMergeBuilder<T>
             Log("End inserting.");
         }
 
-        result.AffectedRows = result.UpdatedRows + result.InsertedRows;
+        if (hasWhenNotMatchedBySourceAction)
+        {
+            Log($"Begin when not matched by source:{Environment.NewLine}{notMatchedBySourceStatement}");
+
+            using var notMatchedBySourceCommand = _connectionContext.CreateTextCommand(notMatchedBySourceStatement, _options);
+
+            notMatchedBySourceRows = await notMatchedBySourceCommand.ExecuteNonQueryAsync(cancellationToken);
+
+            Log("End when not matched by source.");
+        }
+
+        result.AffectedRows = result.UpdatedRows + result.InsertedRows + notMatchedBySourceRows;
         return result;
     }
 
     public BulkMergeResult SingleMerge(T data)
     {
-        if (!_updateColumnNames.Any() && !_insertColumnNames.Any())
+        var whenNotMatchedBySourceAction = GetWhenNotMatchedBySourceAction("", "");
+        bool hasWhenNotMatchedBySourceAction = HasWhenNotMatchedBySourceAction(whenNotMatchedBySourceAction);
+
+        if (!_updateColumnNames.Any() && !_insertColumnNames.Any() && !hasWhenNotMatchedBySourceAction)
         {
             return new BulkMergeResult();
         }
 
         var insertStatementBuilder = new StringBuilder();
         var updateStatementBuilder = new StringBuilder();
+        string notMatchedBySourceStatement = null;
 
         if (_updateColumnNames.Any())
         {
@@ -367,9 +473,17 @@ public class BulkMergeBuilder<T>
             insertStatementBuilder.AppendLine($"WHERE NOT EXISTS ({whereCondition});");
         }
 
+        if (hasWhenNotMatchedBySourceAction)
+        {
+            var whereNotExistsCondition = CreateWhereCondition();
+            var notWhereClause = $"NOT ({whereNotExistsCondition})";
+            notMatchedBySourceStatement = BuildNotMatchedBySourceStatement(whenNotMatchedBySourceAction.Value, "", notWhereClause);
+        }
+
         _connectionContext.EnsureOpen();
 
         var result = new BulkMergeResult();
+        var notMatchedBySourceRows = 0;
 
         if (_updateColumnNames.Any())
         {
@@ -407,19 +521,38 @@ public class BulkMergeBuilder<T>
             Log("End inserting.");
         }
 
-        result.AffectedRows = result.UpdatedRows + result.InsertedRows;
+        if (hasWhenNotMatchedBySourceAction)
+        {
+            var propertyNamesIncludeId = _mergeKeys.ToList();
+            propertyNamesIncludeId = propertyNamesIncludeId.Distinct().ToList();
+
+            Log($"Begin when not matched by source:{Environment.NewLine}{notMatchedBySourceStatement}");
+
+            using var notMatchedBySourceCommand = _connectionContext.CreateTextCommand(notMatchedBySourceStatement, _options);
+            LogParameters(_table.CreateMySqlParameters(notMatchedBySourceCommand, data, propertyNamesIncludeId, includeDiscriminator: true, autoAdd: true));
+
+            notMatchedBySourceRows = notMatchedBySourceCommand.ExecuteNonQuery();
+
+            Log("End when not matched by source.");
+        }
+
+        result.AffectedRows = result.UpdatedRows + result.InsertedRows + notMatchedBySourceRows;
         return result;
     }
 
     public async Task<BulkMergeResult> SingleMergeAsync(T data, CancellationToken cancellationToken = default)
     {
-        if (!_updateColumnNames.Any() && !_insertColumnNames.Any())
+        var whenNotMatchedBySourceAction = GetWhenNotMatchedBySourceAction("", "");
+        bool hasWhenNotMatchedBySourceAction = HasWhenNotMatchedBySourceAction(whenNotMatchedBySourceAction);
+
+        if (!_updateColumnNames.Any() && !_insertColumnNames.Any() && !hasWhenNotMatchedBySourceAction)
         {
             return new BulkMergeResult();
         }
 
         var insertStatementBuilder = new StringBuilder();
         var updateStatementBuilder = new StringBuilder();
+        string notMatchedBySourceStatement = null;
 
         if (_updateColumnNames.Any())
         {
@@ -439,9 +572,17 @@ public class BulkMergeBuilder<T>
             insertStatementBuilder.AppendLine($"WHERE NOT EXISTS ({whereCondition});");
         }
 
+        if (hasWhenNotMatchedBySourceAction)
+        {
+            var whereNotExistsCondition = CreateWhereCondition();
+            var notWhereClause = $"NOT ({whereNotExistsCondition})";
+            notMatchedBySourceStatement = BuildNotMatchedBySourceStatement(whenNotMatchedBySourceAction.Value, "", notWhereClause);
+        }
+
         await _connectionContext.EnsureOpenAsync(cancellationToken: cancellationToken);
 
         var result = new BulkMergeResult();
+        var notMatchedBySourceRows = 0;
 
         if (_updateColumnNames.Any())
         {
@@ -479,7 +620,22 @@ public class BulkMergeBuilder<T>
             Log("End inserting.");
         }
 
-        result.AffectedRows = result.UpdatedRows + result.InsertedRows;
+        if (hasWhenNotMatchedBySourceAction)
+        {
+            var propertyNamesIncludeId = _mergeKeys.ToList();
+            propertyNamesIncludeId = propertyNamesIncludeId.Distinct().ToList();
+
+            Log($"Begin when not matched by source:{Environment.NewLine}{notMatchedBySourceStatement}");
+
+            using var notMatchedBySourceCommand = _connectionContext.CreateTextCommand(notMatchedBySourceStatement, _options);
+            LogParameters(_table.CreateMySqlParameters(notMatchedBySourceCommand, data, propertyNamesIncludeId, includeDiscriminator: true, autoAdd: true));
+
+            notMatchedBySourceRows = await notMatchedBySourceCommand.ExecuteNonQueryAsync(cancellationToken);
+
+            Log("End when not matched by source.");
+        }
+
+        result.AffectedRows = result.UpdatedRows + result.InsertedRows + notMatchedBySourceRows;
         return result;
     }
 }

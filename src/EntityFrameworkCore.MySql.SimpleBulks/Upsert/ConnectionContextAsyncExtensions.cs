@@ -12,6 +12,11 @@ public static class ConnectionContextAsyncExtensions
 {
     public static Task<BulkMergeResult> UpsertAsync<T>(this ConnectionContext connectionContext, T data, Expression<Func<T, object>> idSelector, Expression<Func<T, object>> updateColumnNamesSelector, Expression<Func<T, object>> insertColumnNamesSelector, BulkMergeOptions options = null, CancellationToken cancellationToken = default)
     {
+        if (options?.ConfigureWhenNotMatchedBySource != null)
+        {
+            throw new ArgumentException($"{nameof(BulkMergeOptions.ConfigureWhenNotMatchedBySource)} is not supported for Upsert operations.", nameof(options));
+        }
+
         return connectionContext.CreateBulkMergeBuilder<T>()
         .WithId(idSelector)
          .WithUpdateColumns(updateColumnNamesSelector)
@@ -23,6 +28,11 @@ public static class ConnectionContextAsyncExtensions
 
     public static Task<BulkMergeResult> UpsertAsync<T>(this ConnectionContext connectionContext, T data, IReadOnlyCollection<string> idColumns, IReadOnlyCollection<string> updateColumnNames, IReadOnlyCollection<string> insertColumnNames, BulkMergeOptions options = null, CancellationToken cancellationToken = default)
     {
+        if (options?.ConfigureWhenNotMatchedBySource != null)
+        {
+            throw new ArgumentException($"{nameof(BulkMergeOptions.ConfigureWhenNotMatchedBySource)} is not supported for Upsert operations.", nameof(options));
+        }
+
         return connectionContext.CreateBulkMergeBuilder<T>()
        .WithId(idColumns)
         .WithUpdateColumns(updateColumnNames)

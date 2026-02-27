@@ -3,7 +3,7 @@ using EntityFrameworkCore.MySql.SimpleBulks.Tests.Database;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.Tests.SetStatementContextTests;
 
-public class SetStatementContextTests
+public class SetClauseContextTests
 {
     protected string GetConnectionString(string dbPrefixName)
     {
@@ -24,7 +24,7 @@ public class SetStatementContextTests
         // Act
         var table = dbContext.GetTableInfor<ConfigurationEntry>();
 
-        var ctx = new SetStatementContext
+        var ctx = new SetClauseContext
         {
             TableInfor = table,
         };
@@ -45,7 +45,7 @@ public class SetStatementContextTests
         // Act
         var table = dbContext.GetTableInfor<ConfigurationEntry>();
 
-        var ctx = new SetStatementContext
+        var ctx = new SetClauseContext
         {
             TableInfor = table,
             TargetTableAlias = "t",
@@ -67,7 +67,7 @@ public class SetStatementContextTests
         // Act
         var table = dbContext.GetTableInfor<ConfigurationEntry>();
 
-        var ctx = new SetStatementContext
+        var ctx = new SetClauseContext
         {
             TableInfor = table,
         };
@@ -88,7 +88,7 @@ public class SetStatementContextTests
         // Act
         var table = dbContext.GetTableInfor<ConfigurationEntry>();
 
-        var ctx = new SetStatementContext
+        var ctx = new SetClauseContext
         {
             TableInfor = table,
             SourceTableAlias = "s",
