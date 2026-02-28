@@ -26,7 +26,7 @@ public class CreateSetClauseWithParameterStyleTests
         var result = tableInfor.CreateSetClause("Value", null);
 
         // Assert
-        Assert.Equal("`Value` = @Value", result);
+        Assert.Equal("`Value` = @__Value", result);
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public class CreateSetClauseWithParameterStyleTests
         var result = tableInfor.CreateSetClause("Key", null);
 
         // Assert
-        Assert.Equal("`Key1` = @Key", result);
+        Assert.Equal("`Key1` = @__Key", result);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class CreateSetClauseWithParameterStyleTests
         });
 
         // Assert
-        Assert.Equal("`Value` = COALESCE(@Value, 'default')", result);
+        Assert.Equal("`Value` = COALESCE(@__Value, 'default')", result);
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class CreateSetClauseWithParameterStyleTests
         var result = tableInfor.CreateSetClause("Value", ctx => null);
 
         // Assert
-        Assert.Equal("`Value` = @Value", result);
+        Assert.Equal("`Value` = @__Value", result);
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public class CreateSetClauseWithParameterStyleTests
         Assert.Equal(tableInfor, capturedContext.Value.TableInfor);
         Assert.Equal("Description", capturedContext.Value.PropertyName);
         Assert.Equal("`Description`", capturedContext.Value.Left);
-        Assert.Equal("@Description", capturedContext.Value.Right);
+        Assert.Equal("@__Description", capturedContext.Value.Right);
         Assert.Null(capturedContext.Value.TargetTableAlias);
         Assert.Null(capturedContext.Value.SourceTableAlias);
     }
@@ -110,6 +110,6 @@ public class CreateSetClauseWithParameterStyleTests
         var result = tableInfor.CreateSetClause("ShippingAddress.Street", null);
 
         // Assert
-        Assert.Equal("`ShippingAddress_Street` = @ShippingAddress_Street", result);
+        Assert.Equal("`ShippingAddress_Street` = @__ShippingAddress_Street", result);
     }
 }
