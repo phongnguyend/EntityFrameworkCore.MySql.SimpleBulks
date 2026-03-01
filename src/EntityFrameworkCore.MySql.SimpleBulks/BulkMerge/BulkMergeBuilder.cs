@@ -1,4 +1,4 @@
-﻿using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
+using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -283,6 +283,13 @@ public class BulkMergeBuilder<T>
 
             using var notMatchedBySourceCommand = _connectionContext.CreateTextCommand(notMatchedBySourceStatement, _options);
 
+            var actionParameters = whenNotMatchedBySourceAction?.Parameters.ToMySqlParameterInfors() ?? [];
+            foreach (var param in actionParameters)
+            {
+                notMatchedBySourceCommand.Parameters.Add(param.Parameter);
+            }
+            LogParameters(actionParameters);
+
             notMatchedBySourceRows = notMatchedBySourceCommand.ExecuteNonQuery();
 
             Log("End when not matched by source.");
@@ -432,6 +439,13 @@ public class BulkMergeBuilder<T>
 
             using var notMatchedBySourceCommand = _connectionContext.CreateTextCommand(notMatchedBySourceStatement, _options);
 
+            var actionParameters = whenNotMatchedBySourceAction?.Parameters.ToMySqlParameterInfors() ?? [];
+            foreach (var param in actionParameters)
+            {
+                notMatchedBySourceCommand.Parameters.Add(param.Parameter);
+            }
+            LogParameters(actionParameters);
+
             notMatchedBySourceRows = await notMatchedBySourceCommand.ExecuteNonQueryAsync(cancellationToken);
 
             Log("End when not matched by source.");
@@ -531,6 +545,13 @@ public class BulkMergeBuilder<T>
             using var notMatchedBySourceCommand = _connectionContext.CreateTextCommand(notMatchedBySourceStatement, _options);
             LogParameters(_table.CreateMySqlParameters(notMatchedBySourceCommand, data, propertyNamesIncludeId, includeDiscriminator: true, autoAdd: true));
 
+            var actionParameters = whenNotMatchedBySourceAction?.Parameters.ToMySqlParameterInfors() ?? [];
+            foreach (var param in actionParameters)
+            {
+                notMatchedBySourceCommand.Parameters.Add(param.Parameter);
+            }
+            LogParameters(actionParameters);
+
             notMatchedBySourceRows = notMatchedBySourceCommand.ExecuteNonQuery();
 
             Log("End when not matched by source.");
@@ -629,6 +650,13 @@ public class BulkMergeBuilder<T>
 
             using var notMatchedBySourceCommand = _connectionContext.CreateTextCommand(notMatchedBySourceStatement, _options);
             LogParameters(_table.CreateMySqlParameters(notMatchedBySourceCommand, data, propertyNamesIncludeId, includeDiscriminator: true, autoAdd: true));
+
+            var actionParameters = whenNotMatchedBySourceAction?.Parameters.ToMySqlParameterInfors() ?? [];
+            foreach (var param in actionParameters)
+            {
+                notMatchedBySourceCommand.Parameters.Add(param.Parameter);
+            }
+            LogParameters(actionParameters);
 
             notMatchedBySourceRows = await notMatchedBySourceCommand.ExecuteNonQueryAsync(cancellationToken);
 

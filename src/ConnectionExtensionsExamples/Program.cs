@@ -25,11 +25,11 @@ TableMapper.Configure<ConfigurationEntry>(config =>
     .ConfigureProperty(x => x.RowVersion, readOnly: true)
     .ConfigureProperty(x => x.SeasonAsString, columnType: "longtext")
     .ConfigurePropertyConversion(x => x.SeasonAsString, y => y.ToString(), z => (Season)Enum.Parse(typeof(Season), z))
-    .ParameterConverter((data, propertyName) =>
+    .ParameterConverter((data, propertyName, parameterName) =>
     {
         if (propertyName == "CreatedDateTime")
         {
-            return new MySqlParameter(propertyName, data.CreatedDateTime);
+            return new MySqlParameter(parameterName, data.CreatedDateTime);
         }
 
         return null;
@@ -138,7 +138,8 @@ var mergeResult = await connection.BulkMergeAsync(configurationEntries,
             {
                 AndCondition = $"{ctx.GetTargetTableColumnWithAlias("Key")} LIKE 'Key%'",
                 ActionType = WhenNotMatchedBySourceActionType.Update,
-                SetClause = $"{ctx.GetTargetTableColumnWithoutAlias("Key")} = 'xxx'"
+                SetClause = $"{ctx.GetTargetTableColumnWithoutAlias("Key")} = @Key",
+                Parameters = new { Key = "XXX" }
             };
         }
     });

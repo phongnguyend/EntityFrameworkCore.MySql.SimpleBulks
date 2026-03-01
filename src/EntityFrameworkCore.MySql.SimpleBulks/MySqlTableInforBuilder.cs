@@ -25,7 +25,7 @@ public class MySqlTableInforBuilder<T>
 
     private OutputId _outputId;
 
-    private Func<T, string, MySqlParameter> _parameterConverter;
+    private Func<T, string, string, MySqlParameter> _parameterConverter;
 
     private Discriminator _discriminator;
 
@@ -70,7 +70,7 @@ public class MySqlTableInforBuilder<T>
         return OutputId(propertyName, outputIdMode);
     }
 
-    public MySqlTableInforBuilder<T> ParameterConverter(Func<T, string, MySqlParameter> converter)
+    public MySqlTableInforBuilder<T> ParameterConverter(Func<T, string, string, MySqlParameter> converter)
     {
         _parameterConverter = converter;
         return this;
