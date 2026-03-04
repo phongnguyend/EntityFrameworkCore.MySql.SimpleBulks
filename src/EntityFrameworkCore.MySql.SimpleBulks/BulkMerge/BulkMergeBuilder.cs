@@ -212,7 +212,10 @@ public class BulkMergeBuilder<T>
 
         var dataTable = data.ToDataTable(propertyNames, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _table.ColumnTypeMappings);
-        sqlCreateTemptable += $"\n{CreateIndex(temptableName)}";
+        if (_options.CreateIndexOnTempTable)
+        {
+            sqlCreateTemptable += $"\n{CreateIndex(temptableName)}";
+        }
 
         var joinCondition = CreateJoinCondition(dataTable);
 
@@ -368,7 +371,10 @@ public class BulkMergeBuilder<T>
 
         var dataTable = await data.ToDataTableAsync(propertyNames, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator, cancellationToken: cancellationToken);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _table.ColumnTypeMappings);
-        sqlCreateTemptable += $"\n{CreateIndex(temptableName)}";
+        if (_options.CreateIndexOnTempTable)
+        {
+            sqlCreateTemptable += $"\n{CreateIndex(temptableName)}";
+        }
 
         var joinCondition = CreateJoinCondition(dataTable);
 
