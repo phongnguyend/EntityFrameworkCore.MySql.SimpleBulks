@@ -71,6 +71,11 @@ public class BulkMatchBuilder<T>
         return _table.IncludeDiscriminator(_matchKeys);
     }
 
+    private string CreateIndex(string tableName)
+    {
+        return $"CREATE INDEX Idx_Id ON {tableName} ({string.Join(",", GetKeys().Select(x => $"`{x}`"))});";
+    }
+
     private string CreateJoinCondition(DataTable dataTable)
     {
         return string.Join(" AND ", GetKeys().Select(x =>
@@ -87,6 +92,10 @@ public class BulkMatchBuilder<T>
 
         var dataTable = machedValues.ToDataTable(_matchKeys, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _table.ColumnTypeMappings);
+        if (_options.CreateIndexOnTempTable)
+        {
+            sqlCreateTemptable += $"\n{CreateIndex(temptableName)}";
+        }
 
         var joinCondition = CreateJoinCondition(dataTable);
 
@@ -156,6 +165,10 @@ public class BulkMatchBuilder<T>
 
         var dataTable = await machedValues.ToDataTableAsync(_matchKeys, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator, cancellationToken: cancellationToken);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _table.ColumnTypeMappings);
+        if (_options.CreateIndexOnTempTable)
+        {
+            sqlCreateTemptable += $"\n{CreateIndex(temptableName)}";
+        }
 
         var joinCondition = CreateJoinCondition(dataTable);
 

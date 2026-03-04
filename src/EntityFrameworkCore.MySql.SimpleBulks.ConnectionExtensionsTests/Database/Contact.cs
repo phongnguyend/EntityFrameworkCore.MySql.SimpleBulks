@@ -1,4 +1,6 @@
-﻿namespace EntityFrameworkCore.MySql.SimpleBulks.ConnectionExtensionsTests.Database;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EntityFrameworkCore.MySql.SimpleBulks.ConnectionExtensionsTests.Database;
 
 public class Contact
 {
@@ -8,6 +10,7 @@ public class Contact
 
     public string PhoneNumber { get; set; }
 
+    [MaxLength(100)]
     public string CountryIsoCode { get; set; }
 
     public int Index { get; set; }

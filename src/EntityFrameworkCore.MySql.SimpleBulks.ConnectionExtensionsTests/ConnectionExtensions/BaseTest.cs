@@ -79,6 +79,7 @@ public abstract class BaseTest : IDisposable
             config
             .TableName(GetTableName("Customers"))
             .IgnoreProperty(x => x.Contacts)
+            .ConfigureProperty(x => x.CurrentCountryIsoCode, columnType: "varchar(100)")
             .ConfigureProperty(x => x.SeasonAsString, columnType: "longtext")
             .ConfigurePropertyConversion(x => x.SeasonAsString, y => y.ToString(), z => (Season)Enum.Parse(typeof(Season), z));
         });
@@ -88,6 +89,7 @@ public abstract class BaseTest : IDisposable
             config
             .TableName(GetTableName("Contacts"))
             .IgnoreProperty(x => x.Customer)
+            .ConfigureProperty(x => x.CountryIsoCode, columnType: "varchar(100)")
             .ConfigureProperty(x => x.SeasonAsString, columnType: "longtext")
             .ConfigurePropertyConversion(x => x.SeasonAsString, y => y.ToString(), z => (Season)Enum.Parse(typeof(Season), z));
         });
