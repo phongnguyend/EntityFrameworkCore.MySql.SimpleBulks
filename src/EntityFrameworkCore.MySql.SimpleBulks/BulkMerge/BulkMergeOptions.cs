@@ -8,6 +8,8 @@ public class BulkMergeOptions : BulkOptions
 
     public string Collation { get; set; } = Constants.DefaultCollation;
 
+    public bool CreateIndexOnTempTable { get; set; } = true;
+
     public Func<SetClauseContext, string> ConfigureSetClause { get; set; }
 
     public Func<MergeContext, WhenNotMatchedBySourceAction> ConfigureWhenNotMatchedBySource { get; set; }
