@@ -84,7 +84,12 @@ public class BulkDeleteBuilder<T>
         }
 
         var temptableName = $"`{Guid.NewGuid()}`";
-        var dataTable = data.ToDataTable(_deleteKeys, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator);
+        var dataTable = data.ToDataTable(new DataTableOptions
+        {
+            PropertyNames = _deleteKeys,
+            ValueConverters = _table.ValueConverters,
+            Discriminator = _table.Discriminator
+        });
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _table.ColumnTypeMappings);
         if (_options.CreateIndexOnTempTable)
         {
@@ -177,7 +182,12 @@ public class BulkDeleteBuilder<T>
         }
 
         var temptableName = $"`{Guid.NewGuid()}`";
-        var dataTable = await data.ToDataTableAsync(_deleteKeys, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator, cancellationToken: cancellationToken);
+        var dataTable = await data.ToDataTableAsync(new DataTableOptions
+        {
+            PropertyNames = _deleteKeys,
+            ValueConverters = _table.ValueConverters,
+            Discriminator = _table.Discriminator
+        }, cancellationToken: cancellationToken);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _table.ColumnTypeMappings);
         if (_options.CreateIndexOnTempTable)
         {

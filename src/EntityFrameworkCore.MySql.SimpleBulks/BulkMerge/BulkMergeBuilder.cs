@@ -210,7 +210,12 @@ public class BulkMergeBuilder<T>
         propertyNames.AddRange(_insertColumnNames);
         propertyNames = propertyNames.Distinct().ToList();
 
-        var dataTable = data.ToDataTable(propertyNames, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator);
+        var dataTable = data.ToDataTable(new DataTableOptions
+        {
+            PropertyNames = propertyNames,
+            ValueConverters = _table.ValueConverters,
+            Discriminator = _table.Discriminator
+        });
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _table.ColumnTypeMappings);
         if (_options.CreateIndexOnTempTable)
         {
@@ -369,7 +374,12 @@ public class BulkMergeBuilder<T>
         propertyNames.AddRange(_insertColumnNames);
         propertyNames = propertyNames.Distinct().ToList();
 
-        var dataTable = await data.ToDataTableAsync(propertyNames, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator, cancellationToken: cancellationToken);
+        var dataTable = await data.ToDataTableAsync(new DataTableOptions
+        {
+            PropertyNames = propertyNames,
+            ValueConverters = _table.ValueConverters,
+            Discriminator = _table.Discriminator
+        }, cancellationToken: cancellationToken);
         var sqlCreateTemptable = dataTable.GenerateTempTableDefinition(temptableName, null, _table.ColumnTypeMappings);
         if (_options.CreateIndexOnTempTable)
         {
