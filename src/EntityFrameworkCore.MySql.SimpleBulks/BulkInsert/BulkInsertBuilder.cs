@@ -75,7 +75,12 @@ public class BulkInsertBuilder<T>
         DataTable dataTable;
         if (string.IsNullOrWhiteSpace(_outputIdColumn))
         {
-            dataTable = data.ToDataTable(_columnNames, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator);
+            dataTable = data.ToDataTable(new DataTableOptions
+            {
+                PropertyNames = _columnNames,
+                ValueConverters = _table.ValueConverters,
+                Discriminator = _table.Discriminator
+            });
 
             _connectionContext.EnsureOpen();
 
@@ -93,7 +98,12 @@ public class BulkInsertBuilder<T>
                 columnsToInsert.Add(_outputIdColumn);
             }
 
-            dataTable = data.ToDataTable(columnsToInsert, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator);
+            dataTable = data.ToDataTable(new DataTableOptions
+            {
+                PropertyNames = columnsToInsert,
+                ValueConverters = _table.ValueConverters,
+                Discriminator = _table.Discriminator
+            });
 
             _connectionContext.EnsureOpen();
 
@@ -119,7 +129,12 @@ public class BulkInsertBuilder<T>
                 setId(row, SequentialGuidGenerator.Next());
             }
 
-            dataTable = data.ToDataTable(columnsToInsert, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator);
+            dataTable = data.ToDataTable(new DataTableOptions
+            {
+                PropertyNames = columnsToInsert,
+                ValueConverters = _table.ValueConverters,
+                Discriminator = _table.Discriminator
+            });
 
             _connectionContext.EnsureOpen();
 
@@ -129,7 +144,12 @@ public class BulkInsertBuilder<T>
             return;
         }
 
-        dataTable = data.ToDataTable(_columnNames, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator);
+        dataTable = data.ToDataTable(new DataTableOptions
+        {
+            PropertyNames = _columnNames,
+            ValueConverters = _table.ValueConverters,
+            Discriminator = _table.Discriminator
+        });
 
         _connectionContext.EnsureOpen();
 
@@ -211,7 +231,12 @@ public class BulkInsertBuilder<T>
         DataTable dataTable;
         if (string.IsNullOrWhiteSpace(_outputIdColumn))
         {
-            dataTable = await data.ToDataTableAsync(_columnNames, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator, cancellationToken: cancellationToken);
+            dataTable = await data.ToDataTableAsync(new DataTableOptions
+            {
+                PropertyNames = _columnNames,
+                ValueConverters = _table.ValueConverters,
+                Discriminator = _table.Discriminator
+            }, cancellationToken: cancellationToken);
 
             await _connectionContext.EnsureOpenAsync(cancellationToken);
 
@@ -229,7 +254,12 @@ public class BulkInsertBuilder<T>
                 columnsToInsert.Add(_outputIdColumn);
             }
 
-            dataTable = await data.ToDataTableAsync(columnsToInsert, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator, cancellationToken: cancellationToken);
+            dataTable = await data.ToDataTableAsync(new DataTableOptions
+            {
+                PropertyNames = columnsToInsert,
+                ValueConverters = _table.ValueConverters,
+                Discriminator = _table.Discriminator
+            }, cancellationToken: cancellationToken);
 
             await _connectionContext.EnsureOpenAsync(cancellationToken);
 
@@ -255,7 +285,12 @@ public class BulkInsertBuilder<T>
                 setId(row, SequentialGuidGenerator.Next());
             }
 
-            dataTable = await data.ToDataTableAsync(columnsToInsert, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator, cancellationToken: cancellationToken);
+            dataTable = await data.ToDataTableAsync(new DataTableOptions
+            {
+                PropertyNames = columnsToInsert,
+                ValueConverters = _table.ValueConverters,
+                Discriminator = _table.Discriminator
+            }, cancellationToken: cancellationToken);
 
             await _connectionContext.EnsureOpenAsync(cancellationToken);
 
@@ -265,7 +300,12 @@ public class BulkInsertBuilder<T>
             return;
         }
 
-        dataTable = await data.ToDataTableAsync(_columnNames, valueConverters: _table.ValueConverters, discriminator: _table.Discriminator, cancellationToken: cancellationToken);
+        dataTable = await data.ToDataTableAsync(new DataTableOptions
+        {
+            PropertyNames = _columnNames,
+            ValueConverters = _table.ValueConverters,
+            Discriminator = _table.Discriminator
+        }, cancellationToken: cancellationToken);
 
         await _connectionContext.EnsureOpenAsync(cancellationToken);
 

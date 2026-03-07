@@ -61,7 +61,11 @@ public class TempTableBuilder<T>
     public string Execute(IReadOnlyCollection<T> data)
     {
         var tempTableName = $"`{GetTableName()}`";
-        var dataTable = data.ToDataTable(_columnNames, valueConverters: _mappingContext?.ValueConverters);
+        var dataTable = data.ToDataTable(new DataTableOptions
+        {
+            PropertyNames = _columnNames,
+            ValueConverters = _mappingContext?.ValueConverters
+        });
         var sqlCreateTempTable = dataTable.GenerateTempTableDefinition(tempTableName, _mappingContext?.ColumnNameMappings, _mappingContext?.ColumnTypeMappings);
 
         Log($"Begin creating temp table:{Environment.NewLine}{sqlCreateTempTable}");
@@ -91,7 +95,11 @@ public class TempTableBuilder<T>
     public async Task<string> ExecuteAsync(IReadOnlyCollection<T> data, CancellationToken cancellationToken = default)
     {
         var tempTableName = $"`{GetTableName()}`";
-        var dataTable = await data.ToDataTableAsync(_columnNames, valueConverters: _mappingContext?.ValueConverters, cancellationToken: cancellationToken);
+        var dataTable = await data.ToDataTableAsync(new DataTableOptions
+        {
+            PropertyNames = _columnNames,
+            ValueConverters = _mappingContext?.ValueConverters
+        }, cancellationToken: cancellationToken);
         var sqlCreateTempTable = dataTable.GenerateTempTableDefinition(tempTableName, _mappingContext?.ColumnNameMappings, _mappingContext?.ColumnTypeMappings);
 
         Log($"Begin creating temp table:{Environment.NewLine}{sqlCreateTempTable}");
