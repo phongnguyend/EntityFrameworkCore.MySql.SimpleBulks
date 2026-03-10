@@ -2,6 +2,7 @@
 using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
+using System.Text.Json;
 using Xunit.Abstractions;
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.ConnectionExtensionsTests.ConnectionExtensions;
@@ -37,11 +38,20 @@ public abstract class BaseTest : IDisposable
             .ConfigureComplexProperty(x => x.ComplexShippingAddress.Location)
             .ConfigureComplexProperty(x => x.OwnedShippingAddress)
             .ConfigureComplexProperty(x => x.OwnedShippingAddress.Location)
-            .ConfigurePropertyConversion(x => x.SeasonAsString, y => y.ToString(), z => (Season)Enum.Parse(typeof(Season), z));
+            .ConfigurePropertyConversion(x => x.SeasonAsString, y => y.ToString(), z => (Season)Enum.Parse(typeof(Season), z))
+            .ConfigureJsonProperty(x => x.JsonOwnedShippingAddress, y => JsonSerializer.Serialize(y));
 
             if (_enableDiscriminator)
             {
                 config.ConfigureDiscriminator("Discriminator", value: "SingleKeyRow<int>", columnName: "Discriminator", columnType: _context.GetDiscriminator(typeof(SingleKeyRow<int>)).ColumnType);
+
+                config
+                .ConfigureComplexProperty(x => x.JsonComplexShippingAddress)
+                .ConfigureComplexProperty(x => x.JsonComplexShippingAddress.Location);
+            }
+            else
+            {
+                config.ConfigureJsonProperty(x => x.JsonComplexShippingAddress, y => JsonSerializer.Serialize(y));
             }
 
         });
@@ -66,6 +76,8 @@ public abstract class BaseTest : IDisposable
             .TableName(GetTableName("ConfigurationEntry"))
             .PrimaryKeys(x => x.Id)
             .OutputId(x => x.Id, OutputIdMode.ClientGenerated)
+            .ConfigureProperty(x => x.Id, columnName: "Id1")
+            .ConfigureProperty(x => x.Key, columnName: "Key1")
             .ConfigureProperty(x => x.RowVersion, readOnly: true);
 
             if (_enableDiscriminator)

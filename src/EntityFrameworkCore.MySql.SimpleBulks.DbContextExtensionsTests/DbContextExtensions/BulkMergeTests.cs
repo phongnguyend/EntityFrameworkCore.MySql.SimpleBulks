@@ -35,8 +35,8 @@ public class BulkMergeTests : BaseTest
                     Street = "Street " + i,
                     Location = new ComplexTypeLocation
                     {
-                        Lat = 40.7128 + i,
-                        Lng = -74.0060 - i
+                        Lat = 40.7128m + i,
+                        Lng = -74.0060m - i
                     }
                 },
                 OwnedShippingAddress = new OwnedTypeAddress
@@ -44,8 +44,26 @@ public class BulkMergeTests : BaseTest
                     Street = "Street " + i,
                     Location = new OwnedTypeLocation
                     {
-                        Lat = 40.7128 + i,
-                        Lng = -74.0060 - i
+                        Lat = 40.7128m + i,
+                        Lng = -74.0060m - i
+                    }
+                },
+                JsonComplexShippingAddress = new JsonComplexTypeAddress
+                {
+                    Street = "Street " + i,
+                    Location = new ComplexTypeLocation
+                    {
+                        Lat = 40.7128m + i,
+                        Lng = -74.0060m - i
+                    }
+                },
+                JsonOwnedShippingAddress = new JsonOwnedTypeAddress
+                {
+                    Street = "Street " + i,
+                    Location = new OwnedTypeLocation
+                    {
+                        Lat = 40.7128m + i,
+                        Lng = -74.0060m - i
                     }
                 }
             });
@@ -115,8 +133,8 @@ public class BulkMergeTests : BaseTest
                     Street = "Street " + i,
                     Location = new ComplexTypeLocation
                     {
-                        Lat = 40.7128 + i,
-                        Lng = -74.0060 - i
+                        Lat = 40.7128m + i,
+                        Lng = -74.0060m - i
                     }
                 },
                 OwnedShippingAddress = new OwnedTypeAddress
@@ -124,8 +142,26 @@ public class BulkMergeTests : BaseTest
                     Street = "Street " + i,
                     Location = new OwnedTypeLocation
                     {
-                        Lat = 40.7128 + i,
-                        Lng = -74.0060 - i
+                        Lat = 40.7128m + i,
+                        Lng = -74.0060m - i
+                    }
+                },
+                JsonComplexShippingAddress = new JsonComplexTypeAddress
+                {
+                    Street = "Street " + i,
+                    Location = new ComplexTypeLocation
+                    {
+                        Lat = 40.7128m + i,
+                        Lng = -74.0060m - i
+                    }
+                },
+                JsonOwnedShippingAddress = new JsonOwnedTypeAddress
+                {
+                    Street = "Street " + i,
+                    Location = new OwnedTypeLocation
+                    {
+                        Lat = 40.7128m + i,
+                        Lng = -74.0060m - i
                     }
                 },
                 BulkId = bulkId
@@ -162,7 +198,9 @@ public class BulkMergeTests : BaseTest
            row.ComplexShippingAddress.Location.Lng,
            a = row.OwnedShippingAddress.Street,
            b = row.OwnedShippingAddress.Location.Lat,
-           c = row.OwnedShippingAddress.Location.Lng
+           c = row.OwnedShippingAddress.Location.Lng,
+           row.JsonComplexShippingAddress,
+           row.JsonOwnedShippingAddress
        },
       row => new
       {
@@ -177,6 +215,8 @@ public class BulkMergeTests : BaseTest
           a = row.OwnedShippingAddress.Street,
           b = row.OwnedShippingAddress.Location.Lat,
           c = row.OwnedShippingAddress.Location.Lng,
+          row.JsonComplexShippingAddress,
+          row.JsonOwnedShippingAddress,
           row.BulkId
       },
    mergeOptions);
@@ -219,6 +259,12 @@ public class BulkMergeTests : BaseTest
             Assert.Equal(rows[i].OwnedShippingAddress?.Street, dbRows[i].OwnedShippingAddress?.Street);
             Assert.Equal(rows[i].OwnedShippingAddress?.Location?.Lat, dbRows[i].OwnedShippingAddress?.Location?.Lat);
             Assert.Equal(rows[i].OwnedShippingAddress?.Location?.Lng, dbRows[i].OwnedShippingAddress?.Location?.Lng);
+            Assert.Equal(rows[i].JsonComplexShippingAddress?.Street, dbRows[i].JsonComplexShippingAddress?.Street);
+            Assert.Equal(rows[i].JsonComplexShippingAddress?.Location?.Lat, dbRows[i].JsonComplexShippingAddress?.Location?.Lat);
+            Assert.Equal(rows[i].JsonComplexShippingAddress?.Location?.Lng, dbRows[i].JsonComplexShippingAddress?.Location?.Lng);
+            Assert.Equal(rows[i].JsonOwnedShippingAddress?.Street, dbRows[i].JsonOwnedShippingAddress?.Street);
+            Assert.Equal(rows[i].JsonOwnedShippingAddress?.Location?.Lat, dbRows[i].JsonOwnedShippingAddress?.Location?.Lat);
+            Assert.Equal(rows[i].JsonOwnedShippingAddress?.Location?.Lng, dbRows[i].JsonOwnedShippingAddress?.Location?.Lng);
 
             Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
             Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);
@@ -276,8 +322,8 @@ public class BulkMergeTests : BaseTest
                     Street = "Street " + i,
                     Location = new ComplexTypeLocation
                     {
-                        Lat = 40.7128 + i,
-                        Lng = -74.0060 - i
+                        Lat = 40.7128m + i,
+                        Lng = -74.0060m - i
                     }
                 },
                 OwnedShippingAddress = new OwnedTypeAddress
@@ -285,8 +331,26 @@ public class BulkMergeTests : BaseTest
                     Street = "Street " + i,
                     Location = new OwnedTypeLocation
                     {
-                        Lat = 40.7128 + i,
-                        Lng = -74.0060 - i
+                        Lat = 40.7128m + i,
+                        Lng = -74.0060m - i
+                    }
+                },
+                JsonComplexShippingAddress = new JsonComplexTypeAddress
+                {
+                    Street = "Street " + i,
+                    Location = new ComplexTypeLocation
+                    {
+                        Lat = 40.7128m + i,
+                        Lng = -74.0060m - i
+                    }
+                },
+                JsonOwnedShippingAddress = new JsonOwnedTypeAddress
+                {
+                    Street = "Street " + i,
+                    Location = new OwnedTypeLocation
+                    {
+                        Lat = 40.7128m + i,
+                        Lng = -74.0060m - i
                     }
                 },
                 BulkId = bulkId
@@ -317,14 +381,18 @@ public class BulkMergeTests : BaseTest
             "ComplexShippingAddress.Location.Lng",
             "OwnedShippingAddress.Street",
             "OwnedShippingAddress.Location.Lat",
-            "OwnedShippingAddress.Location.Lng"],
+            "OwnedShippingAddress.Location.Lng",
+            "JsonComplexShippingAddress",
+            "JsonOwnedShippingAddress"],
             ["Column1", "Column2", "Column3", "Season", "SeasonAsString",
             "ComplexShippingAddress.Street",
             "ComplexShippingAddress.Location.Lat",
             "ComplexShippingAddress.Location.Lng",
             "OwnedShippingAddress.Street",
             "OwnedShippingAddress.Location.Lat",
-            "OwnedShippingAddress.Location.Lng", "BulkId"],
+            "OwnedShippingAddress.Location.Lng",
+            "JsonComplexShippingAddress",
+            "JsonOwnedShippingAddress", "BulkId"],
           mergeOptions);
 
         var result2 = _context.BulkMerge(compositeKeyRows,
@@ -365,6 +433,12 @@ public class BulkMergeTests : BaseTest
             Assert.Equal(rows[i].OwnedShippingAddress?.Street, dbRows[i].OwnedShippingAddress?.Street);
             Assert.Equal(rows[i].OwnedShippingAddress?.Location?.Lat, dbRows[i].OwnedShippingAddress?.Location?.Lat);
             Assert.Equal(rows[i].OwnedShippingAddress?.Location?.Lng, dbRows[i].OwnedShippingAddress?.Location?.Lng);
+            Assert.Equal(rows[i].JsonComplexShippingAddress?.Street, dbRows[i].JsonComplexShippingAddress?.Street);
+            Assert.Equal(rows[i].JsonComplexShippingAddress?.Location?.Lat, dbRows[i].JsonComplexShippingAddress?.Location?.Lat);
+            Assert.Equal(rows[i].JsonComplexShippingAddress?.Location?.Lng, dbRows[i].JsonComplexShippingAddress?.Location?.Lng);
+            Assert.Equal(rows[i].JsonOwnedShippingAddress?.Street, dbRows[i].JsonOwnedShippingAddress?.Street);
+            Assert.Equal(rows[i].JsonOwnedShippingAddress?.Location?.Lat, dbRows[i].JsonOwnedShippingAddress?.Location?.Lat);
+            Assert.Equal(rows[i].JsonOwnedShippingAddress?.Location?.Lng, dbRows[i].JsonOwnedShippingAddress?.Location?.Lng);
 
             Assert.Equal(compositeKeyRows[i].Id1, dbCompositeKeyRows[i].Id1);
             Assert.Equal(compositeKeyRows[i].Id2, dbCompositeKeyRows[i].Id2);

@@ -31,8 +31,8 @@ public class DirectInsertAsyncTests : BaseTest
                 Street = "Street " + 1,
                 Location = new ComplexTypeLocation
                 {
-                    Lat = 40.7128 + 1,
-                    Lng = -74.0060 - 1
+                    Lat = 40.7128m + 1,
+                    Lng = -74.0060m - 1
                 }
             },
             OwnedShippingAddress = new OwnedTypeAddress
@@ -40,8 +40,26 @@ public class DirectInsertAsyncTests : BaseTest
                 Street = "Street " + 1,
                 Location = new OwnedTypeLocation
                 {
-                    Lat = 40.7128 + 1,
-                    Lng = -74.0060 - 1
+                    Lat = 40.7128m + 1,
+                    Lng = -74.0060m - 1
+                }
+            },
+            JsonComplexShippingAddress = new JsonComplexTypeAddress
+            {
+                Street = "Street " + 1,
+                Location = new ComplexTypeLocation
+                {
+                    Lat = 40.7128m + 1,
+                    Lng = -74.0060m - 1
+                }
+            },
+            JsonOwnedShippingAddress = new JsonOwnedTypeAddress
+            {
+                Street = "Street " + 1,
+                Location = new OwnedTypeLocation
+                {
+                    Lat = 40.7128m + 1,
+                    Lng = -74.0060m - 1
                 }
             },
             BulkId = bulkId,
@@ -77,6 +95,8 @@ public class DirectInsertAsyncTests : BaseTest
                     a = row.OwnedShippingAddress.Street,
                     b = row.OwnedShippingAddress.Location.Lat,
                     c = row.OwnedShippingAddress.Location.Lng,
+                    row.JsonComplexShippingAddress,
+                    row.JsonOwnedShippingAddress,
                     row.BulkId
                 },
                 options);
@@ -107,6 +127,12 @@ public class DirectInsertAsyncTests : BaseTest
         Assert.Equal(row.OwnedShippingAddress?.Street, dbRows[0].OwnedShippingAddress?.Street);
         Assert.Equal(row.OwnedShippingAddress?.Location?.Lat, dbRows[0].OwnedShippingAddress?.Location?.Lat);
         Assert.Equal(row.OwnedShippingAddress?.Location?.Lng, dbRows[0].OwnedShippingAddress?.Location?.Lng);
+        Assert.Equal(row.JsonComplexShippingAddress?.Street, dbRows[0].JsonComplexShippingAddress?.Street);
+        Assert.Equal(row.JsonComplexShippingAddress?.Location?.Lat, dbRows[0].JsonComplexShippingAddress?.Location?.Lat);
+        Assert.Equal(row.JsonComplexShippingAddress?.Location?.Lng, dbRows[0].JsonComplexShippingAddress?.Location?.Lng);
+        Assert.Equal(row.JsonOwnedShippingAddress?.Street, dbRows[0].JsonOwnedShippingAddress?.Street);
+        Assert.Equal(row.JsonOwnedShippingAddress?.Location?.Lat, dbRows[0].JsonOwnedShippingAddress?.Location?.Lat);
+        Assert.Equal(row.JsonOwnedShippingAddress?.Location?.Lng, dbRows[0].JsonOwnedShippingAddress?.Location?.Lng);
 
         Assert.Equal(compositeKeyRow.Id1, dbCompositeKeyRows[0].Id1);
         Assert.Equal(compositeKeyRow.Id2, dbCompositeKeyRows[0].Id2);
@@ -136,8 +162,8 @@ public class DirectInsertAsyncTests : BaseTest
                 Street = "Street " + 1,
                 Location = new ComplexTypeLocation
                 {
-                    Lat = 40.7128 + 1,
-                    Lng = -74.0060 - 1
+                    Lat = 40.7128m + 1,
+                    Lng = -74.0060m - 1
                 }
             },
             OwnedShippingAddress = new OwnedTypeAddress
@@ -145,8 +171,26 @@ public class DirectInsertAsyncTests : BaseTest
                 Street = "Street " + 1,
                 Location = new OwnedTypeLocation
                 {
-                    Lat = 40.7128 + 1,
-                    Lng = -74.0060 - 1
+                    Lat = 40.7128m + 1,
+                    Lng = -74.0060m - 1
+                }
+            },
+            JsonComplexShippingAddress = new JsonComplexTypeAddress
+            {
+                Street = "Street " + 1,
+                Location = new ComplexTypeLocation
+                {
+                    Lat = 40.7128m + 1,
+                    Lng = -74.0060m - 1
+                }
+            },
+            JsonOwnedShippingAddress = new JsonOwnedTypeAddress
+            {
+                Street = "Street " + 1,
+                Location = new OwnedTypeLocation
+                {
+                    Lat = 40.7128m + 1,
+                    Lng = -74.0060m - 1
                 }
             },
             BulkId = bulkId,
@@ -182,6 +226,8 @@ public class DirectInsertAsyncTests : BaseTest
                     a = row.OwnedShippingAddress.Street,
                     b = row.OwnedShippingAddress.Location.Lat,
                     c = row.OwnedShippingAddress.Location.Lng,
+                    row.JsonComplexShippingAddress,
+                    row.JsonOwnedShippingAddress,
                     row.BulkId
                 },
                 options);
@@ -213,6 +259,12 @@ public class DirectInsertAsyncTests : BaseTest
         Assert.Equal(row.OwnedShippingAddress?.Street, dbRows[0].OwnedShippingAddress?.Street);
         Assert.Equal(row.OwnedShippingAddress?.Location?.Lat, dbRows[0].OwnedShippingAddress?.Location?.Lat);
         Assert.Equal(row.OwnedShippingAddress?.Location?.Lng, dbRows[0].OwnedShippingAddress?.Location?.Lng);
+        Assert.Equal(row.JsonComplexShippingAddress?.Street, dbRows[0].JsonComplexShippingAddress?.Street);
+        Assert.Equal(row.JsonComplexShippingAddress?.Location?.Lat, dbRows[0].JsonComplexShippingAddress?.Location?.Lat);
+        Assert.Equal(row.JsonComplexShippingAddress?.Location?.Lng, dbRows[0].JsonComplexShippingAddress?.Location?.Lng);
+        Assert.Equal(row.JsonOwnedShippingAddress?.Street, dbRows[0].JsonOwnedShippingAddress?.Street);
+        Assert.Equal(row.JsonOwnedShippingAddress?.Location?.Lat, dbRows[0].JsonOwnedShippingAddress?.Location?.Lat);
+        Assert.Equal(row.JsonOwnedShippingAddress?.Location?.Lng, dbRows[0].JsonOwnedShippingAddress?.Location?.Lng);
 
         Assert.Equal(compositeKeyRow.Id1, dbCompositeKeyRows[0].Id1);
         Assert.Equal(compositeKeyRow.Id2, dbCompositeKeyRows[0].Id2);
@@ -240,8 +292,8 @@ public class DirectInsertAsyncTests : BaseTest
                 Street = "Street " + 1,
                 Location = new ComplexTypeLocation
                 {
-                    Lat = 40.7128 + 1,
-                    Lng = -74.0060 - 1
+                    Lat = 40.7128m + 1,
+                    Lng = -74.0060m - 1
                 }
             },
             OwnedShippingAddress = new OwnedTypeAddress
@@ -249,8 +301,26 @@ public class DirectInsertAsyncTests : BaseTest
                 Street = "Street " + 1,
                 Location = new OwnedTypeLocation
                 {
-                    Lat = 40.7128 + 1,
-                    Lng = -74.0060 - 1
+                    Lat = 40.7128m + 1,
+                    Lng = -74.0060m - 1
+                }
+            },
+            JsonComplexShippingAddress = new JsonComplexTypeAddress
+            {
+                Street = "Street " + 1,
+                Location = new ComplexTypeLocation
+                {
+                    Lat = 40.7128m + 1,
+                    Lng = -74.0060m - 1
+                }
+            },
+            JsonOwnedShippingAddress = new JsonOwnedTypeAddress
+            {
+                Street = "Street " + 1,
+                Location = new OwnedTypeLocation
+                {
+                    Lat = 40.7128m + 1,
+                    Lng = -74.0060m - 1
                 }
             }
         };
@@ -284,7 +354,9 @@ public class DirectInsertAsyncTests : BaseTest
                     row.ComplexShippingAddress.Location.Lng,
                     a = row.OwnedShippingAddress.Street,
                     b = row.OwnedShippingAddress.Location.Lat,
-                    c = row.OwnedShippingAddress.Location.Lng
+                    c = row.OwnedShippingAddress.Location.Lng,
+                    row.JsonComplexShippingAddress,
+                    row.JsonOwnedShippingAddress
                 },
                 options);
 
@@ -378,8 +450,8 @@ public class DirectInsertAsyncTests : BaseTest
                 Street = "Street " + 1,
                 Location = new ComplexTypeLocation
                 {
-                    Lat = 40.7128 + 1,
-                    Lng = -74.0060 - 1
+                    Lat = 40.7128m + 1,
+                    Lng = -74.0060m - 1
                 }
             },
             OwnedShippingAddress = new OwnedTypeAddress
@@ -387,8 +459,26 @@ public class DirectInsertAsyncTests : BaseTest
                 Street = "Street " + 1,
                 Location = new OwnedTypeLocation
                 {
-                    Lat = 40.7128 + 1,
-                    Lng = -74.0060 - 1
+                    Lat = 40.7128m + 1,
+                    Lng = -74.0060m - 1
+                }
+            },
+            JsonComplexShippingAddress = new JsonComplexTypeAddress
+            {
+                Street = "Street " + 1,
+                Location = new ComplexTypeLocation
+                {
+                    Lat = 40.7128m + 1,
+                    Lng = -74.0060m - 1
+                }
+            },
+            JsonOwnedShippingAddress = new JsonOwnedTypeAddress
+            {
+                Street = "Street " + 1,
+                Location = new OwnedTypeLocation
+                {
+                    Lat = 40.7128m + 1,
+                    Lng = -74.0060m - 1
                 }
             },
             BulkId = bulkId,
@@ -423,6 +513,8 @@ public class DirectInsertAsyncTests : BaseTest
             "OwnedShippingAddress.Street",
             "OwnedShippingAddress.Location.Lat",
             "OwnedShippingAddress.Location.Lng",
+            "JsonComplexShippingAddress",
+            "JsonOwnedShippingAddress",
             "BulkId"
             ],
             options);
@@ -460,6 +552,12 @@ public class DirectInsertAsyncTests : BaseTest
         Assert.Equal(row.OwnedShippingAddress?.Street, dbRows[0].OwnedShippingAddress?.Street);
         Assert.Equal(row.OwnedShippingAddress?.Location?.Lat, dbRows[0].OwnedShippingAddress?.Location?.Lat);
         Assert.Equal(row.OwnedShippingAddress?.Location?.Lng, dbRows[0].OwnedShippingAddress?.Location?.Lng);
+        Assert.Equal(row.JsonComplexShippingAddress?.Street, dbRows[0].JsonComplexShippingAddress?.Street);
+        Assert.Equal(row.JsonComplexShippingAddress?.Location?.Lat, dbRows[0].JsonComplexShippingAddress?.Location?.Lat);
+        Assert.Equal(row.JsonComplexShippingAddress?.Location?.Lng, dbRows[0].JsonComplexShippingAddress?.Location?.Lng);
+        Assert.Equal(row.JsonOwnedShippingAddress?.Street, dbRows[0].JsonOwnedShippingAddress?.Street);
+        Assert.Equal(row.JsonOwnedShippingAddress?.Location?.Lat, dbRows[0].JsonOwnedShippingAddress?.Location?.Lat);
+        Assert.Equal(row.JsonOwnedShippingAddress?.Location?.Lng, dbRows[0].JsonOwnedShippingAddress?.Location?.Lng);
 
         Assert.Equal(compositeKeyRow.Id1, dbCompositeKeyRows[0].Id1);
         Assert.Equal(compositeKeyRow.Id2, dbCompositeKeyRows[0].Id2);

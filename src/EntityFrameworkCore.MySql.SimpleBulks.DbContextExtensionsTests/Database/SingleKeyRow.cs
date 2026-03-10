@@ -40,6 +40,10 @@ public class SingleKeyRow<TId>
 
     public OwnedTypeAddress OwnedShippingAddress { get; set; }
 
+    public JsonComplexTypeAddress JsonComplexShippingAddress { get; set; }
+
+    public JsonOwnedTypeAddress JsonOwnedShippingAddress { get; set; }
+
     public Guid? BulkId { get; set; }
 
     public int? BulkIndex { get; set; }
