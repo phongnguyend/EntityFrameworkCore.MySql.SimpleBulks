@@ -11,6 +11,10 @@
     <PackageReference Include="BenchmarkDotNet" Version="0.13.2" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Microting.EntityFrameworkCore.MySql" Version="10.0.3" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\EntityFrameworkCore.MySql.SimpleBulks\EntityFrameworkCore.MySql.SimpleBulks.csproj" />
   </ItemGroup>
