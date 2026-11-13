@@ -15,6 +15,10 @@
     <PackageReference Include="Microting.EntityFrameworkCore.MySql" Version="10.0.3" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net11.0'">
+    <PackageReference Include="Microting.EntityFrameworkCore.MySql" Version="11.0.0-preview.1" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\EntityFrameworkCore.MySql.SimpleBulks\EntityFrameworkCore.MySql.SimpleBulks.csproj" />
   </ItemGroup>
