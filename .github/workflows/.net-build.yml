@@ -43,3 +43,11 @@ jobs:
       with:
         name: EntityFrameworkCore.MySql.SimpleBulks
         path: src/EntityFrameworkCore.MySql.SimpleBulks/bin/Release/*.nupkg
+
+    - name: Publish EntityFrameworkCore.MySql.SimpleBulks to NuGet
+      if: startsWith(github.ref, 'refs/tags/releases/v')
+      run: |
+        dotnet nuget push "EntityFrameworkCore.MySql.SimpleBulks/bin/Release/*.nupkg" \
+          --api-key ${{ secrets.NUGET_API_KEY }} \
+          --source https://api.nuget.org/v3/index.json \
+          --skip-duplicate
