@@ -10,4 +10,4 @@ git push origin releases/v11.0.0-preview.1
 
 git checkout main
 git pull
-git branch -D devs/xxx
+git branch -D devs/xxxx
