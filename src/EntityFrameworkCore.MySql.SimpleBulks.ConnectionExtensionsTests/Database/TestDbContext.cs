@@ -1,6 +1,10 @@
 ﻿using EntityFrameworkCore.MySql.SimpleBulks.Extensions;
 using Microsoft.EntityFrameworkCore;
+#if NET11_0_OR_GREATER
+using Microting.EntityFrameworkCore.MySql.Infrastructure;
+#else
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+#endif
 
 namespace EntityFrameworkCore.MySql.SimpleBulks.ConnectionExtensionsTests.Database;
 
