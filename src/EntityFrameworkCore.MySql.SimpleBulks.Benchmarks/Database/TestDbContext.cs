@@ -29,6 +29,9 @@ internal class TestDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // BulkMatch indexes this column in its temporary table, so it must not be longtext.
+        modelBuilder.Entity<Contact>().Property(x => x.CountryIsoCode).HasMaxLength(10);
+
         modelBuilder.Entity<CompositeKeyRow<int, int>>().HasKey(x => new { x.Id1, x.Id2 });
 
         modelBuilder.Entity<ConfigurationEntry>().Property(x => x.Id).HasColumnName("Id1");
